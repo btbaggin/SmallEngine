@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SmallEngine.Test
+namespace SmallEngineTest
 {
-    class test
+    public class Test
     {
         public static void Main()
         {

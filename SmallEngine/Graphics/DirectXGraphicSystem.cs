@@ -143,7 +143,7 @@ namespace SmallEngine.Graphics
         }
         #endregion
 
-        #region "Overridden functions"
+        #region Overridden functions
         public Bitmap LoadBitmap(string pFile, out int pWidth, out int pHeight)
         {
             // Loads from file using System.Drawing.Image
@@ -247,7 +247,7 @@ namespace SmallEngine.Graphics
             Device.ImmediateContext.Rasterizer.SetViewport(new Viewport(0, 0, _form.Width, _form.Height));
             Device.ImmediateContext.OutputMerger.SetTargets(_backBufferView);
             RenderTarget2D.BeginDraw();
-            RenderTarget2D.Clear(new RawColor4(255, 0, 0, 255));
+            RenderTarget2D.Clear(new RawColor4(255, 255, 255, 255));
         }
 
         public void EndDraw()

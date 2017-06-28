@@ -19,7 +19,7 @@ namespace SmallEngine.Graphics
         }
     }
 
-    abstract class RenderComponent : Component
+    public abstract class RenderComponent : Component
     {
         internal static List<RenderComponent> Renderers;
 

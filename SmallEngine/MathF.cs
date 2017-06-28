@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SmallEngine
 {
-    class MathF
+    public class MathF
     {
         public static float Pi
         {

@@ -6,25 +6,22 @@ using System.Threading.Tasks;
 
 namespace SmallEngine
 {
-    class ResourceManager
+    public class ResourceManager
     {
         private static Dictionary<string, Resource> _resources;
-        private static Dictionary<Type, string> _directories;
+        private static Dictionary<string, string[]> _groups;
+        private static Random rand;
 
         #region "Constructor"
         static ResourceManager()
         {
             _resources = new Dictionary<string, Resource>();
-            _directories = new Dictionary<Type, string>();
+            _groups = new Dictionary<string, string[]>();
+            rand = new Random();
         }
         #endregion
 
         #region "Public functions"
-        public static void SetDirectory(Type pType, string pRelativePath)
-        {
-            _directories.Add(pType, pRelativePath);
-        }
-
         /// <summary>
         /// Synchronously loads the resource
         /// Will return if the resource is already loaded
@@ -56,12 +53,13 @@ namespace SmallEngine
 
             //Add to dictionary
             //Set to default resource
-            var r = new T();
-            r.Path = _directories.ContainsKey(typeof(T)) ? System.IO.Path.Combine(_directories[typeof(T)], pPath) : pPath;
-            r.Alias = pAlias;
-            r.KeepReference = pKeepReference;
+            var r = new T()
+            {
+                Path = pPath,
+                Alias = pAlias,
+                KeepReference = pKeepReference
+            };            
             _resources.Add(pAlias, r);
-
             //Begin sync load
             r.Create();
             return (T)r;
@@ -134,10 +132,12 @@ namespace SmallEngine
 
             //Add to dictionary
             //Set to default resource
-            r = new T();
-            r.Path = _directories.ContainsKey(typeof(T)) ? System.IO.Path.Combine(_directories[typeof(T)], pPath) : pPath;
-            r.Alias = pAlias;
-            r.KeepReference = pKeepReference;
+            r = new T()
+            {
+                Path = pPath,
+                Alias = pAlias,
+                KeepReference = pKeepReference
+            };
             _resources.Add(pAlias, r);
 
             //Begin async load
@@ -157,13 +157,15 @@ namespace SmallEngine
         /// <returns>Null if resource is not present; otherwise a handle to the resource</returns>
         public static T Request<T>(string pAlias) where T : Resource, new()
         {
-            if (!_resources.ContainsKey(pAlias))
-            {
-                return null;
-            }
-
+            System.Diagnostics.Debug.Assert(_resources.ContainsKey(pAlias));
             var r = _resources[pAlias];
             return (T)r.Request();
+        }
+
+        public static T RequestFromGroup<T>(string pGroup) where T : Resource, new()
+        {
+            System.Diagnostics.Debug.Assert(_groups.ContainsKey(pGroup));
+            return Request<T>(_groups[pGroup][rand.Next(0, _groups[pGroup].Length)]);
         }
 
         /// <summary>
@@ -223,6 +225,14 @@ namespace SmallEngine
         {
             var r = _resources[pAlias];
             r.CreateAsync();
+        }
+
+        public static void AddGroup(string pGroup, string[] pAlias)
+        {
+            if(!_groups.ContainsKey(pGroup))
+            {
+               _groups.Add(pGroup, pAlias);
+            }
         }
 
         /// <summary>

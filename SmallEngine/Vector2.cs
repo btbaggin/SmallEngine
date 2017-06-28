@@ -153,7 +153,7 @@ namespace SmallEngine
         }
         #endregion
 
-        #region "Static functions"
+        #region Static functions
         /// <summary>
         /// Returns a Vector2 pointing in the opposite direction
         /// </summary>

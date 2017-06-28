@@ -8,13 +8,13 @@ using System.Runtime.InteropServices;
 
 namespace SmallEngine.Input
 {
-    class InputManager
+    public class InputManager
     {
         private static Dictionary<string, InputInfo> _mapping;
         private IntPtr _handle;
         private static InputState _inputState;
 
-        #region "Win32 functions"
+        #region Win32 functions
         [DllImport("user32.dll")]
         static extern short GetAsyncKeyState(Keys pKey);
         public bool IsKeyPressed(Keys pKey)
@@ -53,7 +53,7 @@ namespace SmallEngine.Input
         static extern int ShowCursor(bool bShow);
         #endregion
 
-        #region "Properties"
+        #region Properties
         private static Vector2 _mousePos;
         public static Vector2 MousePosition
         {
@@ -90,7 +90,7 @@ namespace SmallEngine.Input
 
         #endregion
 
-        #region "Constructor"
+        #region Constructor
         public InputManager(IntPtr pHandle)
         {
             _handle = pHandle;
@@ -106,16 +106,14 @@ namespace SmallEngine.Input
             foreach (string name in _mapping.Keys.ToList())
             {
                 InputInfo ii = _mapping[name];
-                bool pressed, held;
-                GetStatus(ref ii, out pressed, out held);
+                GetStatus(ref ii, out bool pressed, out bool held);
                 if (pressed) { _inputState.AddPressed(name, ii); }
                 if (held) { _inputState.AddHeld(name, ii); }
                 _mapping[name] = ii;
             }
 
             //Get mouse position
-            POINT p;
-            GetCursorPos(out p);
+            GetCursorPos(out POINT p);
             ScreenToClient(_handle, ref p);
             _mousePos = new Vector2(p.X, p.Y);
         }
@@ -128,7 +126,7 @@ namespace SmallEngine.Input
             //Pressed if the key is down and enough time has passed since it was last registered
             pPressed = keyPressed && time > pKey.LastRegistered + pKey.Delay;
             //Held if its pressed, its currently begin held, and its been held for long enough to trigger hold
-            pHeld = (keyPressed && pKey.LastReleased < pKey.LastPressed && time > pKey.LastPressed + _holdDelay);
+            pHeld = (keyPressed && pKey.LastReleased < pKey.LastPressed && time > pKey.LastPressed + _holdDelay);   //TODO can we get this from windows?
 
             //If status has changed set variables
             if (pKey.IsPressed != keyPressed)

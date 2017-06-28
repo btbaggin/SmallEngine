@@ -4,49 +4,24 @@ using System.Linq;
 
 namespace SmallEngine
 {
-    public class SceneEventArgs : EventArgs
-    {
-        public string Scene { get; private set; }
-        public SceneEventArgs(string pScene)
-        {
-            Scene = pScene;
-        }
-    }
-
     public class SceneManager
     {
-        public EventHandler<SceneEventArgs> SceneBegin;
-        public EventHandler<SceneEventArgs> SceneEnd;
-
         private Dictionary<string, List<Type>> _definitions;
+        private Game _game;
 
         #region "Properties"
         public Scene Current { get; private set; }
-
-        private static SceneManager _instance;
-        public static SceneManager Instance
-        {
-            get
-            {
-                if(_instance == null)
-                {
-                    _instance = new SceneManager();
-                }
-
-                return _instance;
-            }
-        }
         #endregion
 
-        #region "Constructor"
-        public SceneManager()
+        #region Constructor
+        internal SceneManager(Game pGame)
         {
             _definitions = new Dictionary<string, List<Type>>();
-            _instance = this;
+            _game = pGame;
         }
         #endregion
 
-        #region "SpawnGameObject"
+        #region SpawnGameObject
         public IGameObject SpawnGameObject(params IComponent[] pComponents)
         {
             return SpawnGameObject(null, pComponents);
@@ -178,14 +153,13 @@ namespace SmallEngine
             Current = new Scene(pName);
             Current.Begin();
 
-            SceneBegin?.Invoke(this, new SceneEventArgs(pName));
+            _game.SceneBegin(pName);
         }
         
         public void EndScene()
         {
             Current.End();
-
-            SceneEnd?.Invoke(this, new SceneEventArgs(Current.Name));
+            _game.SceneEnd(Current.Name);
         } 
     }
 }

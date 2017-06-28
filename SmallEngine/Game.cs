@@ -61,7 +61,7 @@ namespace SmallEngine
         public Game()
         {
             Form = new GameForm();
-            SceneManager = new SceneManager();
+            SceneManager = new SceneManager(this);
             _inputManager = new InputManager(Form.Handle);
             GameWorld = new World();
 
@@ -82,6 +82,14 @@ namespace SmallEngine
         }
 
         public virtual void UnloadContent()
+        {
+        }
+
+        public virtual void SceneBegin(string pScene)
+        {
+        }
+
+        public virtual void SceneEnd(string pScene)
         {
         }
 
@@ -158,9 +166,8 @@ namespace SmallEngine
 
         private void OnIdle(object pSender, EventArgs pEventArgs)
         {
-            NativeMessage msg;
-            while (!PeekMessage(out msg, IntPtr.Zero, 0, 0, 0))
-            { 
+            while (!PeekMessage(out NativeMessage msg, IntPtr.Zero, 0, 0, 0))
+            {
                 if (!IsPlaying)
                 {
                     SceneManager.EndScene();

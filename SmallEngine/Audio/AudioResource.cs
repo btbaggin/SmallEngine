@@ -146,7 +146,7 @@ namespace SmallEngine.Audio
         /// </summary>
         public static float MinVolume
         {
-            get { return -XAudio2.MaximumVolumeLevel; }
+            get { return 0f; }
         }
 
         /// <summary>
@@ -154,7 +154,7 @@ namespace SmallEngine.Audio
         /// </summary>
         public static float MaxVolume
         {
-            get { return XAudio2.MaximumVolumeLevel; }
+            get { return 1f; }
         }
 
         /// <summary>
@@ -203,16 +203,13 @@ namespace SmallEngine.Audio
             State = AudioState.Stopped;
         }
 
-        #region "Abstract functions"
-        /// <summary>
-        /// Plays the audio clip.  Will not again if it is currently playing.
-        /// </summary>
-        public  bool Play()
+        #region Abstract functions
+        public bool Play()
         {
             if (IsPlaying) return false;
 
             //Get a new voice
-            AudioResource.GetVoice(this);
+            GetVoice(this);
             Voice.BufferEnd += OnSoundEnd;
 
             //Play sound
@@ -222,6 +219,14 @@ namespace SmallEngine.Audio
 
             return true;
         }
+        /// <summary>
+        /// Plays the audio clip.  Will not again if it is currently playing.
+        /// </summary>
+        public bool Play(float pVolume)
+        {
+            Volume = pVolume;
+            return Play();
+        }
 
         /// <summary>
         /// Plays the audio clip asynchronously.
@@ -229,7 +234,7 @@ namespace SmallEngine.Audio
         public void PlayASync()
         {
             //Get a local voice
-            AudioResource.GetVoice(this);//new SourceVoice(SoundManager.Device, Stream);
+            GetVoice(this);//new SourceVoice(SoundManager.Device, Stream);
             Voice.BufferEnd += OnSoundEnd;
 
             //Clear anything from its buffers (shouldnt be anything)
@@ -371,7 +376,7 @@ namespace SmallEngine.Audio
         private void OnSoundEnd(IntPtr pInt)
         {
             Voice.BufferEnd -= OnSoundEnd;
-            AudioResource.ReuseVoice(ref Voice, this);
+            ReuseVoice(ref Voice, this);
             Voice = null;
             //if we are looping
             if (CurrentlyLooping)

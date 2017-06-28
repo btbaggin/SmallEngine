@@ -74,7 +74,7 @@ namespace SmallEngine
     #endregion
 
     //http://twistedoakstudios.com/blog/Post83_coroutines-more-than-you-want-to-know
-    class Coroutine
+    public class Coroutine
     {
         private static List<IEnumerator<WaitEvent>> _coroutines;
 

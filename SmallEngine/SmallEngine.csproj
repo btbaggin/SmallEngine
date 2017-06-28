@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{808C77F7-63F1-438E-8B07-F8027F306A40}</ProjectGuid>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SmallEngine</RootNamespace>
     <AssemblyName>SmallEngine</AssemblyName>
@@ -45,7 +45,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>SmallEngine.Test.test</StartupObject>
+    <StartupObject>
+    </StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="SharpDX">
@@ -116,10 +117,7 @@
     <Compile Include="Scene.cs" />
     <Compile Include="SceneManager.cs" />
     <Compile Include="Audio\AudioComponent.cs" />
-    <Compile Include="Test\PlayerController.cs" />
     <Compile Include="Physics\RigidBodyComponent.cs" />
-    <Compile Include="Test\test.cs" />
-    <Compile Include="Test\TestGame.cs" />
     <Compile Include="Vector2.cs" />
   </ItemGroup>
   <ItemGroup>

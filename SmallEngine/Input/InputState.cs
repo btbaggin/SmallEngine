@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace SmallEngine.Input
 {
-    class InputState
+    public class InputState
     {
         private Hashtable _pressedKeys;
         private Hashtable _heldKeys;
