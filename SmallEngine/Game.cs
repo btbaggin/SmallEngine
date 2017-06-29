@@ -176,6 +176,8 @@ namespace SmallEngine
                     return;
                 }
 
+                //TODO remove inactive game objects
+
                 GameTime.Tick();
 
                 //Cache pressed keys

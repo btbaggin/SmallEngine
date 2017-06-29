@@ -22,12 +22,13 @@ namespace SmallEngineTest
             Form.Height = 480;
 
             InputManager.AddMapping("createfish", Keys.Space, 1000);
+            InputManager.AddMapping("feed", Mouse.Left, 50);
             InputManager.AddMapping("exit", Keys.Escape);
             _currentState = InputManager.GetInputState();
             _previousState = InputManager.GetInputState();
 
             SceneManager.BeginScene("fish1");
-            _aquarium = new Aquarium() { Persistant = true };
+            _aquarium = new Aquarium(this) { Persistant = true };
             SceneManager.AddToScene(_aquarium);
             //SceneManager.AddToScene(_swarm);
         }
@@ -56,6 +57,8 @@ namespace SmallEngineTest
         {
             ResourceManager.Add<BitmapResource>("aquarium_background", "Graphics/aquarium_background.jpg");
             ResourceManager.Add<BitmapResource>("fish", "Graphics/fish.png");
+            ResourceManager.Add<BitmapResource>("fish_hungry", "Graphics/fish_hungry.gif");
+            ResourceManager.Add<BitmapResource>("food", "Graphics/food.png");
             ResourceManager.Add<AudioResource>("bubble_large", "Audio/bubble_large.wav");
             ResourceManager.Add<AudioResource>("bubble", "Audio/bubble.wav");
             _bubbles = ResourceManager.Add<AudioResource>("bubble_backgroud", "Audio/bubble_background.wav");
@@ -69,9 +72,19 @@ namespace SmallEngineTest
         public override void Update(float pDeltaTime)
         {
             _currentState = InputManager.GetInputState();
+            _currentState = InputManager.GetInputState();
             if (_currentState.IsPressed("createfish") && !_previousState.IsPressed("createfish"))
             {
-                SceneManager.AddToScene(new Fish());
+                var f = new Fish(_aquarium);
+                _aquarium.AddFish(f);
+                SceneManager.AddToScene(f);
+            }
+
+            if (_currentState.IsPressed("feed") && !_previousState.IsPressed("feed"))
+            {
+                var f = new Food();
+                _aquarium.AddFood(f);
+                SceneManager.AddToScene(f);
             }
 
             if (_currentState.IsPressed("exit"))

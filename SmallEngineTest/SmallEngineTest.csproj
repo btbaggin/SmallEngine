@@ -49,6 +49,8 @@
     <Compile Include="Aquarium.cs" />
     <Compile Include="BitmapRenderComponent.cs" />
     <Compile Include="Fish.cs" />
+    <Compile Include="Food.cs" />
+    <Compile Include="HungerComponent.cs" />
     <Compile Include="Test.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestGame.cs" />

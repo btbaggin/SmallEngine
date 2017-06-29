@@ -176,7 +176,7 @@ namespace SmallEngine
             if (pVectorFrom == null) throw new ArgumentNullException("pV1");
             if (pVectorFrom == null) throw new ArgumentNullException("pV2");
 
-            return (pVectorFrom - pVectorTo) * pAmount;
+            return (pVectorTo - pVectorFrom) * pAmount;
         }
 
         /// <summary>

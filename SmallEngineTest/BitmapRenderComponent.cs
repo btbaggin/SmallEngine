@@ -9,15 +9,15 @@ namespace SmallEngineTest
 {
     class BitmapRenderComponent : RenderComponent
     {
-        private BitmapResource _bitmap;
+        public BitmapResource Bitmap { get; set; }
         public BitmapRenderComponent(string pAlias) : base()
         {
-            _bitmap = SmallEngine.ResourceManager.Request<BitmapResource>(pAlias);
+            Bitmap = SmallEngine.ResourceManager.Request<BitmapResource>(pAlias);
         }
 
         public override void Draw(IGraphicsSystem pSystem)
         {
-            pSystem.DrawBitmap(_bitmap, Opacity, GameObject.Position, GameObject.Scale);
+           pSystem.DrawBitmap(Bitmap, Opacity, GameObject.Position, GameObject.Scale);
         }
     }
 }
