@@ -16,19 +16,19 @@ namespace SmallEngineTest
         Vector2 _destination;
         HungerComponent _hunger;
         BitmapRenderComponent _render;
-        Aquarium _aquarium;
-        public Fish(Aquarium pAquarium)
+        public Aquarium _aquarium;
+
+        public override void Initialize()
         {
-            _render = new BitmapRenderComponent("fish") { Order = 1 };
-            AddComponent(_render);
-            _hunger = new HungerComponent(20, 7);
-            AddComponent(_hunger);
+            base.Initialize();
+            _render = (BitmapRenderComponent)GetComponent(typeof(BitmapRenderComponent));
+            _hunger = (HungerComponent)GetComponent(typeof(HungerComponent));
+
             r = new Random();
             Coroutine.Start(GenerateBubbles);
             var s = r.Next(20, 100);
             Scale = new Vector2(s, s);
             _speed = r.Next(25, 100);
-            _aquarium = pAquarium;
         }
 
         public override void Update(float pDeltaTime)
@@ -80,9 +80,11 @@ namespace SmallEngineTest
         {
             while(true)
             {
-                //TODO somethingh something paused?
-                ResourceManager.RequestFromGroup<AudioResource>("bubbles").Play(.4f);
-                yield return new WaitForSeconds((float)r.NextDouble() * 10f);
+                if(!Game.Paused)
+                {
+                    ResourceManager.RequestFromGroup<AudioResource>("bubbles").Play(.4f);
+                    yield return new WaitForSeconds((float)r.NextDouble() * 10f);
+                }
             }
             
         }

@@ -146,6 +146,8 @@ namespace SmallEngine.Graphics
         #region Overridden functions
         public Bitmap LoadBitmap(string pFile, out int pWidth, out int pHeight)
         {
+            System.Diagnostics.Debug.Assert(System.IO.File.Exists(pFile));
+
             // Loads from file using System.Drawing.Image
             using (var bitmap = (System.Drawing.Bitmap)System.Drawing.Image.FromFile(pFile))
             {

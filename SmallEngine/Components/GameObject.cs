@@ -24,6 +24,8 @@ namespace SmallEngine
 
         public bool Persistant { get; set; }
 
+        protected Game Game { get; private set; }
+
         private Dictionary<Type, IComponent> _components;
 
         public GameObject() : this(null) { }
@@ -82,11 +84,21 @@ namespace SmallEngine
             _components.Remove(pComponent);
         }
 
+        public void SetGame(Game pGame)
+        {
+            Game = pGame;
+        }
+
         public virtual void Initialize() { }
 
         public virtual void PreUpdate() { }
 
         public virtual void Update(float pDeltaTime) { }
+
+        public void Destroy()
+        {
+            Game.Destroy(this);
+        }
 
         public void Dispose()
         {

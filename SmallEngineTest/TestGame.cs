@@ -28,8 +28,7 @@ namespace SmallEngineTest
             _previousState = InputManager.GetInputState();
 
             SceneManager.BeginScene("fish1");
-            _aquarium = new Aquarium(this) { Persistant = true };
-            SceneManager.AddToScene(_aquarium);
+            _aquarium = SceneManager.CreateGameObject<Aquarium>(new BitmapRenderComponent("aquarium_background") { Order = 0 });// new Aquarium(this) { Persistant = true };
             //SceneManager.AddToScene(_swarm);
         }
 
@@ -57,11 +56,11 @@ namespace SmallEngineTest
         {
             ResourceManager.Add<BitmapResource>("aquarium_background", "Graphics/aquarium_background.jpg");
             ResourceManager.Add<BitmapResource>("fish", "Graphics/fish.png");
-            ResourceManager.Add<BitmapResource>("fish_hungry", "Graphics/fish_hungry.gif");
+            ResourceManager.Add<BitmapResource>("fish_hungry", "Graphics/fish_hungry.png");
             ResourceManager.Add<BitmapResource>("food", "Graphics/food.png");
             ResourceManager.Add<AudioResource>("bubble_large", "Audio/bubble_large.wav");
             ResourceManager.Add<AudioResource>("bubble", "Audio/bubble.wav");
-            _bubbles = ResourceManager.Add<AudioResource>("bubble_backgroud", "Audio/bubble_background.wav");
+            _bubbles = ResourceManager.Add<AudioResource>("water_backgroud", "Audio/water_background.wav");
             ResourceManager.AddGroup("bubbles", new string[]{ "bubble_large", "bubble"});
             Graphics.DefineColor(System.Drawing.Color.White);
             Graphics.DefineColor(System.Drawing.Color.Blue);
@@ -75,16 +74,15 @@ namespace SmallEngineTest
             _currentState = InputManager.GetInputState();
             if (_currentState.IsPressed("createfish") && !_previousState.IsPressed("createfish"))
             {
-                var f = new Fish(_aquarium);
+                var f = SceneManager.CreateGameObject<Fish>(new BitmapRenderComponent("fish") { Order = 1 },
+                                                            new HungerComponent(20, 7));//new Fish(_aquarium);
                 _aquarium.AddFish(f);
-                SceneManager.AddToScene(f);
             }
 
             if (_currentState.IsPressed("feed") && !_previousState.IsPressed("feed"))
             {
-                var f = new Food();
+                var f = SceneManager.CreateGameObject<Food>(new BitmapRenderComponent("food") { Order = 1 });//new Food();
                 _aquarium.AddFood(f);
-                SceneManager.AddToScene(f);
             }
 
             if (_currentState.IsPressed("exit"))

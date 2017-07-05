@@ -42,13 +42,13 @@ namespace SmallEngineTest
             while(_alive)
             {
                 _currentHunger -= 1;
-                if(_currentHunger < _foodThreshold)
+                if(_currentHunger < _foodThreshold && _currentHunger > 0)
                 {
                     SearchingForFood = true;
                 }
-                else if(_currentHunger == 0)
+                else if(_currentHunger <= 0)
                 {
-                    GameObject.Dispose();//TODO remove from GO
+                    GameObject.Destroy();
                 }
                 else
                 {

@@ -31,8 +31,10 @@ namespace SmallEngine
         void AddComponent(IComponent pComponent);
         void RemoveComponent(Type pComponent);
 
+        void SetGame(Game pGame);
         void Initialize();
         void PreUpdate();
         void Update(float pDeltaTime);
+        void Destroy();
     }
 }

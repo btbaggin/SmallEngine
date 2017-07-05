@@ -9,9 +9,9 @@ namespace SmallEngineTest
 {
     class Food : GameObject
     {
-        public Food()
+        public override void Initialize()
         {
-            AddComponent(new BitmapRenderComponent("food"));
+            base.Initialize();
             Position = SmallEngine.Input.InputManager.MousePosition;
             Scale = new Vector2(10, 10);
         }
@@ -24,7 +24,7 @@ namespace SmallEngineTest
 
             if(Position.Y > 480)
             {
-                Dispose(); //TODO dispose
+                Destroy();
             }
         }
     }

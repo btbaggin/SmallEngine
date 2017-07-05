@@ -131,6 +131,11 @@ namespace SmallEngine
         }
         #endregion
 
+        internal void Destroy(IGameObject pGameObject)
+        {
+            SceneManager.Destroy(pGameObject);
+        }
+
         public void Run()
         {
             IsPlaying = true;
@@ -176,8 +181,7 @@ namespace SmallEngine
                     return;
                 }
 
-                //TODO remove inactive game objects
-
+                SceneManager.DisposeGameObjects();
                 GameTime.Tick();
 
                 //Cache pressed keys

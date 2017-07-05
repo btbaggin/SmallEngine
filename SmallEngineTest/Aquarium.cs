@@ -12,18 +12,18 @@ namespace SmallEngineTest
     {
         List<Fish> _fishes;
         public List<Food> Food { get; private set; }
-        Game _game;
-        public Aquarium(Game pGame)
+
+        public override void Initialize()
         {
-            AddComponent(new BitmapRenderComponent("aquarium_background") { Order = 0 });
+            base.Initialize();
             Scale = new Vector2(640, 480);
-            _fishes = new List<Fish>();
             Food = new List<Food>();
-            _game = pGame;
+            _fishes = new List<Fish>();
         }
 
         public void AddFish(Fish pFish)
         {
+            pFish._aquarium = this;
             _fishes.Add(pFish);
         }
 

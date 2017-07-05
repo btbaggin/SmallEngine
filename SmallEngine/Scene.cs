@@ -56,6 +56,12 @@ namespace SmallEngine
             return null;
         }
 
+        internal void DisposeGameObject(IGameObject pGameObject)
+        {
+            _gameObjects.Remove(pGameObject);
+            //TODO named objects?
+        }
+
         internal void Begin()
         {
             _gameObjects.AddRange(_persistantObjects);
