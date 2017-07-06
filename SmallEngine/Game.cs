@@ -16,7 +16,6 @@ namespace SmallEngine
     {
         /*TODO
          * MessageBus dropping messages if too busy
-         * Keyboard previous state?
          */
 
         public enum RenderSystem

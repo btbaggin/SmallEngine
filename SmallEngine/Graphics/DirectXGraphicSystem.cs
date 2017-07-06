@@ -147,6 +147,7 @@ namespace SmallEngine.Graphics
         public void DrawText(string pText, System.Drawing.Point pPoint, System.Drawing.Color pColor)
         {
             //TODO dont hardcode stuff... probably make a font resource
+            //TODO TextFormat needs dispose
             RenderTarget2D.DrawText(pText, new SharpDX.DirectWrite.TextFormat(FactoryDWrite, "Arial", 12), new RawRectangleF(pPoint.X, pPoint.Y, 100, 100), _colors[pColor]);
         }
 

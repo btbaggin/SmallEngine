@@ -149,7 +149,6 @@ namespace SmallEngine.Input
             return _inputState;
         }
 
-        //TODO allow normal keys
         public static bool IsPressed(Keys pKey)
         {
             return _inputState.IsPressed(pKey) && !_previousState.IsPressed(pKey);
