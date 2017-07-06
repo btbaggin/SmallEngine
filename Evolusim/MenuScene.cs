@@ -25,9 +25,9 @@ namespace Evolusim
             mCurrentIndex = 0;
         }
 
-        public override void Begin()
+        public override void OnBegin()
         {
-            base.Begin();
+            base.OnBegin();
             InputManager.Listen(Keys.Up);
             InputManager.Listen(Keys.Down);
             InputManager.Listen(Keys.Enter);
@@ -82,25 +82,26 @@ namespace Evolusim
             }
         }
 
-        public override void End()
+        public override Scene OnEnd()
         {
-            base.End();
-
-            switch(mCurrentIndex)
-            {
-                case 0:
-                case 1:
-                    var scene = new GameScene();
-                    //TODO
-                    break;
-                case 2:
-                    Game.IsPlaying = false;
-                    break;
-            }
+            base.OnEnd();
 
             InputManager.StopListening(Keys.Up);
             InputManager.StopListening(Keys.Down);
             InputManager.StopListening(Keys.Enter);
+
+            switch (mCurrentIndex)
+            {
+                case 0:
+                case 1:
+                    var scene = new GameScene();
+                    return scene;
+                case 2:
+                    Game.IsPlaying = false;
+                    return null;
+                default:
+                    throw new Exception("unknown index");
+            }
         }
     }
 }

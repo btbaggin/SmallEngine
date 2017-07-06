@@ -12,9 +12,9 @@ namespace Evolusim
     class GameScene : Scene
     {
 
-        public override void Begin()
+        public override void OnBegin()
         {
-            base.Begin();
+            base.OnBegin();
 
             InputManager.Listen(Keys.Escape);
         }
@@ -22,6 +22,8 @@ namespace Evolusim
         public override void Draw(IGraphicsSystem pSystem)
         {
             base.Draw(pSystem);
+            pSystem.DefineColor(System.Drawing.Color.Red);
+            pSystem.DrawRect(new System.Drawing.RectangleF(0, 0, Game.Form.Width, Game.Form.Height), System.Drawing.Color.Red);
         }
 
         public override void Update(float pDeltaTime)
@@ -34,11 +36,12 @@ namespace Evolusim
             }
         }
 
-        public override void End()
+        public override Scene OnEnd()
         {
-            base.End();
+            base.OnEnd();
 
             InputManager.StopListening(Keys.Escape);
+            return null;
         }
     }
 }
