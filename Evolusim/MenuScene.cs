@@ -23,7 +23,6 @@ namespace Evolusim
                 "Quit"
             };
             mCurrentIndex = 0;
-
         }
 
         public override void Begin()
@@ -92,10 +91,10 @@ namespace Evolusim
                 case 0:
                 case 1:
                     var scene = new GameScene();
-                    //TODO start
+                    //TODO
                     break;
                 case 2:
-                    //TODO quit
+                    Game.IsPlaying = false;
                     break;
             }
 

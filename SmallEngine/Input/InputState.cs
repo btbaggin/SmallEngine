@@ -56,5 +56,10 @@ namespace SmallEngine.Input
         {
             return _pressedKeys.ContainsKey(pMouse);
         }
+
+        public bool IsHeld(Mouse pMouse)
+        {
+            return _heldKeys.ContainsKey(pMouse);
+        }
     }
 }

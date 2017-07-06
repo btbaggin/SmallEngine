@@ -18,6 +18,8 @@ namespace SmallEngine
         {
             get { return _gameObjects; }
         }
+
+        public Game Game { get; private set; }
         #endregion  
 
         #region Constructors
@@ -43,8 +45,6 @@ namespace SmallEngine
 
         public virtual void Begin()
         {
-            _gameObjects.AddRange(_persistantObjects);
-            _persistantObjects.Clear();
         }
 
         public virtual void End()
@@ -53,6 +53,14 @@ namespace SmallEngine
             {
                 _persistantObjects.Add(g);
             }
+        }
+
+        internal void BeginScene(Game pGame)
+        {
+            _gameObjects.AddRange(_persistantObjects);
+            _persistantObjects.Clear();
+            Game = pGame;
+            Begin();
         }
 
 

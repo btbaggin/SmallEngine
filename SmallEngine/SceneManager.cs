@@ -151,7 +151,7 @@ namespace SmallEngine
         public void BeginScene(Scene pScene)
         {
             Current = pScene;
-            Current.Begin();
+            Current.BeginScene(_game);
         }
         
         public void EndScene()
