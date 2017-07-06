@@ -91,8 +91,6 @@ namespace SmallEngine
 
         public virtual void Initialize() { }
 
-        public virtual void PreUpdate() { }
-
         public virtual void Update(float pDeltaTime) { }
 
         public void Destroy()

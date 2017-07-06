@@ -33,7 +33,6 @@ namespace SmallEngine
 
         void SetGame(Game pGame);
         void Initialize();
-        void PreUpdate();
         void Update(float pDeltaTime);
         void Destroy();
     }

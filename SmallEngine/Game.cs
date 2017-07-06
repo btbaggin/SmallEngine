@@ -216,7 +216,7 @@ namespace SmallEngine
             }
         }      
 
-        #region "PeekMessage PInvoke"
+        #region PeekMessage PInvoke
         [System.Runtime.InteropServices.DllImport("User32.dll", CharSet = System.Runtime.InteropServices.CharSet.Auto)]
         private static extern bool PeekMessage(out NativeMessage pMsg, IntPtr pHWnd, uint pMessageFilterMin, uint pMessageFilterMax, uint pFlags);
 
