@@ -148,18 +148,15 @@ namespace SmallEngine
             _toRemove.Clear();
         }
         
-        public void BeginScene(string pName)
+        public void BeginScene(Scene pScene)
         {
-            Current = new Scene(pName);
+            Current = pScene;
             Current.Begin();
-
-            _game.SceneBegin(pName);
         }
         
         public void EndScene()
         {
             Current.End();
-            _game.SceneEnd(Current.Name);
         } 
     }
 }

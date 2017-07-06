@@ -34,7 +34,7 @@ namespace SmallEngineTest
 
         public override void SceneBegin(string pScene)
         {
-            _bubbles.Play(.1f);
+            _bubbles.Loop();
             switch(pScene)
             {
                 case "fish1":

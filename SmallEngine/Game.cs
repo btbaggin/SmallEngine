@@ -85,16 +85,10 @@ namespace SmallEngine
         {
         }
 
-        public virtual void SceneBegin(string pScene)
-        {
-        }
-
-        public virtual void SceneEnd(string pScene)
-        {
-        }
-
         public virtual void Update(float pDeltaTime)
         {
+            SceneManager.Current.Update(pDeltaTime);
+
             //Update game objects
             foreach(var go in SceneManager.Current.GameObjects)
             {
@@ -122,6 +116,8 @@ namespace SmallEngine
 
         private void Draw()
         {
+            SceneManager.Current.Draw(Graphics);
+
             foreach (var r in _toRender)
             {
                 r.BeginDraw(Graphics);

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SmallEngine.Graphics;
 
 namespace SmallEngine
 {
@@ -12,29 +13,50 @@ namespace SmallEngine
         private Dictionary<string, IGameObject> _namedObjects;
         private static List<IGameObject> _persistantObjects;
 
-        #region "Properties"
+        #region Properties
         public List<IGameObject> GameObjects
         {
             get { return _gameObjects; }
         }
-
-        public string Name { get; private set; }
         #endregion  
 
-        #region "Constructors"
+        #region Constructors
         static Scene()
         {
             _persistantObjects = new List<IGameObject>();
         }
 
-        internal Scene(string pName)
+        public Scene()
         {
             _gameObjects = new List<IGameObject>();
             _namedObjects = new Dictionary<string, IGameObject>();
-            Name = pName;
         }
         #endregion
 
+        public virtual void Draw(IGraphicsSystem pSystem)
+        {
+        }
+
+        public virtual void Update(float pDeltaTime)
+        {
+        }
+
+        public virtual void Begin()
+        {
+            _gameObjects.AddRange(_persistantObjects);
+            _persistantObjects.Clear();
+        }
+
+        public virtual void End()
+        {
+            foreach (var g in _gameObjects.Where((pG) => pG.Persistant))
+            {
+                _persistantObjects.Add(g);
+            }
+        }
+
+
+        //TODO look at all this stuff
         internal void AddGameObject(IGameObject pGameObject)
         {
             _gameObjects.Add(pGameObject);
@@ -60,21 +82,6 @@ namespace SmallEngine
         {
             _gameObjects.Remove(pGameObject);
             //TODO named objects?
-        }
-
-        internal void Begin()
-        {
-            _gameObjects.AddRange(_persistantObjects);
-
-            _persistantObjects.Clear();
-        }
-
-        internal void End()
-        {
-            foreach(var g in _gameObjects.Where((pG) => pG.Persistant))
-            {
-                _persistantObjects.Add(g);
-            }
         }
     }
 }

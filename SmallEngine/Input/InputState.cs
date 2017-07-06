@@ -18,24 +18,43 @@ namespace SmallEngine.Input
             _heldKeys = new Hashtable();
         }
 
-        internal void AddPressed(string pName, InputInfo pI)
+        internal void AddPressed(InputInfo pI)
         {
-            _pressedKeys.Add(pName, pI);
+            if (pI.Key.HasValue)
+            {
+                _pressedKeys.Add(pI.Key, pI);
+            }
+            else
+            {
+                _pressedKeys.Add(pI.Mouse, pI);
+            }
         }
 
-        internal void AddHeld(string pName, InputInfo pI)
+        internal void AddHeld(InputInfo pI)
         {
-            _heldKeys.Add(pName, pI);
+            if(pI.Key.HasValue)
+            {
+                _heldKeys.Add(pI.Key, pI);
+            }
+            else
+            {
+                _heldKeys.Add(pI.Mouse, pI);
+            }
         }
 
-        public bool IsPressed(string pName)
+        public bool IsPressed(Keys pKey)
         {
-            return _pressedKeys.ContainsKey(pName);
+            return _pressedKeys.ContainsKey(pKey);
         }
 
-        public bool IsHeld(string pName)
+        public bool IsHeld(Keys pKey)
         {
-            return _heldKeys.ContainsKey(pName);
+            return _heldKeys.ContainsKey(pKey);
+        }
+
+        public bool IsPressed(Mouse pMouse)
+        {
+            return _pressedKeys.ContainsKey(pMouse);
         }
     }
 }

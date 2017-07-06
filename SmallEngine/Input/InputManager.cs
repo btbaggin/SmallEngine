@@ -10,9 +10,10 @@ namespace SmallEngine.Input
 {
     public class InputManager
     {
-        private static Dictionary<string, InputInfo> _mapping;
+        private static List<InputInfo> _keys;
         private IntPtr _handle;
         private static InputState _inputState;
+        private static InputState _previousState;
 
         #region Win32 functions
         [DllImport("user32.dll")]
@@ -93,8 +94,8 @@ namespace SmallEngine.Input
         #region Constructor
         public InputManager(IntPtr pHandle)
         {
+            _keys = new List<InputInfo>();
             _handle = pHandle;
-            _mapping = new Dictionary<string, InputInfo>();
             HoldDelay = 500;    //Default half second for holding a key
 
         }
@@ -102,14 +103,14 @@ namespace SmallEngine.Input
 
         internal void ProcessInput()
         {
+            _previousState = _inputState;
             _inputState = new InputState();
-            foreach (string name in _mapping.Keys.ToList())
+            foreach (var ii in _keys)
             {
-                InputInfo ii = _mapping[name];
-                GetStatus(ref ii, out bool pressed, out bool held);
-                if (pressed) { _inputState.AddPressed(name, ii); }
-                if (held) { _inputState.AddHeld(name, ii); }
-                _mapping[name] = ii;
+                var i = ii;
+                GetStatus(ref i, out bool pressed, out bool held);
+                if (pressed) { _inputState.AddPressed(ii); }
+                if (held) { _inputState.AddHeld(ii); }
             }
 
             //Get mouse position
@@ -148,81 +149,59 @@ namespace SmallEngine.Input
             return _inputState;
         }
 
-        public static void AddMapping(string pName, Keys pKey)
+        //TODO allow normal keys
+        public static bool IsPressed(Keys pKey)
         {
-            System.Diagnostics.Debug.Assert(!string.IsNullOrEmpty(pName));
-            if (!_mapping.ContainsKey(pName))
-            {
-                _mapping.Add(pName, new InputInfo(pKey, 0));
-            }
+            return _inputState.IsPressed(pKey) && !_previousState.IsPressed(pKey);
         }
 
-        public static void AddMapping(string pName, Keys pKey, int pDelay)
+        public static bool IsPressed(Mouse pMouse)
         {
-            System.Diagnostics.Debug.Assert(!string.IsNullOrEmpty(pName));
-            if (!_mapping.ContainsKey(pName))
-            {
-                _mapping.Add(pName, new InputInfo(pKey, GameTime.MillisToTick(pDelay)));
-            }
+            return _inputState.IsPressed(pMouse) && !_previousState.IsPressed(pMouse);
         }
 
-        public static void AddMapping(string pName, Mouse pMouse)
+        public static void Listen(Keys pKey)
         {
-            System.Diagnostics.Debug.Assert(!string.IsNullOrEmpty(pName));
-            if(!_mapping.ContainsKey(pName))
-            {
-                _mapping.Add(pName, new InputInfo(pMouse, 0));
-            }
+            _keys.Add(new InputInfo(pKey, 0));
         }
 
-        public static void AddMapping(string pName, Mouse pMouse, int pDelay)
+        public static void Listen(Mouse pMouse)
         {
-            System.Diagnostics.Debug.Assert(!string.IsNullOrEmpty(pName));
-            if (!_mapping.ContainsKey(pName))
-            {
-                _mapping.Add(pName, new InputInfo(pMouse, GameTime.MillisToTick(pDelay)));
-            }
+            _keys.Add(new InputInfo(pMouse, 0));
         }
 
-        public static void SetDelay(string pName, int pDelay)
+        public static void StopListening(Keys pKey)
         {
-            System.Diagnostics.Debug.Assert(_mapping.ContainsKey(pName));
-            InputInfo ii = _mapping[pName];
-            ii.Delay = GameTime.MillisToTick(pDelay);
-            _mapping[pName] = ii;
+            InputInfo toRemove = new InputInfo();
+            bool found = false;
+            foreach (var ii in _keys)
+            {
+                if (ii.Key.HasValue && ii.Key == pKey)
+                {
+                    toRemove = ii;
+                    found = true;
+                    break;
+                }
+            }
+
+            if (found) _keys.Remove(toRemove);
         }
 
-        public static void UpdateMapping(string pName, Keys pKey)
+        public static void StopListening(Mouse pMouse)
         {
-            System.Diagnostics.Debug.Assert(!string.IsNullOrEmpty(pName));
-            if(_mapping.ContainsKey(pName))
+            InputInfo toRemove = new InputInfo();
+            bool found = false;
+            foreach (var ii in _keys)
             {
-                InputInfo ii = _mapping[pName];
-                ii.Key = pKey;
-                ii.Mouse = null;
-                _mapping[pName] = ii;
+                if (ii.Mouse.HasValue && ii.Mouse == pMouse)
+                {
+                    toRemove = ii;
+                    found = true;
+                    break;
+                }
             }
-        }
 
-        public static void UpdateMapping(string pName, Mouse pMouse)
-        {
-            System.Diagnostics.Debug.Assert(!string.IsNullOrEmpty(pName));
-            if(_mapping.ContainsKey(pName))
-            {
-                InputInfo ii = _mapping[pName];
-                ii.Mouse = pMouse;
-                ii.Key = null;
-                _mapping[pName] = ii;
-            }
-        }
-
-        public static void RemoveMapping(string pName)
-        {
-            System.Diagnostics.Debug.Assert(!string.IsNullOrEmpty(pName));
-            if(_mapping.ContainsKey(pName))
-            {
-                _mapping.Remove(pName);
-            }
+            if (found) _keys.Remove(toRemove);
         }
         #endregion
     }

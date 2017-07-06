@@ -8,6 +8,7 @@ namespace SmallEngine.Graphics
         bool Initialize(GameForm pForm, bool pFullScreen);
         void BeginDraw();
         void EndDraw();
+        void DrawText(string pText, Point pPoint, Color pColor);
         void DrawBitmap(BitmapResource pBitmap, float pOpacity, Vector2 pPosition, Vector2 pScale);
         void DrawBitmap(BitmapResource pBitmap, float pOpacity, RectangleF pSource, Vector2 pPosition);
         void DrawPoint(Vector2 pPoint, Color pColor);

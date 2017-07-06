@@ -22,7 +22,7 @@ namespace SmallEngine.Graphics
         private RenderTargetView _backBufferView;
         private Dictionary<System.Drawing.Color, SolidColorBrush> _colors;
 
-        #region "Properties"
+        #region Properties
         public Device Device
         {
             get { return _device; }
@@ -40,7 +40,7 @@ namespace SmallEngine.Graphics
         public RenderTarget RenderTarget2D { get; private set; }
         #endregion
 
-        #region "Creation functions"
+        #region Creation functions
         private GameForm _form;
         public bool Initialize(GameForm pWindow, bool pFullScreen)
         {
@@ -144,6 +144,12 @@ namespace SmallEngine.Graphics
         #endregion
 
         #region Overridden functions
+        public void DrawText(string pText, System.Drawing.Point pPoint, System.Drawing.Color pColor)
+        {
+            //TODO dont hardcode stuff... probably make a font resource
+            RenderTarget2D.DrawText(pText, new SharpDX.DirectWrite.TextFormat(FactoryDWrite, "Arial", 12), new RawRectangleF(pPoint.X, pPoint.Y, 100, 100), _colors[pColor]);
+        }
+
         public Bitmap LoadBitmap(string pFile, out int pWidth, out int pHeight)
         {
             System.Diagnostics.Debug.Assert(System.IO.File.Exists(pFile));
