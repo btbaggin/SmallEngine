@@ -144,11 +144,10 @@ namespace SmallEngine.Graphics
         #endregion
 
         #region Overridden functions
-        public void DrawText(string pText, System.Drawing.Point pPoint, System.Drawing.Color pColor)
+        public void DrawText(string pText, System.Drawing.Point pPoint, Font pFont)
         {
-            //TODO dont hardcode stuff... probably make a font resource
-            //TODO TextFormat needs dispose
-            RenderTarget2D.DrawText(pText, new SharpDX.DirectWrite.TextFormat(FactoryDWrite, "Arial", 12), new RawRectangleF(pPoint.X, pPoint.Y, 100, 100), _colors[pColor]);
+            //TODO dont hardcode stuff... 
+            RenderTarget2D.DrawText(pText, pFont.Format, new RawRectangleF(pPoint.X, pPoint.Y, 100, 100), pFont.Brush);
         }
 
         public Bitmap LoadBitmap(string pFile, out int pWidth, out int pHeight)
@@ -268,6 +267,11 @@ namespace SmallEngine.Graphics
         public void SetFullScreen(bool pFullScreen)
         {
             _swapChain.SetFullscreenState(pFullScreen, null);
+        }
+
+        public Font CreateFont(string pFamily, float pSize, System.Drawing.Color pColor)
+        {
+            return new Font(FactoryDWrite, RenderTarget2D, pFamily, pSize, pColor);
         }
         #endregion
     }

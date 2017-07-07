@@ -170,7 +170,7 @@ namespace SmallEngine
             }
             else
             {
-                _scenes.Pop();
+                //_scenes.Pop();
                 _scenes.Push(pScene);
             }
             Current = pScene;

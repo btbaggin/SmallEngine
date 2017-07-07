@@ -95,6 +95,7 @@
     <Compile Include="GameTime.cs" />
     <Compile Include="Graphics\BitmapResource.cs" />
     <Compile Include="Graphics\DirectXGraphicSystem.cs" />
+    <Compile Include="Graphics\Font.cs" />
     <Compile Include="Graphics\IGraphicsSystem.cs" />
     <Compile Include="Components\IComponent.cs" />
     <Compile Include="Graphics\RenderComponent.cs" />

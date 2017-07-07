@@ -11,10 +11,12 @@ namespace Evolusim
         private List<string> mItems;
         private int mCurrentIndex;
         private bool _inGame;
+        private Font _font;
+        private Font _highlightFont;
 
         public MenuScene(bool pInGame) : base()
         {
-            if (!_inGame)
+            if (!pInGame)
             {
                 mItems = new List<string>(3)
                 {
@@ -42,6 +44,8 @@ namespace Evolusim
             InputManager.Listen(Keys.Up);
             InputManager.Listen(Keys.Down);
             InputManager.Listen(Keys.Enter);
+            _font = Game.Graphics.CreateFont("Arial", 16, System.Drawing.Color.Black);
+            _highlightFont = Game.Graphics.CreateFont("Arial", 18, System.Drawing.Color.White);
         }
 
         public override void Draw(IGraphicsSystem pSystem)
@@ -50,8 +54,6 @@ namespace Evolusim
 
             //TODO
             pSystem.DefineColor(System.Drawing.Color.Aqua);
-            pSystem.DefineColor(System.Drawing.Color.Black);
-            pSystem.DefineColor(System.Drawing.Color.White);
 
             pSystem.DrawRect(new System.Drawing.RectangleF(0, 0, Game.Form.Width, Game.Form.Height), System.Drawing.Color.Aqua);
 
@@ -62,13 +64,13 @@ namespace Evolusim
             {
                 if(mCurrentIndex == i)
                 {
-                    pSystem.DrawText(mItems[i], p, System.Drawing.Color.White);
+                    pSystem.DrawText(mItems[i], p, _highlightFont);
                 }
                 else
                 {
-                    pSystem.DrawText(mItems[i], p, System.Drawing.Color.Black);
+                    pSystem.DrawText(mItems[i], p, _font);
                 }
-                p.Y += 10;
+                p.Y += 20;
             }
         }
 
@@ -100,6 +102,9 @@ namespace Evolusim
             InputManager.StopListening(Keys.Up);
             InputManager.StopListening(Keys.Down);
             InputManager.StopListening(Keys.Enter);
+
+            _font.Dispose();
+            _highlightFont.Dispose();
 
             switch (mCurrentIndex)
             {
