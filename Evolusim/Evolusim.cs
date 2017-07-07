@@ -18,7 +18,7 @@ namespace Evolusim
 
         public override void Initialize()
         {
-            SceneManager.BeginScene(new MenuScene());
+            SceneManager.BeginScene(new MenuScene(false));
         }
 
         public override void Update(float pDeltaTime)

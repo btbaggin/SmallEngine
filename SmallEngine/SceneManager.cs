@@ -4,14 +4,21 @@ using System.Linq;
 
 namespace SmallEngine
 {
+    public enum SceneLoadMode
+    {
+        Replace,
+        Additive
+    }
+
     public class SceneManager
     {
-        private Dictionary<string, List<Type>> _definitions;
-        private List<IGameObject> _toRemove;
-        private Game _game;
+        private static Dictionary<string, List<Type>> _definitions;
+        private static List<IGameObject> _toRemove;
+        private static Game _game;
+        private static Stack<Scene> _scenes;
 
         #region Properties
-        public Scene Current { get; private set; }
+        public static Scene Current { get; private set; }
         #endregion
 
         #region Constructor
@@ -19,6 +26,7 @@ namespace SmallEngine
         {
             _definitions = new Dictionary<string, List<Type>>();
             _toRemove = new List<IGameObject>();
+            _scenes = new Stack<Scene>();
             _game = pGame;
         }
         #endregion
@@ -148,18 +156,36 @@ namespace SmallEngine
             _toRemove.Clear();
         }
         
-        public void BeginScene(Scene pScene)
+        public static void BeginScene(Scene pScene)
         {
-            Current = pScene;
-            Current.BeginScene(_game, this);
+            BeginScene(pScene, SceneLoadMode.Replace);
         }
 
-        public void EndScene()
+        public static void BeginScene(Scene pScene, SceneLoadMode pMode)
         {
-            var next = Current.OnEnd();
-            if (next != null)
+            if(pMode == SceneLoadMode.Additive)
             {
-                BeginScene(next);
+                //TODO fix
+                _scenes.Push(pScene);
+            }
+            else
+            {
+                _scenes.Pop();
+                _scenes.Push(pScene);
+            }
+            Current = pScene;
+            Current.BeginScene(_game);
+        }
+
+        public static void EndScene()
+        {
+            if(_scenes.Count > 1)
+            {
+                Current = _scenes.Pop();
+            }
+            else
+            {
+                Current.End();
             }
         } 
     }

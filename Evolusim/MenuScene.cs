@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using SmallEngine;
 using SmallEngine.Graphics;
 using SmallEngine.Input;
@@ -13,21 +10,35 @@ namespace Evolusim
     {
         private List<string> mItems;
         private int mCurrentIndex;
+        private bool _inGame;
 
-        public MenuScene() : base()
+        public MenuScene(bool pInGame) : base()
         {
-            mItems = new List<string>(3)
+            if (!_inGame)
             {
-                "New",
-                "Continue",
-                "Quit"
-            };
+                mItems = new List<string>(3)
+                {
+                    "New",
+                    "Continue",
+                    "Quit"
+                };
+            }
+            else
+            {
+                mItems = new List<string>(2)
+                {
+                    "Resume",
+                    "Quit"
+                };
+            }
+            
             mCurrentIndex = 0;
+            _inGame = pInGame;
         }
 
-        public override void OnBegin()
+        public override void Begin()
         {
-            base.OnBegin();
+            base.Begin();
             InputManager.Listen(Keys.Up);
             InputManager.Listen(Keys.Down);
             InputManager.Listen(Keys.Enter);
@@ -78,13 +89,13 @@ namespace Evolusim
 
             if(InputManager.IsPressed(Keys.Enter))
             {
-                End();
+                SceneManager.EndScene();
             }
         }
 
-        public override Scene OnEnd()
+        public override void End()
         {
-            base.OnEnd();
+            base.End();
 
             InputManager.StopListening(Keys.Up);
             InputManager.StopListening(Keys.Down);
@@ -93,12 +104,24 @@ namespace Evolusim
             switch (mCurrentIndex)
             {
                 case 0:
+                    if(!_inGame)
+                    {
+                        SceneManager.BeginScene(new GameScene());
+                    }
+                    break;
                 case 1:
-                    var scene = new GameScene();
-                    return scene;
+                    if(_inGame)
+                    {
+                        Game.IsPlaying = false;
+                    }
+                    else
+                    {
+                        SceneManager.BeginScene(new GameScene());
+                    }
+                    break;
                 case 2:
                     Game.IsPlaying = false;
-                    return null;
+                    break;
                 default:
                     throw new Exception("unknown index");
             }

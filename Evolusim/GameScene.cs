@@ -12,9 +12,9 @@ namespace Evolusim
     class GameScene : Scene
     {
 
-        public override void OnBegin()
+        public override void Begin()
         {
-            base.OnBegin();
+            base.Begin();
 
             InputManager.Listen(Keys.Escape);
         }
@@ -32,16 +32,15 @@ namespace Evolusim
 
             if(InputManager.IsPressed(Keys.Escape))
             {
-                //TODO load menu
+                SceneManager.BeginScene(new MenuScene(true), SceneLoadMode.Additive);
             }
         }
 
-        public override Scene OnEnd()
+        public override void End()
         {
-            base.OnEnd();
+            base.End();
 
             InputManager.StopListening(Keys.Escape);
-            return null;
         }
     }
 }

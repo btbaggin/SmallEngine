@@ -9,7 +9,6 @@ namespace SmallEngine
 {
     public class Scene
     {
-        private SceneManager _manager;
         private List<IGameObject> _gameObjects;
         private Dictionary<string, IGameObject> _namedObjects;
         private static List<IGameObject> _persistantObjects;
@@ -44,32 +43,24 @@ namespace SmallEngine
         {
         }
 
-        public virtual void OnBegin()
+        public virtual void Begin()
         {
         }
 
-        public virtual Scene OnEnd()
+        public virtual void End()
         {
             foreach (var g in _gameObjects.Where((pG) => pG.Persistant))
             {
                 _persistantObjects.Add(g);
             }
-
-            return null;
         }
 
-        protected void End()
-        {
-            _manager.EndScene();
-        }
-
-        internal void BeginScene(Game pGame, SceneManager pManager)
+        internal void BeginScene(Game pGame)
         {
             _gameObjects.AddRange(_persistantObjects);
             _persistantObjects.Clear();
-            _manager = pManager;
             Game = pGame;
-            OnBegin();
+            Begin();
         }
 
 
