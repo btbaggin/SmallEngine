@@ -20,7 +20,6 @@ namespace SmallEngine.Graphics
         private SwapChain _swapChain;
         private Device _device;
         private RenderTargetView _backBufferView;
-        private Dictionary<System.Drawing.Color, SolidColorBrush> _colors;
 
         #region Properties
         public Device Device
@@ -44,8 +43,6 @@ namespace SmallEngine.Graphics
         private GameForm _form;
         public bool Initialize(GameForm pWindow, bool pFullScreen)
         {
-            _colors = new Dictionary<System.Drawing.Color, SolidColorBrush>();
-
             _form = pWindow;
             _form.WindowSizeChanged += Resize;
             try
@@ -136,18 +133,13 @@ namespace SmallEngine.Graphics
             RenderTarget2D.Dispose();
             Factory2D.Dispose();
             FactoryDWrite.Dispose();
-            foreach(SolidColorBrush c in _colors.Values)
-            {
-                c.Dispose();
-            }
         }
         #endregion
 
         #region Overridden functions
-        public void DrawText(string pText, System.Drawing.Point pPoint, Font pFont)
+        public void DrawText(string pText, System.Drawing.RectangleF pRect, Font pFont)
         {
-            //TODO dont hardcode stuff... 
-            RenderTarget2D.DrawText(pText, pFont.Format, new RawRectangleF(pPoint.X, pPoint.Y, 100, 100), pFont.Brush);
+            RenderTarget2D.DrawText(pText, pFont.Format, new RawRectangleF(pRect.X, pRect.Y, pRect.Right, pRect.Bottom), pFont.Brush);
         }
 
         public Bitmap LoadBitmap(string pFile, out int pWidth, out int pHeight)
@@ -194,14 +186,6 @@ namespace SmallEngine.Graphics
             }
         }
 
-        public void DefineColor(System.Drawing.Color pColor)
-        {
-            if(!_colors.ContainsKey(pColor))
-            {
-                _colors.Add(pColor, new SolidColorBrush(RenderTarget2D, new Color(pColor.R, pColor.G, pColor.B, pColor.A)));
-            }
-        }
-
         public void DrawBitmap(BitmapResource pBitmap, float pOpacity, Vector2 pPosition, Vector2 pScale)
         {
             var x = pPosition.X;
@@ -216,28 +200,24 @@ namespace SmallEngine.Graphics
             RenderTarget2D.DrawBitmap(pBitmap.DirectXBitmap, new RawRectangleF(x, y, x + pBitmap.Width, y + pBitmap.Height), pOpacity, BitmapInterpolationMode.NearestNeighbor, new RawRectangleF(pSourceRect.Left, pSourceRect.Top, pSourceRect.Right, pSourceRect.Bottom));
         }
 
-        public void DrawPoint(Vector2 pPoint, System.Drawing.Color pColor)
+        public void DrawPoint(Vector2 pPoint, Brush pBrush)
         {
-            System.Diagnostics.Debug.Assert(_colors.ContainsKey(pColor));
-            RenderTarget2D.FillRectangle(new RawRectangleF(pPoint.X - 1, pPoint.Y - 1, pPoint.X + 1, pPoint.Y + 1), _colors[pColor]);
+            RenderTarget2D.FillRectangle(new RawRectangleF(pPoint.X - 1, pPoint.Y - 1, pPoint.X + 1, pPoint.Y + 1), pBrush.ColorBrush);
         }
 
-        public void DrawLine(Vector2 pPoint1, Vector2 pPoint2, System.Drawing.Color pColor)
+        public void DrawLine(Vector2 pPoint1, Vector2 pPoint2, Brush pBrush)
         {
-            System.Diagnostics.Debug.Assert(_colors.ContainsKey(pColor));
-            RenderTarget2D.DrawLine((RawVector2)pPoint1, (RawVector2)pPoint2, _colors[pColor]);
+            RenderTarget2D.DrawLine((RawVector2)pPoint1, (RawVector2)pPoint2, pBrush.ColorBrush);
         }
 
-        public void DrawRect(System.Drawing.RectangleF pRect, System.Drawing.Color pColor)
+        public void DrawRect(System.Drawing.RectangleF pRect, Brush pBrush)
         {
-            System.Diagnostics.Debug.Assert(_colors.ContainsKey(pColor));
-            RenderTarget2D.FillRectangle(new RawRectangleF(pRect.Left, pRect.Top, pRect.Right, pRect.Bottom), _colors[pColor]);
+            RenderTarget2D.FillRectangle(new RawRectangleF(pRect.Left, pRect.Top, pRect.Right, pRect.Bottom), pBrush.ColorBrush);
         }
 
-        public void DrawElipse(Vector2 pPoint, float pRadius, System.Drawing.Color pColor)
+        public void DrawElipse(Vector2 pPoint, float pRadius, Brush pBrush)
         {
-            System.Diagnostics.Debug.Assert(_colors.ContainsKey(pColor));
-            RenderTarget2D.DrawEllipse(new Ellipse((RawVector2)pPoint, pRadius, pRadius), _colors[pColor]);
+            RenderTarget2D.DrawEllipse(new Ellipse((RawVector2)pPoint, pRadius, pRadius), pBrush.ColorBrush);
         }
 
         public void SetTransform(float pRotation, Vector2 pCenter)
@@ -272,6 +252,11 @@ namespace SmallEngine.Graphics
         public Font CreateFont(string pFamily, float pSize, System.Drawing.Color pColor)
         {
             return new Font(FactoryDWrite, RenderTarget2D, pFamily, pSize, pColor);
+        }
+
+        public Brush CreateBrush(System.Drawing.Color pColor)
+        {
+            return new Brush(pColor, RenderTarget2D);
         }
         #endregion
     }

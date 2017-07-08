@@ -8,19 +8,19 @@ namespace SmallEngine.Graphics
         bool Initialize(GameForm pForm, bool pFullScreen);
         void BeginDraw();
         void EndDraw();
-        void DrawText(string pText, Point pPoint, Font pFont);
+        void DrawText(string pText, RectangleF pRect, Font pFont);
         void DrawBitmap(BitmapResource pBitmap, float pOpacity, Vector2 pPosition, Vector2 pScale);
         void DrawBitmap(BitmapResource pBitmap, float pOpacity, RectangleF pSource, Vector2 pPosition);
-        void DrawPoint(Vector2 pPoint, Color pColor);
-        void DrawLine(Vector2 pPoint1, Vector2 pPoint2, Color pColor);
-        void DrawRect(RectangleF pRect, Color pColor);
-        void DrawElipse(Vector2 pPoint, float pRadius, Color pColor);
+        void DrawPoint(Vector2 pPoint, Brush pBrush);
+        void DrawLine(Vector2 pPoint1, Vector2 pPoint2, Brush pBrush);
+        void DrawRect(RectangleF pRect, Brush pBrush);
+        void DrawElipse(Vector2 pPoint, float pRadius, Brush pBrush);
         void SetFullScreen(bool pFullScreen);
-        void DefineColor(Color pColor);
         void SetTransform(float pRotation, Vector2 pCenter);
         void ResetTransform();
 
         Font CreateFont(string pFamily, float pSize, Color pColor);
+        Brush CreateBrush(Color pColor);
         //TODO effects?
     }
 }

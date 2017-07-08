@@ -11,8 +11,10 @@ namespace Evolusim
         private List<string> mItems;
         private int mCurrentIndex;
         private bool _inGame;
+        private Font _titleFont;
         private Font _font;
         private Font _highlightFont;
+        private Brush _backgroundBrush;
 
         public MenuScene(bool pInGame) : base()
         {
@@ -44,33 +46,36 @@ namespace Evolusim
             InputManager.Listen(Keys.Up);
             InputManager.Listen(Keys.Down);
             InputManager.Listen(Keys.Enter);
+            _titleFont = Game.Graphics.CreateFont("Arial", 28, System.Drawing.Color.Blue);
             _font = Game.Graphics.CreateFont("Arial", 16, System.Drawing.Color.Black);
             _highlightFont = Game.Graphics.CreateFont("Arial", 18, System.Drawing.Color.White);
+            _backgroundBrush = Game.Graphics.CreateBrush(System.Drawing.Color.Aqua);
+
+            _titleFont.Alignment = Alignment.Center;
+            _font.Alignment = Alignment.Center;
+            _highlightFont.Alignment = Alignment.Center;
         }
 
         public override void Draw(IGraphicsSystem pSystem)
         {
             base.Draw(pSystem);
 
-            //TODO
-            pSystem.DefineColor(System.Drawing.Color.Aqua);
+            pSystem.DrawRect(new System.Drawing.RectangleF(0, 0, Game.Form.Width, Game.Form.Height), _backgroundBrush);
 
-            pSystem.DrawRect(new System.Drawing.RectangleF(0, 0, Game.Form.Width, Game.Form.Height), System.Drawing.Color.Aqua);
+            pSystem.DrawText("Evolusim", new System.Drawing.RectangleF(0, 50, Game.Form.Width, 30), _titleFont);
 
-            var mid = Game.Form.Width / 2;
-
-            System.Drawing.Point p = new System.Drawing.Point(mid, 50);
+            float y = 100;
             for(int i = 0; i < mItems.Count; i++)
             {
                 if(mCurrentIndex == i)
                 {
-                    pSystem.DrawText(mItems[i], p, _highlightFont);
+                    pSystem.DrawText(mItems[i], new System.Drawing.RectangleF(0, y, Game.Form.Width, 20), _highlightFont);
                 }
                 else
                 {
-                    pSystem.DrawText(mItems[i], p, _font);
+                    pSystem.DrawText(mItems[i], new System.Drawing.RectangleF(0, y, Game.Form.Width, 20), _font);
                 }
-                p.Y += 20;
+                y += 20;
             }
         }
 

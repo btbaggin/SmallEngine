@@ -94,6 +94,7 @@
     <Compile Include="GameForm.cs" />
     <Compile Include="GameTime.cs" />
     <Compile Include="Graphics\BitmapResource.cs" />
+    <Compile Include="Graphics\Brush.cs" />
     <Compile Include="Graphics\DirectXGraphicSystem.cs" />
     <Compile Include="Graphics\Font.cs" />
     <Compile Include="Graphics\IGraphicsSystem.cs" />
