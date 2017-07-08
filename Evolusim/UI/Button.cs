@@ -11,31 +11,29 @@ namespace Evolusim.UI
 {
     class ToggleButton
     {
-        Brush _background;
         Brush _highlightBrush;
         Font _font;
         BitmapResource _image;
         string _text;
         float _imageSize;
-        System.Drawing.RectangleF _rect;
-        System.Drawing.RectangleF _textRect;
+        float _width, _height;
 
+        System.Drawing.RectangleF _rect;
         bool _mouseOver;
+
+        public Vector2 Position { get; set; }
 
         public bool IsSelected { get; private set; }
 
-        public ToggleButton(BitmapResource pImage, string pText, float pX, float pY, float pWidth, float pHeight)
+        public ToggleButton(BitmapResource pImage, string pText, float pWidth, float pHeight)
         {
             _image = pImage;
             _text = pText;
-
-            _rect = new System.Drawing.RectangleF(pX, pY, pWidth, pHeight);
+            _width = pWidth;
+            _height = pHeight;
             _imageSize = pHeight - 8;
 
-            _textRect = new System.Drawing.RectangleF(pX + pHeight, pY, pWidth - pHeight, pHeight);
-
             _highlightBrush = Game.Graphics.CreateBrush(System.Drawing.Color.Yellow);
-            _background = Game.Graphics.CreateBrush(System.Drawing.Color.Green);
             _font = Game.Graphics.CreateFont("Arial", 18, System.Drawing.Color.White);
             _font.Alignment = Alignment.Center;
 
@@ -43,14 +41,15 @@ namespace Evolusim.UI
 
         public void Draw(IGraphicsSystem pSystem)
         {
-            pSystem.DrawFillRect(_rect, _background);
+            _rect = new System.Drawing.RectangleF(Position.X, Position.Y, _width, _height);
+            var textRect = new System.Drawing.RectangleF(Position.X + _height, Position.Y, _width - _height, _height);
 
             pSystem.DrawBitmap(_image, 1, new Vector2(_rect.X + 4, _rect.Y + 4), new Vector2(_imageSize, _imageSize));
-            pSystem.DrawText(_text, _textRect, _font);
+            pSystem.DrawText(_text, textRect, _font);
 
             if(IsSelected)
             {
-                pSystem.DrawRect(_rect, _highlightBrush, 5);
+                pSystem.DrawRect(_rect, _highlightBrush, 3);
             }
         }
 

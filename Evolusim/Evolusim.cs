@@ -11,7 +11,11 @@ namespace Evolusim
 {
     class Evolusim : Game
     {
-
+        /*
+         *TODO
+         * Bake terrain into a single bitmap
+         * Camera to move around/zoom
+         */
         public override void LoadContent()
         {
             ResourceManager.Add<BitmapResource>("water", "Graphics/water.png");

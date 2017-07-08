@@ -20,6 +20,7 @@ namespace Evolusim
 
             _terrain = new Terrain(100, 100);
             _toolbar = new Toolbar();
+            InputManager.Listen(Keys.T);
             InputManager.Listen(Keys.Escape);
             InputManager.Listen(Mouse.Left);
         }
@@ -46,12 +47,18 @@ namespace Evolusim
             {
                 _terrain.SetTypeAtMouse(_toolbar.SelectedType);
             }
+
+            if(InputManager.IsPressed(Keys.T))
+            {
+                _toolbar.Toggle();
+            }
         }
 
         public override void End()
         {
             base.End();
 
+            InputManager.StopListening(Keys.T);
             InputManager.StopListening(Keys.Escape);
             InputManager.StopListening(Mouse.Left);
         }
