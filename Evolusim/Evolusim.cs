@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using SmallEngine;
 using SmallEngine.Input;
+using SmallEngine.Graphics;
 
 namespace Evolusim
 {
@@ -13,7 +14,11 @@ namespace Evolusim
 
         public override void LoadContent()
         {
-            //TODO load global bitmaps, audio, etc...
+            ResourceManager.Add<BitmapResource>("water", "Graphics/water.png");
+            ResourceManager.Add<BitmapResource>("plains", "Graphics/plains.png");
+            ResourceManager.Add<BitmapResource>("mountain", "Graphics/mountain.jpg");
+            ResourceManager.Add<BitmapResource>("desert", "Graphics/desert.jpg");
+            ResourceManager.Add<BitmapResource>("forest", "Graphics/forest.jpg");
         }
 
         public override void Initialize()
