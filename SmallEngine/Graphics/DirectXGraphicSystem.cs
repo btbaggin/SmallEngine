@@ -256,12 +256,12 @@ namespace SmallEngine.Graphics
 
         public Font CreateFont(string pFamily, float pSize, System.Drawing.Color pColor)
         {
-            return new Font(FactoryDWrite, RenderTarget2D, pFamily, pSize, pColor);
+            return Font.Create(FactoryDWrite, RenderTarget2D, pFamily, pSize, pColor);
         }
 
         public Brush CreateBrush(System.Drawing.Color pColor)
         {
-            return new Brush(pColor, RenderTarget2D);
+            return Brush.Create(pColor, RenderTarget2D);
         }
         #endregion
     }

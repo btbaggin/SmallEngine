@@ -29,13 +29,14 @@ namespace Evolusim
 
         public Toolbar()
         {
-            _background = Game.Graphics.CreateBrush(System.Drawing.Color.Black);
+            _background = Game.Graphics.CreateBrush(Color.FromArgb(150, 0, 0, 0));
 
-            _plainsButton = new ToggleButton(ResourceManager.Request<BitmapResource>("plains"), "Plains", 150, 50);
-            _waterButton = new ToggleButton(ResourceManager.Request<BitmapResource>("water"), "Water", 150, 50);
-            _desertButton = new ToggleButton(ResourceManager.Request<BitmapResource>("desert"), "Desert", 150, 50);
-            _forestButton = new ToggleButton(ResourceManager.Request<BitmapResource>("forest"), "Forest", 150, 50);
-            _mountainButton = new ToggleButton(ResourceManager.Request<BitmapResource>("mountain"), "Mountains", 150, 50);
+            var group = new ToggleButtonGroup();
+            _plainsButton = new ToggleButton(ResourceManager.Request<BitmapResource>("plains"), "Plains", 150, 50, group);
+            _waterButton = new ToggleButton(ResourceManager.Request<BitmapResource>("water"), "Water", 150, 50, group);
+            _desertButton = new ToggleButton(ResourceManager.Request<BitmapResource>("desert"), "Desert", 150, 50, group);
+            _forestButton = new ToggleButton(ResourceManager.Request<BitmapResource>("forest"), "Forest", 150, 50, group);
+            _mountainButton = new ToggleButton(ResourceManager.Request<BitmapResource>("mountain"), "Mountains", 150, 50, group);
         }
 
         public void Toggle()

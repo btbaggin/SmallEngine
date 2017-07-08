@@ -18,14 +18,19 @@ namespace Evolusim.UI
         float _imageSize;
         float _width, _height;
 
+        ToggleButtonGroup _group;
         System.Drawing.RectangleF _rect;
         bool _mouseOver;
 
         public Vector2 Position { get; set; }
 
-        public bool IsSelected { get; private set; }
+        public bool IsSelected { get; internal set; }
 
-        public ToggleButton(BitmapResource pImage, string pText, float pWidth, float pHeight)
+        public ToggleButton(BitmapResource pImage, string pText, float pWidth, float pHeight) : this(pImage, pText, pWidth, pHeight, null)
+        {
+        }
+
+        public ToggleButton(BitmapResource pImage, string pText, float pWidth, float pHeight, ToggleButtonGroup pGroup)
         {
             _image = pImage;
             _text = pText;
@@ -37,6 +42,11 @@ namespace Evolusim.UI
             _font = Game.Graphics.CreateFont("Arial", 18, System.Drawing.Color.White);
             _font.Alignment = Alignment.Center;
 
+            if(pGroup != null)
+            {
+                _group = pGroup;
+                _group.AddToGroup(this);
+            }
         }
 
         public void Draw(IGraphicsSystem pSystem)
@@ -56,10 +66,10 @@ namespace Evolusim.UI
         public void Update(float pDeltaTime)
         {
             var p = InputManager.MousePosition;
-            //TODO group so it doesnt unselect when clicking game board?
             _mouseOver = _rect.Contains(new System.Drawing.PointF(p.X, p.Y));
-            if(InputManager.IsPressed(Mouse.Left))
+            if(InputManager.IsPressed(Mouse.Left) && _mouseOver)
             {
+                _group?.SetAllOff();
                 IsSelected = _mouseOver;
             }
         }
