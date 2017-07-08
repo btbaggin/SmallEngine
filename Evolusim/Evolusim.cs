@@ -24,6 +24,8 @@ namespace Evolusim
         public override void Initialize()
         {
             SceneManager.BeginScene(new MenuScene(false));
+            Game.Form.Width = 1280;
+            Game.Form.Height = 720;
         }
 
         public override void Update(float pDeltaTime)

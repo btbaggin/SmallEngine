@@ -210,9 +210,14 @@ namespace SmallEngine.Graphics
             RenderTarget2D.DrawLine((RawVector2)pPoint1, (RawVector2)pPoint2, pBrush.ColorBrush);
         }
 
-        public void DrawRect(System.Drawing.RectangleF pRect, Brush pBrush)
+        public void DrawFillRect(System.Drawing.RectangleF pRect, Brush pBrush)
         {
             RenderTarget2D.FillRectangle(new RawRectangleF(pRect.Left, pRect.Top, pRect.Right, pRect.Bottom), pBrush.ColorBrush);
+        }
+
+        public void DrawRect(System.Drawing.RectangleF pRect, Brush pBrush,float pStroke)
+        {
+            RenderTarget2D.DrawRectangle(new RawRectangleF(pRect.Left, pRect.Top, pRect.Right, pRect.Bottom), pBrush.ColorBrush, pStroke);
         }
 
         public void DrawElipse(Vector2 pPoint, float pRadius, Brush pBrush)

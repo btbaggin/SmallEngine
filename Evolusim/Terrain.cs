@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Drawing;
 using SmallEngine;
 using SmallEngine.Graphics;
+using SmallEngine.Input;
 
 namespace Evolusim
 {
@@ -46,8 +47,7 @@ namespace Evolusim
 
         public void Draw(IGraphicsSystem pSystem)
         {
-            float xStep = Game.Form.Width / _width;
-            float yStep = Game.Form.Height / _height;
+            float step = Game.Form.Height / (float)_height;
             for(int x = 0; x < _width; x++)
             {
                 for(int y = 0; y < _height; y++)
@@ -55,27 +55,45 @@ namespace Evolusim
                     switch(_terrain[x,y])
                     {
                         case Type.Desert:
-                            pSystem.DrawBitmap(_desert, 1, new Vector2(xStep * x, yStep * y), new Vector2(xStep, yStep));
+                            pSystem.DrawBitmap(_desert, 1, new Vector2(step * x, step * y), new Vector2(step, step));
                             break;
 
                         case Type.Forest:
-                            pSystem.DrawBitmap(_forest, 1, new Vector2(xStep * x, yStep * y), new Vector2(xStep, yStep));
+                            pSystem.DrawBitmap(_forest, 1, new Vector2(step * x, step * y), new Vector2(step, step));
                             break;
 
                         case Type.Mountain:
-                            pSystem.DrawBitmap(_mountain, 1, new Vector2(xStep * x, yStep * y), new Vector2(xStep, yStep));
+                            pSystem.DrawBitmap(_mountain, 1, new Vector2(step * x, step * y), new Vector2(step, step));
                             break;
 
                         case Type.Plains:
-                            pSystem.DrawBitmap(_plains, 1, new Vector2(xStep * x, yStep * y), new Vector2(xStep, yStep));
+                            pSystem.DrawBitmap(_plains, 1, new Vector2(step * x, step * y), new Vector2(step, step));
                             break;
 
                         case Type.Water:
-                            pSystem.DrawBitmap(_water, 1, new Vector2(xStep * x, yStep * y), new Vector2(xStep, yStep));
+                            pSystem.DrawBitmap(_water, 1, new Vector2(step * x, step * y), new Vector2(step, step));
                             break;
                     }
                 }
             }
+        }
+
+        public void SetTypeAtMouse(Type pType)
+        {
+            var p = InputManager.MousePosition;
+            if(p.X > 0 && p.X < Game.Form.Height && p.Y > 0 && p.Y < Game.Form.Height)
+            {
+                var step = Game.Form.Height / (float)_height;
+                int x = (int)Math.Floor(p.X / step);
+                int y = (int)Math.Floor(p.Y / step);
+                _terrain[x, y] = pType;
+            }
+
+        }
+
+        public Type GetType(int pX, int pY)
+        {
+            return _terrain[pX, pY];
         }
     }
 }

@@ -12,28 +12,39 @@ namespace Evolusim
     class GameScene : Scene
     {
         Terrain _terrain;
+        Toolbar _toolbar;
 
         public override void Begin()
         {
             base.Begin();
 
             _terrain = new Terrain(100, 100);
+            _toolbar = new Toolbar();
             InputManager.Listen(Keys.Escape);
+            InputManager.Listen(Mouse.Left);
         }
 
         public override void Draw(IGraphicsSystem pSystem)
         {
             base.Draw(pSystem);
             _terrain.Draw(pSystem);
+            _toolbar.Draw(pSystem);
         }
 
         public override void Update(float pDeltaTime)
         {
             base.Update(pDeltaTime);
 
+            _toolbar.Update(pDeltaTime);
+
             if(InputManager.IsPressed(Keys.Escape))
             {
                 SceneManager.BeginScene(new MenuScene(true), SceneLoadMode.Additive);
+            }
+
+            if(InputManager.IsPressed(Mouse.Left))
+            {
+                _terrain.SetTypeAtMouse(_toolbar.SelectedType);
             }
         }
 
@@ -42,6 +53,7 @@ namespace Evolusim
             base.End();
 
             InputManager.StopListening(Keys.Escape);
+            InputManager.StopListening(Mouse.Left);
         }
     }
 }

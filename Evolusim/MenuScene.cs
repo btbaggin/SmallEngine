@@ -60,7 +60,7 @@ namespace Evolusim
         {
             base.Draw(pSystem);
 
-            pSystem.DrawRect(new System.Drawing.RectangleF(0, 0, Game.Form.Width, Game.Form.Height), _backgroundBrush);
+            pSystem.DrawFillRect(new System.Drawing.RectangleF(0, 0, Game.Form.Width, Game.Form.Height), _backgroundBrush);
 
             pSystem.DrawText("Evolusim", new System.Drawing.RectangleF(0, 50, Game.Form.Width, 30), _titleFont);
 
