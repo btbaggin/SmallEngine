@@ -10,7 +10,7 @@ namespace SmallEngine.Graphics
         void EndDraw();
         void DrawText(string pText, RectangleF pRect, Font pFont);
         void DrawBitmap(BitmapResource pBitmap, float pOpacity, Vector2 pPosition, Vector2 pScale);
-        void DrawBitmap(BitmapResource pBitmap, float pOpacity, RectangleF pSource, Vector2 pPosition);
+        void DrawBitmap(BitmapResource pBitmap, float pOpacity, Vector2 pPosition, Vector2 pScale, RectangleF pSourceRect);
         void DrawLine(Vector2 pPoint1, Vector2 pPoint2, Brush pBrush);
         void DrawFillRect(RectangleF pRect, Brush pBrush);
         void DrawRect(RectangleF pRect, Brush pBrush, float pStroke);

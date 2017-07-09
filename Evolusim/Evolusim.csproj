@@ -46,6 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Camera.cs" />
     <Compile Include="Evolusim.cs" />
     <Compile Include="GameScene.cs" />
     <Compile Include="MenuScene.cs" />

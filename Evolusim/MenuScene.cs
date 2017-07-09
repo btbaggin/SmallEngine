@@ -83,18 +83,18 @@ namespace Evolusim
         {
             base.Update(pDeltaTime);
 
-            if(InputManager.IsPressed(Keys.Up))
+            if(InputManager.KeyPressed(Keys.Up))
             {
                 if (mCurrentIndex == 0) mCurrentIndex = mItems.Count - 1;
                 else mCurrentIndex--;
             }
-            else if(InputManager.IsPressed(Keys.Down))
+            else if(InputManager.KeyPressed(Keys.Down))
             {
                 if (mCurrentIndex == mItems.Count - 1) mCurrentIndex = 0;
                 else mCurrentIndex++;
             }
 
-            if(InputManager.IsPressed(Keys.Enter))
+            if(InputManager.KeyPressed(Keys.Enter))
             {
                 SceneManager.EndScene();
             }

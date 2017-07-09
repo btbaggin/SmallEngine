@@ -186,6 +186,7 @@ namespace SmallEngine
 
                 Update(GameTime.DeltaTime);
                 FilterVisible();
+                InputManager.MouseWheelDelta = 0;
 
                 Graphics.BeginDraw();
                 Draw();

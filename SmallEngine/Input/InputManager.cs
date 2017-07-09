@@ -76,11 +76,22 @@ namespace SmallEngine.Input
             }
         }
 
-        private static int _mouseDelta;
-        public static int MouseDelta
+        private static int _mouseWheel;
+        public static int MouseWheel
         {
-            get { return _mouseDelta; }
-            internal set { _mouseDelta += value; }
+            get { return _mouseWheel; }
+            internal set
+            {
+                _mouseWheel += value;
+                MouseWheelDelta = value;
+            }
+        }
+
+        private static int _mouseWheelDelta;
+        public static int MouseWheelDelta
+        {
+            get { return _mouseWheelDelta; }
+            internal set { _mouseWheelDelta = value; }
         }
 
         private static long _holdDelay;
@@ -150,14 +161,44 @@ namespace SmallEngine.Input
             return _inputState;
         }
 
-        public static bool IsPressed(Keys pKey)
+        public static bool KeyPressed(Keys pKey)
         {
             return _inputState.IsPressed(pKey) && !_previousState.IsPressed(pKey);
         }
 
-        public static bool IsPressed(Mouse pMouse)
+        public static bool KeyPressed(Mouse pMouse)
         {
             return _inputState.IsPressed(pMouse) && !_previousState.IsPressed(pMouse);
+        }
+
+        public static bool KeyReleased(Keys pKey)
+        {
+            return !_inputState.IsPressed(pKey) && _previousState.IsPressed(pKey);
+        }
+
+        public static bool KeyReleased(Mouse pMouse)
+        {
+            return !_inputState.IsPressed(pMouse) && _previousState.IsPressed(pMouse);
+        }
+
+        public static bool KeyDown(Keys pKey)
+        {
+            return _inputState.IsPressed(pKey);
+        }
+
+        public static bool KeyDown(Mouse pMouse)
+        {
+            return _inputState.IsPressed(pMouse);
+        }
+
+        public static bool KeyUp(Keys pKey)
+        {
+            return !_inputState.IsPressed(pKey);
+        }
+
+        public static bool KeyUp(Mouse pMouse)
+        {
+            return !_inputState.IsPressed(pMouse);
         }
 
         public static void Listen(Keys pKey)

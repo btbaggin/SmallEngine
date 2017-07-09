@@ -38,17 +38,17 @@ namespace Evolusim
 
             _toolbar.Update(pDeltaTime);
 
-            if(InputManager.IsPressed(Keys.Escape))
+            if(InputManager.KeyPressed(Keys.Escape))
             {
                 SceneManager.BeginScene(new MenuScene(true), SceneLoadMode.Additive);
             }
 
-            if(InputManager.IsPressed(Mouse.Left))
+            if(InputManager.KeyDown(Mouse.Left))
             {
                 _terrain.SetTypeAtMouse(_toolbar.SelectedType);
             }
 
-            if(InputManager.IsPressed(Keys.T))
+            if(InputManager.KeyPressed(Keys.T))
             {
                 _toolbar.Toggle();
             }

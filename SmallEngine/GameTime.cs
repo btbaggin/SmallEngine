@@ -3,7 +3,7 @@ using System.Diagnostics;
 
 namespace SmallEngine
 {
-    sealed class GameTime
+    public sealed class GameTime
     {
         static readonly double _secondsPerCount;
         static double _deltaTime;

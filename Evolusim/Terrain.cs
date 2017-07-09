@@ -81,12 +81,11 @@ namespace Evolusim
             }
 
             _terrainBitmap = ((DirectXGraphicSystem)Game.Graphics).CreateTile(bitmaps, _width, _height, 64);
-
         }
 
         public void Draw(IGraphicsSystem pSystem)
         {
-            pSystem.DrawBitmap(_terrainBitmap, 1, Vector2.Zero, new Vector2(Game.Form.Height, Game.Form.Height));
+            pSystem.DrawBitmap(_terrainBitmap, 1, Vector2.Zero, new Vector2(Game.Form.Height, Game.Form.Height), Evolusim.MainCamera.Viewport);
         }
 
         public void SetTypeAtMouse(Type pType)
@@ -97,8 +96,11 @@ namespace Evolusim
                 var step = Game.Form.Height / (float)_height;
                 int x = (int)Math.Floor(p.X / step);
                 int y = (int)Math.Floor(p.Y / step);
-                _terrain[x, y] = pType;
-                RenderTerrain();
+                if(_terrain[x,y] != pType)
+                {
+                    _terrain[x, y] = pType;
+                    RenderTerrain();
+                }
             }
         }
 

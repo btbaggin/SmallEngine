@@ -67,7 +67,7 @@ namespace Evolusim.UI
         {
             var p = InputManager.MousePosition;
             _mouseOver = _rect.Contains(new System.Drawing.PointF(p.X, p.Y));
-            if(InputManager.IsPressed(Mouse.Left) && _mouseOver)
+            if(InputManager.KeyPressed(Mouse.Left) && _mouseOver)
             {
                 _group?.SetAllOff();
                 IsSelected = _mouseOver;
