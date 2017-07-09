@@ -22,7 +22,8 @@ namespace Evolusim
         public float Height { get; private set; }
         #endregion
 
-        private const float _zoomSpeed = 5;
+        private float _zoomXSpeed;
+        private float _zoomYSpeed;
         private float _moveXSpeed;
         private float _moveYSpeed;
 
@@ -41,13 +42,16 @@ namespace Evolusim
 
             Width = pMaxWidth;
             Height = pMaxHeight;
+
+            _zoomYSpeed = 5;
+            _zoomXSpeed = 5 * (Width / Height);
         }
 
         public void Update(float pDeltaTime)
         {
             var mw = InputManager.MouseWheelDelta;
-            Width += mw * _zoomSpeed;
-            Height += mw * _zoomSpeed;
+            Width += mw * _zoomXSpeed;
+            Height += mw * _zoomYSpeed;
 
             Width = MathF.Clamp(Width, _minWidth, _maxWidth);
             Height = MathF.Clamp(Height, _minHeight, _maxHeight);

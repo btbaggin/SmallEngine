@@ -4,7 +4,7 @@ namespace SmallEngine
 {
     public struct Vector2
     {
-        #region "Properties"
+        #region Properties
         /// <summary>
         /// X component of the Vector2
         /// </summary>
@@ -84,7 +84,7 @@ namespace SmallEngine
         }
         #endregion
 
-        #region "Construtors"
+        #region Construtors
         public Vector2(float pXY)
         {
             this.X = pXY;
@@ -98,7 +98,7 @@ namespace SmallEngine
         }
         #endregion
 
-        #region "Public functions"
+        #region Public functions
         /// <summary>
         /// Normalizes the vector to a length of 1
         /// </summary>
@@ -394,7 +394,7 @@ namespace SmallEngine
         }
         #endregion
 
-        #region "Operators"
+        #region Operators
         public override bool Equals(object obj)
         {
             if (obj is Vector2)

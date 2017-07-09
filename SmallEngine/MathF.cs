@@ -33,6 +33,11 @@ namespace SmallEngine
             return (pValue < pMin) ? pMin : ((pValue > pMax) ? pMax : pValue);
         }
 
+        public static float Lerp(float pValueFrom, float pValueTo, float pAmount)
+        {
+            return (pValueTo - pValueFrom) * pAmount;
+        }
+
         public static float Log(double pA)
         {
             return (float)Math.Log(pA);
