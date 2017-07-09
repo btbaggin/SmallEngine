@@ -24,7 +24,11 @@ namespace Evolusim
         int _width;
         int _height;
 
+        float _bitmapWidth;
+        float _bitmapHeight;
+
         Type[,] _terrain;
+        BitmapResource[,] _bitmaps;
 
         BitmapResource _plains;
         BitmapResource _water;
@@ -37,7 +41,10 @@ namespace Evolusim
         {
             _width = pWidth;
             _height = pHeight;
+            _bitmapWidth = _width * 64;
+            _bitmapHeight = _height * 64;
             _terrain = new Type[_width, _height];
+            _bitmaps = new BitmapResource[_width, _height];
 
             _plains = ResourceManager.Request<BitmapResource>("plains");
             _water = ResourceManager.Request<BitmapResource>("water");
@@ -45,12 +52,12 @@ namespace Evolusim
             _forest = ResourceManager.Request<BitmapResource>("forest");
             _desert = ResourceManager.Request<BitmapResource>("desert");
 
-            RenderTerrain();
+            InitializeBitmaps();
+            GenerateBitmap();
         }
 
-        private void RenderTerrain()
+        private void InitializeBitmaps()
         {
-            BitmapResource[,] bitmaps = new BitmapResource[_width, _height];
             for (int x = 0; x < _width; x++)
             {
                 for (int y = 0; y < _height; y++)
@@ -58,48 +65,72 @@ namespace Evolusim
                     switch (_terrain[x, y])
                     {
                         case Type.Desert:
-                            bitmaps[x,y] = _desert;
+                            _bitmaps[x,y] = _desert;
                             break;
 
                         case Type.Forest:
-                            bitmaps[x,y] = _forest;
+                            _bitmaps[x,y] = _forest;
                             break;
 
                         case Type.Mountain:
-                            bitmaps[x,y] = _mountain;
+                            _bitmaps[x,y] = _mountain;
                             break;
 
                         case Type.Plains:
-                            bitmaps[x,y] = _plains;
+                            _bitmaps[x,y] = _plains;
                             break;
 
                         case Type.Water:
-                            bitmaps[x,y] = _water;
+                            _bitmaps[x,y] = _water;
                             break;
                     }
                 }
             }
+        }
 
-            _terrainBitmap = ((DirectXGraphicSystem)Game.Graphics).CreateTile(bitmaps, _width, _height, 64);
+        private void GenerateBitmap()
+        {
+            //TODO this leaks
+            _terrainBitmap = ((DirectXGraphicSystem)Game.Graphics).CreateTile(_bitmaps, _width, _height, 64);
         }
 
         public void Draw(IGraphicsSystem pSystem)
         {
-            pSystem.DrawBitmap(_terrainBitmap, 1, Vector2.Zero, new Vector2(Game.Form.Height, Game.Form.Height), Evolusim.MainCamera.Viewport);
+            pSystem.DrawBitmap(_terrainBitmap, 1, Vector2.Zero, new Vector2(Game.Form.Width, Game.Form.Height), Evolusim.MainCamera.Viewport);
         }
 
-        public void SetTypeAtMouse(Type pType)
+        public void SetTypeAt(Type pType, Vector2 pPoint)
         {
-            var p = InputManager.MousePosition;
-            if(p.X > 0 && p.X < Game.Form.Height && p.Y > 0 && p.Y < Game.Form.Height)
+            int x = (int)Math.Floor(pPoint.X / 64);
+            int y = (int)Math.Floor(pPoint.Y / 64);
+            if(x >= 0 && y >= 0 && x < _terrain.GetUpperBound(0) && y < _terrain.GetUpperBound(1))
             {
-                var step = Game.Form.Height / (float)_height;
-                int x = (int)Math.Floor(p.X / step);
-                int y = (int)Math.Floor(p.Y / step);
-                if(_terrain[x,y] != pType)
+                if (_terrain[x, y] != pType)
                 {
                     _terrain[x, y] = pType;
-                    RenderTerrain();
+                    switch (pType)
+                    {
+                        case Type.Desert:
+                            _bitmaps[x, y] = _desert;
+                            break;
+
+                        case Type.Forest:
+                            _bitmaps[x, y] = _forest;
+                            break;
+
+                        case Type.Mountain:
+                            _bitmaps[x, y] = _mountain;
+                            break;
+
+                        case Type.Plains:
+                            _bitmaps[x, y] = _plains;
+                            break;
+
+                        case Type.Water:
+                            _bitmaps[x, y] = _water;
+                            break;
+                    }
+                    GenerateBitmap();
                 }
             }
         }

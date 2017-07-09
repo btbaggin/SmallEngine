@@ -45,7 +45,7 @@ namespace Evolusim
 
             if(InputManager.KeyDown(Mouse.Left))
             {
-                _terrain.SetTypeAtMouse(_toolbar.SelectedType);
+                _terrain.SetTypeAt(_toolbar.SelectedType, Evolusim.MainCamera.ToWorldSpace(InputManager.MousePosition));
             }
 
             if(InputManager.KeyPressed(Keys.T))

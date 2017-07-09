@@ -39,7 +39,7 @@ namespace Evolusim
             InputManager.Listen(Keys.Up);
             InputManager.Listen(Keys.Down);
 
-            MainCamera = new Camera(500, 2500, 500, 2500);
+            MainCamera = new Camera(889, 4444, 500, 2500);
         }
 
         public override void Update(float pDeltaTime)
