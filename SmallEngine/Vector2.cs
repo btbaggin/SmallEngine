@@ -252,6 +252,15 @@ namespace SmallEngine
             return new Vector2(pV1.Y - pV2.Y, pV2.X - pV1.X);
         }
 
+        public static Vector2 Clamp(Vector2 pValue, Vector2 pMin, Vector2 pMax)
+        {
+            if (pValue.X > pMax.X) pValue.X = pMax.X;
+            if (pValue.X < pMin.X) pValue.X = pMin.X;
+            if (pValue.Y > pMax.Y) pValue.Y = pMax.Y;
+            if (pValue.Y < pMin.Y) pValue.Y = pMin.Y;
+            return pValue;
+        }
+
         /// <summary>
         /// Returns the vector with the highest X and Y components
         /// </summary>

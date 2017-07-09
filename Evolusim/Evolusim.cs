@@ -18,6 +18,8 @@ namespace Evolusim
 
         public static Camera MainCamera { get; private set; }
 
+        public static int WorldSize { get { return 64 * 100; } }
+
         public override void LoadContent()
         {
             ResourceManager.Add<BitmapResource>("water", "Graphics/water.png");

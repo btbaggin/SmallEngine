@@ -56,6 +56,8 @@ namespace Evolusim
 
             if (_position.X < 0) _position.X = 0;
             if (_position.Y < 0) _position.Y = 0;
+            if (_position.X + Width > Evolusim.WorldSize) _position.X = Evolusim.WorldSize - Width;
+            if (_position.Y + Height > Evolusim.WorldSize) _position.Y = Evolusim.WorldSize - Height;
         }
 
         public void MoveLeft()
