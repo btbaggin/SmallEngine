@@ -17,11 +17,6 @@ namespace Evolusim
             get { return new RectangleF(_position.X, _position.Y, Width, Height); }
         }
 
-        public float ZoomLevel
-        {
-            get { return Width / 100 * 64; }
-        }
-
         public float Width { get; private set; }
 
         public float Height { get; private set; }
