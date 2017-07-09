@@ -13,7 +13,6 @@ namespace Evolusim
     {
         /*
          *TODO
-         * Bake terrain into a single bitmap
          * Camera to move around/zoom
          */
         public override void LoadContent()

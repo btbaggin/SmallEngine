@@ -31,6 +31,7 @@ namespace Evolusim
         BitmapResource _mountain;
         BitmapResource _forest;
         BitmapResource _desert;
+        BitmapResource _terrainBitmap;
 
         public Terrain(int pWidth, int pHeight)
         {
@@ -43,39 +44,49 @@ namespace Evolusim
             _mountain = ResourceManager.Request<BitmapResource>("mountain");
             _forest = ResourceManager.Request<BitmapResource>("forest");
             _desert = ResourceManager.Request<BitmapResource>("desert");
+
+            RenderTerrain();
         }
 
-        public void Draw(IGraphicsSystem pSystem)
+        private void RenderTerrain()
         {
-            float step = Game.Form.Height / (float)_height;
-            for(int x = 0; x < _width; x++)
+            BitmapResource[,] bitmaps = new BitmapResource[_width, _height];
+            for (int x = 0; x < _width; x++)
             {
-                for(int y = 0; y < _height; y++)
+                for (int y = 0; y < _height; y++)
                 {
-                    switch(_terrain[x,y])
+                    switch (_terrain[x, y])
                     {
                         case Type.Desert:
-                            pSystem.DrawBitmap(_desert, 1, new Vector2(step * x, step * y), new Vector2(step, step));
+                            bitmaps[x,y] = _desert;
                             break;
 
                         case Type.Forest:
-                            pSystem.DrawBitmap(_forest, 1, new Vector2(step * x, step * y), new Vector2(step, step));
+                            bitmaps[x,y] = _forest;
                             break;
 
                         case Type.Mountain:
-                            pSystem.DrawBitmap(_mountain, 1, new Vector2(step * x, step * y), new Vector2(step, step));
+                            bitmaps[x,y] = _mountain;
                             break;
 
                         case Type.Plains:
-                            pSystem.DrawBitmap(_plains, 1, new Vector2(step * x, step * y), new Vector2(step, step));
+                            bitmaps[x,y] = _plains;
                             break;
 
                         case Type.Water:
-                            pSystem.DrawBitmap(_water, 1, new Vector2(step * x, step * y), new Vector2(step, step));
+                            bitmaps[x,y] = _water;
                             break;
                     }
                 }
             }
+
+            _terrainBitmap = ((DirectXGraphicSystem)Game.Graphics).CreateTile(bitmaps, _width, _height, 64);
+
+        }
+
+        public void Draw(IGraphicsSystem pSystem)
+        {
+            pSystem.DrawBitmap(_terrainBitmap, 1, Vector2.Zero, new Vector2(Game.Form.Height, Game.Form.Height));
         }
 
         public void SetTypeAtMouse(Type pType)
@@ -87,8 +98,8 @@ namespace Evolusim
                 int x = (int)Math.Floor(p.X / step);
                 int y = (int)Math.Floor(p.Y / step);
                 _terrain[x, y] = pType;
+                RenderTerrain();
             }
-
         }
 
         public Type GetType(int pX, int pY)

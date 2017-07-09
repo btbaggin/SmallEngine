@@ -8,7 +8,7 @@ namespace SmallEngine.Graphics
 {
     public class BitmapResource : Resource
     {
-        public SharpDX.Direct2D1.Bitmap DirectXBitmap { get; private set; }
+        public SharpDX.Direct2D1.Bitmap DirectXBitmap { get; internal set; }
 
         public int Width { get; private set; }
 
