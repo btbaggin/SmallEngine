@@ -91,7 +91,7 @@ namespace Evolusim
         private void GenerateBitmap()
         {
             //TODO this leaks
-            _terrainBitmap = ((DirectXGraphicSystem)Game.Graphics).CreateTile(_bitmaps, _width, _height, 64);
+            _terrainBitmap = Game.Graphics.CreateTile(_bitmaps, _width, _height, 64);
         }
 
         public void Draw(IGraphicsSystem pSystem)
