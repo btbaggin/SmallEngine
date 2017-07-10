@@ -35,7 +35,7 @@ namespace SmallEngine
 
         public static float Lerp(float pValueFrom, float pValueTo, float pAmount)
         {
-            return (pValueTo - pValueFrom) * pAmount;
+            return (float)((1.0 - pAmount) * pValueFrom + pAmount * pValueTo);
         }
 
         public static float Log(double pA)

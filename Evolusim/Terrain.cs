@@ -52,6 +52,36 @@ namespace Evolusim
             _forest = ResourceManager.Request<BitmapResource>("forest");
             _desert = ResourceManager.Request<BitmapResource>("desert");
 
+            HeightMap h = new HeightMap();
+
+            for(int x = 0; x < _width; x++)
+            {
+                for(int y = 0; y < _height; y++)
+                {
+                    var hh = h.sample(x, y);
+                    if(hh < -6)
+                    {
+                        _terrain[x, y] = Type.Water;
+                    }
+                    else if(hh < -2)
+                    {
+                        _terrain[x, y] = Type.Plains;
+                    }
+                    else if(hh < 2)
+                    {
+                        _terrain[x, y] = Type.Forest;
+                    }
+                    else if(hh < 6)
+                    {
+                        _terrain[x, y] = Type.Desert;
+                    }
+                    else
+                    {
+                        _terrain[x, y] = Type.Mountain;
+                    }
+                }
+            }
+
             InitializeBitmaps();
             GenerateBitmap();
         }
