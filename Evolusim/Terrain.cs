@@ -94,25 +94,25 @@ namespace Evolusim
 
         public void Draw(IGraphicsSystem pSystem)
         {
-            int x = (int)Math.Floor(Evolusim.MainCamera.Position.X / 64);
-            int y = (int)Math.Floor(Evolusim.MainCamera.Position.Y / 64);
-
-            float numTilesX = (Evolusim.MainCamera.Width / 64);
-            float numTilesY = (Evolusim.MainCamera.Height / 64);
-
-            float startX = (x * 64) - Evolusim.MainCamera.Position.X;
-            float startY = (y * 64) - Evolusim.MainCamera.Position.Y;
+            int x = (int)(Evolusim.MainCamera.Position.X / 64);
+            int y = (int)(Evolusim.MainCamera.Position.Y / 64);
+            float numTilesX = Evolusim.MainCamera.Width / 64f;
+            float numTilesY = Evolusim.MainCamera.Height / 64f;
+            float r = Game.Form.Width / Evolusim.MainCamera.Width;
 
             //Width and height should be the same
             float tileSize = Game.Form.Width / numTilesX;
+            float startX = (x * 64) - Evolusim.MainCamera.Position.X;
+            float startY = (y * 64) - Evolusim.MainCamera.Position.Y;
+            startX *= r; startY *= r;
 
             Vector2 scale = new Vector2(tileSize, tileSize);
             var currentX = startX;
             var currentY = startY;
-            for(int i = x; i <= Math.Ceiling(x + numTilesX) + 2; i++)
+            for(int i = x; i <= x + numTilesX + 2; i++)
             {
                 if (i >= _width) break;
-                for(int j = y; j <= Math.Ceiling(y + numTilesY) + 2; j++)
+                for(int j = y; j <= y + numTilesY + 2; j++)
                 {
                     if (j >= _height) break;
                     switch(_terrain[i, j])

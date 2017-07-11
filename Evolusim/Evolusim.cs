@@ -31,6 +31,7 @@ namespace Evolusim
 
         public override void Initialize()
         {
+            MaxFps = 120;
             Game.Form.Text = "Evolusim";
             Game.Form.Width = 1280;
             Game.Form.Height = 720;
@@ -41,7 +42,7 @@ namespace Evolusim
             InputManager.Listen(Keys.Up);
             InputManager.Listen(Keys.Down);
 
-            MainCamera = new Camera(500, 2500, 889, 4444);
+            MainCamera = new Camera(889, 4444, 500, 2500 );
         }
 
         public override void Update(float pDeltaTime)
