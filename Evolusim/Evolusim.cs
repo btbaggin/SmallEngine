@@ -13,7 +13,9 @@ namespace Evolusim
     {
         /*
          *TODO
-         * Camera to move around/zoom
+         * Minimap
+         * Creatures
+         * Terrain bitmasking
          */
 
         public static Camera MainCamera { get; private set; }

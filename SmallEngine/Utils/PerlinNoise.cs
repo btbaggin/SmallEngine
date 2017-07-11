@@ -38,11 +38,11 @@ namespace SmallEngine
 
             for (int i = 0; i < GradientSizeTable; i++)
             {
-                float z = 1f - 2f * (float)_random.NextDouble();
-                float r = (float)Math.Sqrt(1f - z * z);
-                float theta = 2 * (float)Math.PI * (float)_random.NextDouble();
-                _gradients[i * 3] = r * (float)Math.Cos(theta);
-                _gradients[i * 3 + 1] = r * (float)Math.Sin(theta);
+                float z = 1f - 2f * _random.NextFloat();
+                float r = MathF.Sqrt(1f - z * z);
+                float theta = 2 * MathF.PI * _random.NextFloat();
+                _gradients[i * 3] = r * MathF.Cos(theta);
+                _gradients[i * 3 + 1] = r * MathF.Sin(theta);
                 _gradients[i * 3 + 2] = z;
             }
         }

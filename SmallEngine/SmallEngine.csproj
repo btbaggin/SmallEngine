@@ -106,6 +106,7 @@
     <Compile Include="Input\Keys.cs" />
     <Compile Include="Input\Mouse.cs" />
     <Compile Include="Utils\DiamondSquareNoise.cs" />
+    <Compile Include="Utils\Extensions.cs" />
     <Compile Include="Utils\MathF.cs" />
     <Compile Include="Physics\CollisionDetection.cs" />
     <Compile Include="Physics\Material.cs" />

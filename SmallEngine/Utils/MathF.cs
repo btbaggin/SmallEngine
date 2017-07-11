@@ -8,7 +8,7 @@ namespace SmallEngine
 {
     public class MathF
     {
-        public static float Pi
+        public static float PI
         {
             get { return (float)Math.PI; }
         }
