@@ -52,26 +52,38 @@ namespace Evolusim
             _forest = ResourceManager.Request<BitmapResource>("forest");
             _desert = ResourceManager.Request<BitmapResource>("desert");
 
-            HeightMap h = new HeightMap();
+            var n = new DiamondSquareNoise(_width);
+            var h = n.Generate(0, 20, .4f);
+
+            float minValue = 0;
+            float maxValue = 0;
+            for(int x = 0; x < _width; x++)
+            {
+                for(int y = 0; y < _width; y++)
+                {
+                    if (h[x, y] > maxValue) maxValue = h[x, y];
+                    if (h[x, y] < minValue) minValue = h[x, y];
+                }
+            }
 
             for(int x = 0; x < _width; x++)
             {
                 for(int y = 0; y < _height; y++)
                 {
-                    var hh = h.sample(x, y);
-                    if(hh < -6)
+                    var hh = (h[x, y] + Math.Abs(minValue)) / maxValue;
+                    if(hh < .45)
                     {
                         _terrain[x, y] = Type.Water;
                     }
-                    else if(hh < -2)
+                    else if(hh < .5)
                     {
                         _terrain[x, y] = Type.Plains;
                     }
-                    else if(hh < 2)
+                    else if(hh < .7)
                     {
                         _terrain[x, y] = Type.Forest;
                     }
-                    else if(hh < 6)
+                    else if(hh < .9)
                     {
                         _terrain[x, y] = Type.Desert;
                     }

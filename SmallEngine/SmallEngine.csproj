@@ -105,7 +105,8 @@
     <Compile Include="Input\InputState.cs" />
     <Compile Include="Input\Keys.cs" />
     <Compile Include="Input\Mouse.cs" />
-    <Compile Include="MathF.cs" />
+    <Compile Include="Utils\DiamondSquareNoise.cs" />
+    <Compile Include="Utils\MathF.cs" />
     <Compile Include="Physics\CollisionDetection.cs" />
     <Compile Include="Physics\Material.cs" />
     <Compile Include="Threading\ResourcePool.cs" />
@@ -120,6 +121,7 @@
     <Compile Include="SceneManager.cs" />
     <Compile Include="Audio\AudioComponent.cs" />
     <Compile Include="Physics\RigidBodyComponent.cs" />
+    <Compile Include="Utils\PerlinNoise.cs" />
     <Compile Include="Vector2.cs" />
   </ItemGroup>
   <ItemGroup>
