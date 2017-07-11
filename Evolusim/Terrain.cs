@@ -28,14 +28,12 @@ namespace Evolusim
         float _bitmapHeight;
 
         Type[,] _terrain;
-        BitmapResource[,] _bitmaps;
 
         BitmapResource _plains;
         BitmapResource _water;
         BitmapResource _mountain;
         BitmapResource _forest;
         BitmapResource _desert;
-        BitmapResource _terrainBitmap;
 
         public Terrain(int pWidth, int pHeight)
         {
@@ -44,7 +42,6 @@ namespace Evolusim
             _bitmapWidth = _width * 64;
             _bitmapHeight = _height * 64;
             _terrain = new Type[_width, _height];
-            _bitmaps = new BitmapResource[_width, _height];
 
             _plains = ResourceManager.Request<BitmapResource>("plains");
             _water = ResourceManager.Request<BitmapResource>("water");
@@ -93,52 +90,54 @@ namespace Evolusim
                     }
                 }
             }
-
-            InitializeBitmaps();
-            GenerateBitmap();
-        }
-
-        private void InitializeBitmaps()
-        {
-            for (int x = 0; x < _width; x++)
-            {
-                for (int y = 0; y < _height; y++)
-                {
-                    switch (_terrain[x, y])
-                    {
-                        case Type.Desert:
-                            _bitmaps[x,y] = _desert;
-                            break;
-
-                        case Type.Forest:
-                            _bitmaps[x,y] = _forest;
-                            break;
-
-                        case Type.Mountain:
-                            _bitmaps[x,y] = _mountain;
-                            break;
-
-                        case Type.Plains:
-                            _bitmaps[x,y] = _plains;
-                            break;
-
-                        case Type.Water:
-                            _bitmaps[x,y] = _water;
-                            break;
-                    }
-                }
-            }
-        }
-
-        private void GenerateBitmap()
-        {
-            //TODO this leaks
-            _terrainBitmap = Game.Graphics.CreateTile(_bitmaps, _width, _height, 64);
         }
 
         public void Draw(IGraphicsSystem pSystem)
         {
-            pSystem.DrawBitmap(_terrainBitmap, 1, Vector2.Zero, new Vector2(Game.Form.Width, Game.Form.Height), Evolusim.MainCamera.Viewport);
+            int x = (int)Math.Floor(Evolusim.MainCamera.Position.X / 64);
+            int y = (int)Math.Floor(Evolusim.MainCamera.Position.Y / 64);
+
+            float numTilesX = (Evolusim.MainCamera.Width / 64);
+            float numTilesY = (Evolusim.MainCamera.Height / 64);
+
+            float startX = (x * 64) - Evolusim.MainCamera.Position.X;
+            float startY = (y * 64) - Evolusim.MainCamera.Position.Y;
+
+            //Width and height should be the same
+            float tileSize = Game.Form.Width / numTilesX;
+
+            Vector2 scale = new Vector2(tileSize, tileSize);
+            var currentX = startX;
+            var currentY = startY;
+            for(int i = x; i <= Math.Ceiling(x + numTilesX) + 2; i++)
+            {
+                if (i >= _width) break;
+                for(int j = y; j <= Math.Ceiling(y + numTilesY) + 2; j++)
+                {
+                    if (j >= _height) break;
+                    switch(_terrain[i, j])
+                    {
+                        case Type.Desert:
+                            pSystem.DrawBitmap(_desert, 1, new Vector2(currentX, currentY), scale);
+                            break;
+                        case Type.Forest:
+                            pSystem.DrawBitmap(_forest, 1, new Vector2(currentX, currentY), scale);
+                            break;
+                        case Type.Mountain:
+                            pSystem.DrawBitmap(_mountain, 1, new Vector2(currentX, currentY), scale);
+                            break;
+                        case Type.Plains:
+                            pSystem.DrawBitmap(_plains, 1, new Vector2(currentX, currentY), scale);
+                            break;
+                        case Type.Water:
+                            pSystem.DrawBitmap(_water, 1, new Vector2(currentX, currentY), scale);
+                            break;
+                    }
+                    currentY += tileSize;
+                }
+                currentY = startY;
+                currentX += tileSize;
+            }
         }
 
         public void SetTypeAt(Type pType, Vector2 pPoint)
@@ -150,29 +149,6 @@ namespace Evolusim
                 if (_terrain[x, y] != pType)
                 {
                     _terrain[x, y] = pType;
-                    switch (pType)
-                    {
-                        case Type.Desert:
-                            _bitmaps[x, y] = _desert;
-                            break;
-
-                        case Type.Forest:
-                            _bitmaps[x, y] = _forest;
-                            break;
-
-                        case Type.Mountain:
-                            _bitmaps[x, y] = _mountain;
-                            break;
-
-                        case Type.Plains:
-                            _bitmaps[x, y] = _plains;
-                            break;
-
-                        case Type.Water:
-                            _bitmaps[x, y] = _water;
-                            break;
-                    }
-                    GenerateBitmap();
                 }
             }
         }

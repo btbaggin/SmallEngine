@@ -18,7 +18,7 @@ namespace Evolusim
 
         public static Camera MainCamera { get; private set; }
 
-        public static int WorldSize { get { return 64 * 100; } }
+        public static int WorldSize { get { return 64 * 513; } } //TODO dont hardcode
 
         public override void LoadContent()
         {
@@ -41,7 +41,7 @@ namespace Evolusim
             InputManager.Listen(Keys.Up);
             InputManager.Listen(Keys.Down);
 
-            MainCamera = new Camera(889, 4444, 500, 2500);
+            MainCamera = new Camera(500, 2500, 889, 4444);
         }
 
         public override void Update(float pDeltaTime)

@@ -20,6 +20,13 @@ namespace Evolusim
         public float Width { get; private set; }
 
         public float Height { get; private set; }
+
+        private Vector2 _position;
+        public Vector2 Position
+        {
+            get { return _position; }
+            private set { _position = value; }
+        }
         #endregion
 
         private float _zoomXSpeed;
@@ -27,14 +34,12 @@ namespace Evolusim
         private float _moveXSpeed;
         private float _moveYSpeed;
 
-        private Vector2 _position;
-
         private float _minWidth, _minHeight;
         private float _maxWidth, _maxHeight;
 
         public Camera(float pMinWidth, float pMaxWidth, float pMinHeight, float pMaxHeight)
         {
-            _position = Vector2.Zero;
+            Position = Vector2.Zero;
             _minWidth = pMinWidth;
             _maxWidth = pMaxWidth;
             _minHeight = pMinHeight;

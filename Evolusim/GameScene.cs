@@ -18,7 +18,7 @@ namespace Evolusim
         {
             base.Begin();
 
-            _terrain = new Terrain(129, 129);
+            _terrain = new Terrain(513, 513);
             _toolbar = new Toolbar();
             InputManager.Listen(Keys.T);
             InputManager.Listen(Keys.Escape);
