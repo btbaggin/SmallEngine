@@ -83,6 +83,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Audio\AudioState.cs" />
+    <Compile Include="Camera.cs" />
     <Compile Include="Components\Component.cs" />
     <Compile Include="Components\DependencyComponent.cs" />
     <Compile Include="Components\IGameObject.cs" />

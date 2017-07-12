@@ -142,23 +142,6 @@ namespace SmallEngine.Graphics
             RenderTarget2D.DrawText(pText, pFont.Format, new RawRectangleF(pRect.X, pRect.Y, pRect.Right, pRect.Bottom), pFont.Brush);
         }
 
-        public BitmapResource CreateTile(BitmapResource[,] pBitmaps, int pWidth, int pHeight, int pStride)
-        {
-            var bmp = new Bitmap(RenderTarget2D, new Size2(pWidth * pStride, pHeight * pStride), new BitmapProperties(RenderTarget2D.PixelFormat));
-
-            for(int x = 0; x < pWidth; x++)
-            {
-                for (int y = 0; y < pHeight; y++)
-                {
-                    var b = pBitmaps[x, y];
-                    bmp.CopyFromBitmap(b.DirectXBitmap, new RawPoint(x * pStride, y * pStride));
-                }
-            }
-
-            var br = new BitmapResource() { DirectXBitmap = bmp };
-            return br;
-        }
-
         public Bitmap LoadBitmap(string pFile, out int pWidth, out int pHeight)
         {
             System.Diagnostics.Debug.Assert(System.IO.File.Exists(pFile));

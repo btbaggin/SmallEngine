@@ -10,7 +10,6 @@ namespace SmallEngine.Input
 {
     public class InputManager
     {
-        //TODO this needs to be a dictionary or something...
         private static List<InputInfo> _keys;
         private IntPtr _handle;
         private static InputState _inputState;

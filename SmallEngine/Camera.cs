@@ -7,15 +7,17 @@ using System.Drawing;
 using SmallEngine;
 using SmallEngine.Input;
 
-namespace Evolusim
+namespace SmallEngine
 {
-    class Camera
+    public class Camera
     {
         #region Properties
         public RectangleF Viewport
         {
             get { return new RectangleF(_position.X, _position.Y, Width, Height); }
         }
+
+        public RectangleF Bounds { get; set; }
 
         public float Width { get; private set; }
 
@@ -63,10 +65,10 @@ namespace Evolusim
             _moveXSpeed = Width;
             _moveYSpeed = Height;
 
-            if (_position.X < 0) _position.X = 0;
-            if (_position.Y < 0) _position.Y = 0;
-            if (_position.X + Width > Evolusim.WorldSize) _position.X = Evolusim.WorldSize - Width;
-            if (_position.Y + Height > Evolusim.WorldSize) _position.Y = Evolusim.WorldSize - Height;
+            if (_position.X < Bounds.Left) _position.X = 0;
+            if (_position.Y < Bounds.Top) _position.Y = 0;
+            if (_position.X + Width > Bounds.Right) _position.X = Bounds.Right - Width;
+            if (_position.Y + Height > Bounds.Bottom) _position.Y = Bounds.Bottom - Height;
         }
 
         public void MoveLeft()

@@ -46,6 +46,7 @@ namespace Evolusim
             InputManager.Listen(Keys.Up);
             InputManager.Listen(Keys.Down);
             InputManager.Listen(Keys.Enter);
+
             _titleFont = Game.Graphics.CreateFont("Arial", 28, System.Drawing.Color.Blue);
             _font = Game.Graphics.CreateFont("Arial", 16, System.Drawing.Color.Black);
             _highlightFont = Game.Graphics.CreateFont("Arial", 18, System.Drawing.Color.White);

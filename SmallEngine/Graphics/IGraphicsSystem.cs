@@ -19,7 +19,6 @@ namespace SmallEngine.Graphics
         void SetTransform(float pRotation, Vector2 pCenter);
         void ResetTransform();
 
-        BitmapResource CreateTile(BitmapResource[,] pBitmaps, int pWidth, int pHeight, int pStride);
         Font CreateFont(string pFamily, float pSize, Color pColor);
         Brush CreateBrush(Color pColor);
         //TODO effects?

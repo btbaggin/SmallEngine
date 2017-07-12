@@ -45,6 +45,7 @@ namespace Evolusim
             InputManager.Listen(Keys.Down);
 
             MainCamera = new Camera(889, 4444, 500, 2500 );
+            MainCamera.Bounds = new System.Drawing.RectangleF(0, 0, WorldSize, WorldSize);
         }
 
         public override void Update(float pDeltaTime)
