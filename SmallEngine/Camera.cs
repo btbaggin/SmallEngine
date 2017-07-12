@@ -29,6 +29,8 @@ namespace SmallEngine
             get { return _position; }
             private set { _position = value; }
         }
+
+        public int ZoomSpeed { get; set; }
         #endregion
 
         private float _zoomXSpeed;
@@ -49,9 +51,7 @@ namespace SmallEngine
 
             Width = pMaxWidth;
             Height = pMaxHeight;
-
-            _zoomYSpeed = 5;
-            _zoomXSpeed = 5 * (Width / Height);
+            ZoomSpeed = 5;
         }
 
         public void Update(float pDeltaTime)
@@ -59,6 +59,8 @@ namespace SmallEngine
             var mw = InputManager.MouseWheelDelta;
             Width += mw * _zoomXSpeed;
             Height += mw * _zoomYSpeed;
+            _zoomYSpeed = ZoomSpeed;
+            _zoomXSpeed = ZoomSpeed * (Width / Height);
 
             Width = MathF.Clamp(Width, _minWidth, _maxWidth);
             Height = MathF.Clamp(Height, _minHeight, _maxHeight);

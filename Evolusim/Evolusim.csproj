@@ -46,9 +46,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BitmapRenderComponent.cs" />
     <Compile Include="Evolusim.cs" />
     <Compile Include="GameScene.cs" />
     <Compile Include="MenuScene.cs" />
+    <Compile Include="MovementComponent.cs" />
     <Compile Include="Organism.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

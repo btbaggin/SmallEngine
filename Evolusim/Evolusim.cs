@@ -29,6 +29,7 @@ namespace Evolusim
             ResourceManager.Add<BitmapResource>("mountain", "Graphics/mountain.jpg");
             ResourceManager.Add<BitmapResource>("desert", "Graphics/desert.jpg");
             ResourceManager.Add<BitmapResource>("forest", "Graphics/forest.jpg");
+            ResourceManager.Add<BitmapResource>("organism", "Graphics/water.png");
         }
 
         public override void Initialize()

@@ -14,7 +14,7 @@ namespace Evolusim
         Terrain _terrain;
         Toolbar _toolbar;
 
-        public override void Begin()
+        protected override void Begin()
         {
             base.Begin();
 
@@ -28,16 +28,21 @@ namespace Evolusim
             InputManager.Listen(Keys.Right);
 
             InputManager.Listen(Mouse.Left);
+
+            for(int i = 0; i < 100; i++)
+            {
+                Organism.Create();
+            }
         }
 
-        public override void Draw(IGraphicsSystem pSystem)
+        protected override void Draw(IGraphicsSystem pSystem)
         {
             base.Draw(pSystem);
             _terrain.Draw(pSystem);
             _toolbar.Draw(pSystem);
         }
 
-        public override void Update(float pDeltaTime)
+        protected override void Update(float pDeltaTime)
         {
             base.Update(pDeltaTime);
 
@@ -59,7 +64,7 @@ namespace Evolusim
             }
         }
 
-        public override void End()
+        protected override void End()
         {
             base.End();
 

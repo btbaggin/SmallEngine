@@ -40,7 +40,7 @@ namespace Evolusim
             _inGame = pInGame;
         }
 
-        public override void Begin()
+        protected override void Begin()
         {
             base.Begin();
             InputManager.Listen(Keys.Up);
@@ -57,7 +57,7 @@ namespace Evolusim
             _highlightFont.Alignment = Alignment.Center;
         }
 
-        public override void Draw(IGraphicsSystem pSystem)
+        protected override void Draw(IGraphicsSystem pSystem)
         {
             base.Draw(pSystem);
 
@@ -80,7 +80,7 @@ namespace Evolusim
             }
         }
 
-        public override void Update(float pDeltaTime)
+        protected override void Update(float pDeltaTime)
         {
             base.Update(pDeltaTime);
 
@@ -101,7 +101,7 @@ namespace Evolusim
             }
         }
 
-        public override void End()
+        protected override void End()
         {
             base.End();
 

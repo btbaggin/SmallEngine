@@ -24,11 +24,12 @@ namespace SmallEngine
             OpenGL
         }
 
+        private SceneManager _sceneManager;
         private InputManager _inputManager;
         private float _timeElapsed;
         private int _frameCount;
 
-        #region "Properties"
+        #region Properties
         public static IGraphicsSystem Graphics { get; private set; }
 
         public int MaxFps { get; set; } = 0;
@@ -37,7 +38,10 @@ namespace SmallEngine
 
         public bool IsPlaying { get; set; }
 
-        protected SceneManager SceneManager { get; private set; }
+        protected Scene Scene
+        {
+            get { return SceneManager.Current; }
+        }
 
         public static GameForm Form { get; private set; }
 
@@ -60,7 +64,7 @@ namespace SmallEngine
         public Game()
         {
             Form = new GameForm();
-            SceneManager = new SceneManager(this);
+            _sceneManager = new SceneManager(this);
             _inputManager = new InputManager(Form.Handle);
             GameWorld = new World();
 
@@ -86,10 +90,10 @@ namespace SmallEngine
 
         public virtual void Update(float pDeltaTime)
         {
-            SceneManager.Current.Update(pDeltaTime);
+            Scene.Update(pDeltaTime);
 
             //Update game objects
-            foreach(var go in SceneManager.Current.GameObjects)
+            foreach(var go in Scene.GameObjects)
             {
                 go.Update(pDeltaTime);
             }
@@ -115,7 +119,7 @@ namespace SmallEngine
 
         private void Draw()
         {
-            SceneManager.Current.Draw(Graphics);
+            Scene.Draw(Graphics);
 
             foreach (var r in _toRender)
             {
@@ -128,7 +132,7 @@ namespace SmallEngine
 
         internal void Destroy(IGameObject pGameObject)
         {
-            SceneManager.Destroy(pGameObject);
+            Scene.Destroy(pGameObject);
         }
 
         public void Run()
@@ -176,7 +180,7 @@ namespace SmallEngine
                     return;
                 }
 
-                SceneManager.DisposeGameObjects();
+                Scene.DisposeGameObjects();
                 GameTime.Tick();
 
                 //Cache pressed keys
