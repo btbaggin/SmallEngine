@@ -98,17 +98,14 @@ namespace Evolusim
             int y = (int)(Evolusim.MainCamera.Position.Y / 64);
             float numTilesX = Evolusim.MainCamera.Width / 64f;
             float numTilesY = Evolusim.MainCamera.Height / 64f;
-            float r = Game.Form.Width / Evolusim.MainCamera.Width;
 
             //Width and height should be the same
             float tileSize = Game.Form.Width / numTilesX;
-            float startX = (x * 64) - Evolusim.MainCamera.Position.X;
-            float startY = (y * 64) - Evolusim.MainCamera.Position.Y;
-            startX *= r; startY *= r;
+            var startPoint = Evolusim.MainCamera.ToCameraSpace(new Vector2(x * 64, y * 64));
 
             Vector2 scale = new Vector2(tileSize, tileSize);
-            var currentX = startX;
-            var currentY = startY;
+            var currentX = startPoint.X;
+            var currentY = startPoint.Y;
             for(int i = x; i <= x + numTilesX + 2; i++)
             {
                 if (i >= _width) break;
@@ -135,7 +132,7 @@ namespace Evolusim
                     }
                     currentY += tileSize;
                 }
-                currentY = startY;
+                currentY = startPoint.Y;
                 currentX += tileSize;
             }
         }

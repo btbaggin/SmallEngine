@@ -100,7 +100,8 @@ namespace Evolusim
         {
             var dx = Width / Game.Form.Width;
             var dy = Height / Game.Form.Height;
-            return new Vector2(pWorldSpace.X / dx, pWorldSpace.Y / dy) - _position;
+            var p = pWorldSpace - _position;
+            return new Vector2(p.X / dx, p.Y / dy);
         }
     }
 }
