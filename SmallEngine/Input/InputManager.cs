@@ -203,12 +203,42 @@ namespace SmallEngine.Input
 
         public static void Listen(Keys pKey)
         {
-            _keys.Add(new InputInfo(pKey, 0));
+            if(!CheckExists(pKey))
+            {
+                _keys.Add(new InputInfo(pKey, 0));
+            }
         }
 
         public static void Listen(Mouse pMouse)
         {
-            _keys.Add(new InputInfo(pMouse, 0));
+            if(!CheckExists(pMouse))
+            {
+                _keys.Add(new InputInfo(pMouse, 0));
+            }
+        }
+
+        private static bool CheckExists(Keys pKey)
+        {
+            foreach(InputInfo k in _keys)
+            {
+                if(k.Key.HasValue && k.Key.Value == pKey)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private static bool CheckExists(Mouse pMouse)
+        {
+            foreach (InputInfo k in _keys)
+            {
+                if (k.Mouse.HasValue && k.Mouse.Value == pMouse)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         public static void StopListening(Keys pKey)

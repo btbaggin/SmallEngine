@@ -98,8 +98,9 @@ namespace Evolusim
 
         public Vector2 ToCameraSpace(Vector2 pWorldSpace)
         {
-            //TODO
-            return pWorldSpace - _position;
+            var dx = Width / Game.Form.Width;
+            var dy = Height / Game.Form.Height;
+            return new Vector2(pWorldSpace.X / dx, pWorldSpace.Y / dy) - _position;
         }
     }
 }

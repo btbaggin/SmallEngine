@@ -22,6 +22,11 @@ namespace Evolusim
             _toolbar = new Toolbar();
             InputManager.Listen(Keys.T);
             InputManager.Listen(Keys.Escape);
+            InputManager.Listen(Keys.Up);
+            InputManager.Listen(Keys.Down);
+            InputManager.Listen(Keys.Left);
+            InputManager.Listen(Keys.Right);
+
             InputManager.Listen(Mouse.Left);
         }
 
@@ -60,6 +65,11 @@ namespace Evolusim
 
             InputManager.StopListening(Keys.T);
             InputManager.StopListening(Keys.Escape);
+            InputManager.StopListening(Keys.Up);
+            InputManager.StopListening(Keys.Down);
+            InputManager.StopListening(Keys.Left);
+            InputManager.StopListening(Keys.Right);
+
             InputManager.StopListening(Mouse.Left);
         }
     }
