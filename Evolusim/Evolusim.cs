@@ -52,8 +52,6 @@ namespace Evolusim
 
         public override void Update(float pDeltaTime)
         {
-            base.Update(pDeltaTime); //Update GameObjects
-            
             if(InputManager.KeyDown(Keys.Left))
             {
                 ActiveCamera.MoveLeft();
@@ -73,6 +71,8 @@ namespace Evolusim
             {
                 ActiveCamera.MoveDown();
             }
+
+            base.Update(pDeltaTime);
         }
     }
 }
