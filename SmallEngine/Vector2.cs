@@ -174,9 +174,18 @@ namespace SmallEngine
         public static Vector2 Lerp(Vector2 pVectorFrom, Vector2 pVectorTo, float pAmount)
         {
             if (pVectorFrom == null) throw new ArgumentNullException("pV1");
-            if (pVectorFrom == null) throw new ArgumentNullException("pV2");
+            if (pVectorTo == null) throw new ArgumentNullException("pV2");
 
-            return (pVectorTo - pVectorFrom) * pAmount;
+            return  pVectorFrom + ((pVectorTo - pVectorFrom) * pAmount);
+        }
+
+        public static Vector2 MoveTowards(Vector2 pVectorFrom, Vector2 pVectorTo, float pAmount)
+        {
+            if (pVectorFrom == null) throw new ArgumentNullException("pV1");
+            if (pVectorTo == null) throw new ArgumentNullException("pV2");
+
+            //TODO
+            return Lerp(pVectorFrom, pVectorTo, pAmount);
         }
 
         /// <summary>

@@ -59,6 +59,8 @@ namespace SmallEngine
         }
 
         public World GameWorld { get; private set; }
+
+        public static Camera ActiveCamera { get; set; }
         #endregion  
 
         public Game()
@@ -91,9 +93,10 @@ namespace SmallEngine
         public virtual void Update(float pDeltaTime)
         {
             Scene.Update(pDeltaTime);
+            ActiveCamera.Update(pDeltaTime);
 
             //Update game objects
-            foreach(var go in Scene.GameObjects)
+            foreach (var go in Scene.GameObjects)
             {
                 go.Update(pDeltaTime);
             }
@@ -107,9 +110,9 @@ namespace SmallEngine
             //Filter out ones not on screen
             _toRender.Clear();
             foreach(var r in RenderComponent.Renderers)
-            {
-                var b = r.GameObject.Bounds;
-                var onScreen = b.IntersectsWith(Form.ClientRectangle);
+            { 
+                //var b = r.GameObject.Bounds;
+                var onScreen = ActiveCamera.IsVisible(r.GameObject);//TODO need to use camera // b.IntersectsWith(Form.ClientRectangle);
                 if(onScreen && r.Visible && r.Opacity > 0f)
                 {
                     _toRender.Add(r);

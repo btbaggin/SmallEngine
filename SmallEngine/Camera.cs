@@ -67,8 +67,8 @@ namespace SmallEngine
             _moveXSpeed = Width;
             _moveYSpeed = Height;
 
-            if (_position.X < Bounds.Left) _position.X = 0;
-            if (_position.Y < Bounds.Top) _position.Y = 0;
+            if (_position.X < Bounds.Left) _position.X = Bounds.Left;
+            if (_position.Y < Bounds.Top) _position.Y = Bounds.Top;
             if (_position.X + Width > Bounds.Right) _position.X = Bounds.Right - Width;
             if (_position.Y + Height > Bounds.Bottom) _position.Y = Bounds.Bottom - Height;
         }
@@ -106,6 +106,13 @@ namespace SmallEngine
             var dy = Height / Game.Form.Height;
             var p = pWorldSpace - _position;
             return new Vector2(p.X / dx, p.Y / dy);
+        }
+
+        public bool IsVisible(IGameObject pGameObject)
+        {
+            var p = ToCameraSpace(pGameObject.Position);
+            return p.X + pGameObject.Scale.X > 0 && p.X < Width &&
+                   p.Y + pGameObject.Scale.Y > 0 && p.Y < Height;
         }
     }
 }

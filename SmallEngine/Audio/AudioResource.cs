@@ -20,6 +20,7 @@ namespace SmallEngine.Audio
 
     public class AudioResource : Resource
     {
+        //TODO look at sound playing properly-
         public delegate void SoundEndEventHandler(object pSender, SoundEventArgs pInt);
         public event SoundEndEventHandler SoundEnd;
 
@@ -29,7 +30,7 @@ namespace SmallEngine.Audio
         internal static List<SourceVoice> FreeVoices;
         static MasteringVoice _mv;
 
-        #region "Resource Functions"
+        #region Resource Functions
         internal override void Create()
         {
             LoadSound(Path);
@@ -57,7 +58,7 @@ namespace SmallEngine.Audio
         }
         #endregion
 
-        #region "Protected properties"
+        #region Protected properties
         protected bool CurrentlyLooping { get; set; }
 
         protected int LoopCount { get; set; }
@@ -69,7 +70,7 @@ namespace SmallEngine.Audio
         protected string FileName { get; set; }
         #endregion
 
-        #region "Public properties"
+        #region Public properties
         /// <summary>
         /// Current state of the sound.
         /// </summary>
@@ -377,7 +378,6 @@ namespace SmallEngine.Audio
         {
             Voice.BufferEnd -= OnSoundEnd;
             ReuseVoice(ref Voice, this);
-            Voice = null;
             //if we are looping
             if (CurrentlyLooping)
             {

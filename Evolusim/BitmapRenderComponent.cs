@@ -23,7 +23,7 @@ namespace Evolusim
 
         public override void Draw(IGraphicsSystem pSystem)
         {
-            pSystem.DrawBitmap(_bitmap, 1, Evolusim.MainCamera.ToCameraSpace(GameObject.Position), GameObject.Scale);
+            pSystem.DrawBitmap(_bitmap, 1, Evolusim.ActiveCamera.ToCameraSpace(GameObject.Position), GameObject.Scale);
         }
     }
 }

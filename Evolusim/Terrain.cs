@@ -94,14 +94,14 @@ namespace Evolusim
 
         public void Draw(IGraphicsSystem pSystem)
         {
-            int x = (int)(Evolusim.MainCamera.Position.X / 64);
-            int y = (int)(Evolusim.MainCamera.Position.Y / 64);
-            float numTilesX = Evolusim.MainCamera.Width / 64f;
-            float numTilesY = Evolusim.MainCamera.Height / 64f;
+            int x = (int)(Evolusim.ActiveCamera.Position.X / 64);
+            int y = (int)(Evolusim.ActiveCamera.Position.Y / 64);
+            float numTilesX = Evolusim.ActiveCamera.Width / 64f;
+            float numTilesY = Evolusim.ActiveCamera.Height / 64f;
 
             //Width and height should be the same
             float tileSize = Game.Form.Width / numTilesX;
-            var startPoint = Evolusim.MainCamera.ToCameraSpace(new Vector2(x * 64, y * 64));
+            var startPoint = Evolusim.ActiveCamera.ToCameraSpace(new Vector2(x * 64, y * 64));
 
             Vector2 scale = new Vector2(tileSize, tileSize);
             var currentX = startPoint.X;

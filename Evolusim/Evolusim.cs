@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SmallEngine;
+using SmallEngine.Audio;
 using SmallEngine.Input;
 using SmallEngine.Graphics;
 
@@ -18,8 +19,6 @@ namespace Evolusim
          * Terrain bitmasking
          */
 
-        public static Camera MainCamera { get; private set; }
-
         public static int WorldSize { get { return 64 * 513; } } //TODO dont hardcode
 
         public override void LoadContent()
@@ -30,6 +29,8 @@ namespace Evolusim
             ResourceManager.Add<BitmapResource>("desert", "Graphics/desert.jpg");
             ResourceManager.Add<BitmapResource>("forest", "Graphics/forest.jpg");
             ResourceManager.Add<BitmapResource>("organism", "Graphics/water.png");
+
+            ResourceManager.Add<AudioResource>("menu", "Audio/misc_menu.wav");
         }
 
         public override void Initialize()
@@ -45,8 +46,8 @@ namespace Evolusim
             InputManager.Listen(Keys.Up);
             InputManager.Listen(Keys.Down);
 
-            MainCamera = new Camera(889, 4444, 500, 2500 );
-            MainCamera.Bounds = new System.Drawing.RectangleF(0, 0, WorldSize, WorldSize);
+            ActiveCamera = new Camera(889, 4444, 500, 2500);
+            ActiveCamera.Bounds = new System.Drawing.RectangleF(0, 0, WorldSize, WorldSize);
         }
 
         public override void Update(float pDeltaTime)
@@ -55,25 +56,23 @@ namespace Evolusim
             
             if(InputManager.KeyDown(Keys.Left))
             {
-                MainCamera.MoveLeft();
+                ActiveCamera.MoveLeft();
             }
 
             if(InputManager.KeyDown(Keys.Right))
             {
-                MainCamera.MoveRight();
+                ActiveCamera.MoveRight();
             }
 
             if(InputManager.KeyDown(Keys.Up))
             {
-                MainCamera.MoveUp();
+                ActiveCamera.MoveUp();
             }
 
             if(InputManager.KeyDown(Keys.Down))
             {
-                MainCamera.MoveDown();
+                ActiveCamera.MoveDown();
             }
-
-            MainCamera.Update(pDeltaTime);
         }
     }
 }

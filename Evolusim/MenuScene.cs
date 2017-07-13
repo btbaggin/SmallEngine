@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using SmallEngine;
+using SmallEngine.Audio;
 using SmallEngine.Graphics;
 using SmallEngine.Input;
 
@@ -15,6 +16,7 @@ namespace Evolusim
         private Font _font;
         private Font _highlightFont;
         private Brush _backgroundBrush;
+        private AudioResource _menu;
 
         public MenuScene(bool pInGame) : base()
         {
@@ -52,6 +54,8 @@ namespace Evolusim
             _highlightFont = Game.Graphics.CreateFont("Arial", 18, System.Drawing.Color.White);
             _backgroundBrush = Game.Graphics.CreateBrush(System.Drawing.Color.Aqua);
 
+            _menu = ResourceManager.Request<AudioResource>("menu");
+
             _titleFont.Alignment = Alignment.Center;
             _font.Alignment = Alignment.Center;
             _highlightFont.Alignment = Alignment.Center;
@@ -88,11 +92,14 @@ namespace Evolusim
             {
                 if (mCurrentIndex == 0) mCurrentIndex = mItems.Count - 1;
                 else mCurrentIndex--;
+                _menu.PlayASync();
+
             }
             else if(InputManager.KeyPressed(Keys.Down))
             {
                 if (mCurrentIndex == mItems.Count - 1) mCurrentIndex = 0;
                 else mCurrentIndex++;
+                _menu.PlayASync();
             }
 
             if(InputManager.KeyPressed(Keys.Enter))

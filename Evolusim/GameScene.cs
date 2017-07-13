@@ -29,10 +29,10 @@ namespace Evolusim
 
             InputManager.Listen(Mouse.Left);
 
-            for(int i = 0; i < 100; i++)
-            {
+            //for(int i = 0; i < 100; i++)
+            //{
                 Organism.Create();
-            }
+            //}
         }
 
         protected override void Draw(IGraphicsSystem pSystem)
@@ -55,7 +55,7 @@ namespace Evolusim
 
             if(InputManager.KeyDown(Mouse.Left))
             {
-                _terrain.SetTypeAt(_toolbar.SelectedType, Evolusim.MainCamera.ToWorldSpace(InputManager.MousePosition));
+                _terrain.SetTypeAt(_toolbar.SelectedType, Evolusim.ActiveCamera.ToWorldSpace(InputManager.MousePosition));
             }
 
             if(InputManager.KeyPressed(Keys.T))
