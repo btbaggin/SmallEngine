@@ -18,17 +18,10 @@ namespace SmallEngine.Input
 
         #region Win32 functions
         [DllImport("user32.dll")]
-        static extern short GetAsyncKeyState(Keys pKey);
-        public bool IsKeyPressed(Keys pKey)
+        static extern short GetAsyncKeyState(int pKey);
+        public bool IsKeyPressed(int pKey)
         {
             return 0 != (GetAsyncKeyState(pKey) & 0x8000);
-        }
-
-        [DllImport("user32.dll")]
-        static extern short GetAsyncKeyState(Mouse pMouse);
-        public bool IsMousePressed(Mouse pMouse)
-        {
-            return 0 != (GetAsyncKeyState(pMouse) & 0x8000);
         }
 
         [DllImport("user32.dll", SetLastError = true)]
@@ -129,29 +122,27 @@ namespace SmallEngine.Input
             GetCursorPos(out POINT p);
             ScreenToClient(_handle, ref p);
             _mousePos = new Vector2(p.X, p.Y);
+            CheckDrag();
         }
 
         private void GetStatus(ref InputInfo pKey, out bool pPressed, out bool pHeld)
         {
             var time = GameTime.CurrentTime;
-            var keyPressed = pKey.Key.HasValue ? IsKeyPressed(pKey.Key.Value) : IsMousePressed(pKey.Mouse.Value);
+            var keyPressed = IsKeyPressed(pKey.Value);
 
             //Pressed if the key is down and enough time has passed since it was last registered
-            pPressed = keyPressed && time > pKey.LastRegistered + pKey.Delay;
+            pPressed = keyPressed && time > pKey.LastPressed + pKey.Delay;
             //Held if its pressed, its currently begin held, and its been held for long enough to trigger hold
-            pHeld = (keyPressed && pKey.LastReleased < pKey.LastPressed && time > pKey.LastPressed + _holdDelay);   //TODO can we get this from windows?
+            pHeld = (keyPressed && _previousState.IsPressed(pKey.Value) && time > pKey.LastPressed + _holdDelay);   //TODO can we get this from windows?
 
             //If status has changed set variables
             if (pKey.IsPressed != keyPressed)
             {
-                if(keyPressed) { pKey.LastPressed = time; } else { pKey.LastReleased = time; }
+                if (keyPressed)
+                {
+                    pKey.LastPressed = time;
+                }
                 pKey.IsPressed = keyPressed;
-            }
-
-            //Set when the last registered action was
-            if (pPressed || pHeld)
-            {
-                pKey.LastRegistered = time;
             }
         }
 
@@ -201,9 +192,46 @@ namespace SmallEngine.Input
             return !_inputState.IsPressed(pMouse);
         }
 
+        public static bool IsDragging(Mouse pMouse)
+        {
+            return _mode == Mode.Drag;
+        }
+
+        private static Vector2 _dragStart;
+        private static Mode _mode = Mode.Normal;
+        private enum Mode
+        {
+            PossibleDrag,
+            Drag,
+            Normal
+        }
+
+        private static void CheckDrag()
+        {
+            if (_mode == Mode.Normal && KeyPressed(Mouse.Left))
+            {
+                _mode = Mode.PossibleDrag;
+                _dragStart = _mousePos;
+            }
+
+            if (_mode == Mode.PossibleDrag && KeyDown(Mouse.Left))
+            {
+                var _dragDistance = _mousePos - _dragStart;
+                if (Math.Abs(_dragDistance.X) > System.Windows.SystemParameters.MinimumHorizontalDragDistance ||
+                   Math.Abs(_dragDistance.Y) > System.Windows.SystemParameters.MinimumVerticalDragDistance)
+                {
+                    _mode = Mode.Drag;
+                }
+            }
+            else if (KeyUp(Mouse.Left))
+            {
+                _mode = Mode.Normal;
+            }
+        }
+
         public static void Listen(Keys pKey)
         {
-            if(!CheckExists(pKey))
+            if (!CheckExists(pKey))
             {
                 _keys.Add(new InputInfo(pKey, 0));
             }
@@ -211,7 +239,7 @@ namespace SmallEngine.Input
 
         public static void Listen(Mouse pMouse)
         {
-            if(!CheckExists(pMouse))
+            if (!CheckExists(pMouse))
             {
                 _keys.Add(new InputInfo(pMouse, 0));
             }
@@ -219,9 +247,9 @@ namespace SmallEngine.Input
 
         private static bool CheckExists(Keys pKey)
         {
-            foreach(InputInfo k in _keys)
+            foreach (InputInfo k in _keys)
             {
-                if(k.Key.HasValue && k.Key.Value == pKey)
+                if (k.Value == (int)pKey)
                 {
                     return true;
                 }
@@ -233,7 +261,7 @@ namespace SmallEngine.Input
         {
             foreach (InputInfo k in _keys)
             {
-                if (k.Mouse.HasValue && k.Mouse.Value == pMouse)
+                if (k.Value == (int)pMouse)
                 {
                     return true;
                 }
@@ -243,36 +271,24 @@ namespace SmallEngine.Input
 
         public static void StopListening(Keys pKey)
         {
-            InputInfo toRemove = new InputInfo();
-            bool found = false;
-            foreach (var ii in _keys)
+            for (int i = 0; i < _keys.Count; i++)
             {
-                if (ii.Key.HasValue && ii.Key == pKey)
+                if (_keys[i].Value == (int)pKey)
                 {
-                    toRemove = ii;
-                    found = true;
-                    break;
+                    _keys.RemoveAt(i);
                 }
             }
-
-            if (found) _keys.Remove(toRemove);
         }
 
         public static void StopListening(Mouse pMouse)
         {
-            InputInfo toRemove = new InputInfo();
-            bool found = false;
-            foreach (var ii in _keys)
+            for (int i = 0; i < _keys.Count; i++)
             {
-                if (ii.Mouse.HasValue && ii.Mouse == pMouse)
+                if (_keys[i].Value == (int)pMouse)
                 {
-                    toRemove = ii;
-                    found = true;
-                    break;
+                    _keys.RemoveAt(i);
                 }
             }
-
-            if (found) _keys.Remove(toRemove);
         }
         #endregion
     }

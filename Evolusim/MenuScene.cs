@@ -92,14 +92,14 @@ namespace Evolusim
             {
                 if (mCurrentIndex == 0) mCurrentIndex = mItems.Count - 1;
                 else mCurrentIndex--;
-                _menu.PlayASync();
+                _menu.PlayImmediate();
 
             }
             else if(InputManager.KeyPressed(Keys.Down))
             {
                 if (mCurrentIndex == mItems.Count - 1) mCurrentIndex = 0;
                 else mCurrentIndex++;
-                _menu.PlayASync();
+                _menu.PlayImmediate();
             }
 
             if(InputManager.KeyPressed(Keys.Enter))

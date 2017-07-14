@@ -20,46 +20,37 @@ namespace SmallEngine.Input
 
         internal void AddPressed(InputInfo pI)
         {
-            if (pI.Key.HasValue)
-            {
-                _pressedKeys.Add(pI.Key, pI);
-            }
-            else
-            {
-                _pressedKeys.Add(pI.Mouse, pI);
-            }
+            _pressedKeys.Add(pI.Value, pI);
         }
 
         internal void AddHeld(InputInfo pI)
         {
-            if(pI.Key.HasValue)
-            {
-                _heldKeys.Add(pI.Key, pI);
-            }
-            else
-            {
-                _heldKeys.Add(pI.Mouse, pI);
-            }
+            _heldKeys.Add(pI.Value, pI);
         }
 
         public bool IsPressed(Keys pKey)
         {
-            return _pressedKeys.ContainsKey(pKey);
+            return _pressedKeys.ContainsKey((int)pKey);
+        }
+
+        internal bool IsPressed(int pValue)
+        {
+            return _pressedKeys.ContainsKey(pValue);
         }
 
         public bool IsHeld(Keys pKey)
         {
-            return _heldKeys.ContainsKey(pKey);
+            return _heldKeys.ContainsKey((int)pKey);
         }
 
         public bool IsPressed(Mouse pMouse)
         {
-            return _pressedKeys.ContainsKey(pMouse);
+            return _pressedKeys.ContainsKey((int)pMouse);
         }
 
         public bool IsHeld(Mouse pMouse)
         {
-            return _heldKeys.ContainsKey(pMouse);
+            return _heldKeys.ContainsKey((int)pMouse);
         }
     }
 }

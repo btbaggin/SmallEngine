@@ -49,6 +49,7 @@
     </StartupObject>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="PresentationFramework" />
     <Reference Include="SharpDX">
       <HintPath>SharpDX\SharpDX.dll</HintPath>
     </Reference>
@@ -83,6 +84,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Audio\AudioState.cs" />
+    <Compile Include="Audio\FadeEffect.cs" />
+    <Compile Include="Audio\SoundEventArgs.cs" />
     <Compile Include="Camera.cs" />
     <Compile Include="Components\Component.cs" />
     <Compile Include="Components\DependencyComponent.cs" />
@@ -106,6 +109,9 @@
     <Compile Include="Input\InputState.cs" />
     <Compile Include="Input\Keys.cs" />
     <Compile Include="Input\Mouse.cs" />
+    <Compile Include="UI\AnchorDirection.cs" />
+    <Compile Include="UI\UIElement.cs" />
+    <Compile Include="UI\UIManager.cs" />
     <Compile Include="Utils\DiamondSquareNoise.cs" />
     <Compile Include="Utils\Extensions.cs" />
     <Compile Include="Utils\MathF.cs" />
@@ -138,6 +144,7 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

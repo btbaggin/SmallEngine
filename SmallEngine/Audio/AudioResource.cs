@@ -9,25 +9,19 @@ using SharpDX.Multimedia;
 
 namespace SmallEngine.Audio
 {
-    public class SoundEventArgs : EventArgs
-    {
-        public IntPtr Pointer { get; private set; }
-        public SoundEventArgs(IntPtr pPointer)
-        {
-            Pointer = pPointer;
-        }
-    }
-
     public class AudioResource : Resource
     {
-        //TODO look at sound playing properly-
         public delegate void SoundEndEventHandler(object pSender, SoundEventArgs pInt);
         public event SoundEndEventHandler SoundEnd;
 
-        protected AudioBuffer Buffer;
-        protected SourceVoice Voice;
+        private bool _currentlyLooping;
+        private int _loopCount;
+        private int _loopCounter;
+
+        private AudioBuffer _buffer;
+        private SourceVoice _voice;
         internal WaveFormat Stream;
-        internal static List<SourceVoice> FreeVoices;
+        static List<SourceVoice> _freeVoices;
         static MasteringVoice _mv;
 
         #region Resource Functions
@@ -56,18 +50,6 @@ namespace SmallEngine.Audio
                 Stop();
             }
         }
-        #endregion
-
-        #region Protected properties
-        protected bool CurrentlyLooping { get; set; }
-
-        protected int LoopCount { get; set; }
-
-        protected int LoopCounter { get; set; }
-
-        protected float FadeTimer { get; set; }
-
-        protected string FileName { get; set; }
         #endregion
 
         #region Public properties
@@ -100,7 +82,7 @@ namespace SmallEngine.Audio
         /// </summary>
         public bool IsRepeating
         {
-            get { return CurrentlyLooping; }
+            get { return _currentlyLooping; }
         }
 
         /// <summary>
@@ -108,7 +90,7 @@ namespace SmallEngine.Audio
         /// </summary>
         public int Channels
         {
-            get { return Voice.VoiceDetails.InputChannelCount; }
+            get { return _voice.VoiceDetails.InputChannelCount; }
         }
 
         /// <summary>
@@ -134,9 +116,9 @@ namespace SmallEngine.Audio
             set
             {
                 _volume = value;
-                if (Voice != null)
+                if (_voice != null)
                 {
-                    Voice.SetVolume(_volume);
+                    _voice.SetVolume(_volume);
                     Device.CommitChanges();
                 }
             }
@@ -175,9 +157,6 @@ namespace SmallEngine.Audio
 
         private void Initialize(string pFileName)
         {
-            //Read the file into our stream
-            FileName = pFileName;
-
             SoundStream soundStream;
             System.IO.FileStream s;
             System.Diagnostics.Debug.Assert(System.IO.File.Exists(pFileName));
@@ -185,7 +164,7 @@ namespace SmallEngine.Audio
             soundStream = new SoundStream(s);
 
             //Create a audio buffer from the file data
-            Buffer = new AudioBuffer()
+            _buffer = new AudioBuffer()
             {
                 Stream = soundStream,
                 AudioBytes = (int)soundStream.Length,
@@ -195,58 +174,47 @@ namespace SmallEngine.Audio
             DecodedPacketsInfo = soundStream.DecodedPacketsInfo;
             Stream = soundStream.Format;
 
-            CurrentlyLooping = false;
-            LoopCount = -1;
-            LoopCounter = -1;
+            _currentlyLooping = false;
 
             Volume = MaxVolume;
 
             State = AudioState.Stopped;
         }
 
-        #region Abstract functions
+        #region Public functions
         public bool Play()
         {
             if (IsPlaying) return false;
 
             //Get a new voice
-            GetVoice(this);
-            Voice.BufferEnd += OnSoundEnd;
+            GetVoice(this, out _voice);
+            _voice.BufferEnd += OnSoundEnd;
 
             //Play sound
-            Voice.SubmitSourceBuffer(Buffer, DecodedPacketsInfo);
-            Voice.Start();
+            _voice.SubmitSourceBuffer(_buffer, DecodedPacketsInfo);
+            _voice.Start();
             State = AudioState.Playing;
 
             return true;
-        }
-        /// <summary>
-        /// Plays the audio clip.  Will not again if it is currently playing.
-        /// </summary>
-        public bool Play(float pVolume)
-        {
-            Volume = pVolume;
-            return Play();
         }
 
         /// <summary>
         /// Plays the audio clip asynchronously.
         /// </summary>
-        public void PlayASync()
+        public void PlayImmediate()
         {
             //Get a local voice
-            GetVoice(this);//new SourceVoice(SoundManager.Device, Stream);
-            Voice.BufferEnd += OnSoundEnd;
+            SourceVoice voice;
+            GetVoice(this, out voice);
+            voice.BufferEnd += OnSoundEnd;
 
             //Clear anything from its buffers (shouldnt be anything)
-            Voice.FlushSourceBuffers();
+            voice.FlushSourceBuffers();
 
             //Play
-            Voice.SubmitSourceBuffer(Buffer, DecodedPacketsInfo);
-            Voice.Start();
-
-            //Set the call back so that the voice can be recycled
-            Voice.BufferEnd += (new SoundCompleteCallback(Voice, this)).OnSoundFinished;
+            voice.SubmitSourceBuffer(_buffer, DecodedPacketsInfo);
+            voice.Start();
+            State = AudioState.Playing;
         }
 
         /// <summary>
@@ -256,8 +224,8 @@ namespace SmallEngine.Audio
         {
             if (!IsPlaying) return false;
 
-            Voice.Stop();
-            Voice.FlushSourceBuffers();
+            _voice.Stop();
+            _voice.FlushSourceBuffers();
             State = AudioState.Stopped;
 
             return true;
@@ -270,7 +238,7 @@ namespace SmallEngine.Audio
         {
             if (!IsPlaying) return;
 
-            Voice.Stop();
+            _voice.Stop();
             State = AudioState.Paused;
         }
 
@@ -281,7 +249,7 @@ namespace SmallEngine.Audio
         {
             if (State != AudioState.Paused) return;
 
-            Voice.Start();
+            _voice.Start();
             State = AudioState.Playing;
         }
 
@@ -290,9 +258,9 @@ namespace SmallEngine.Audio
         /// </summary>
         public void Loop()
         {
-            if (CurrentlyLooping) return;
+            if (_currentlyLooping) return;
 
-            CurrentlyLooping = true;
+            _currentlyLooping = true;
             Play();
             State = AudioState.Repeating;
         }
@@ -303,11 +271,11 @@ namespace SmallEngine.Audio
         /// <param name="pCount">Number of times to loop the clip</param>
         public void Loop(int pCount)
         {
-            if (CurrentlyLooping) return;
+            if (_currentlyLooping) return;
 
-            CurrentlyLooping = true;
-            LoopCount = pCount;
-            LoopCounter = 1;
+            _currentlyLooping = true;
+            _loopCount = pCount;
+            _loopCounter = 1;
             Play();
             State = AudioState.Repeating;
         }
@@ -317,9 +285,9 @@ namespace SmallEngine.Audio
         /// </summary>
         public void StopLoop()
         {
-            CurrentlyLooping = false;
-            LoopCount = -1;
-            LoopCounter = -1;
+            _currentlyLooping = false;
+            _loopCount = 0;
+            _loopCounter = 0;
         }
 
         /// <summary>
@@ -327,9 +295,9 @@ namespace SmallEngine.Audio
         /// </summary>
         public void StopLoopImmediate()
         {
-            CurrentlyLooping = false;
-            LoopCount = -1;
-            LoopCounter = -1;
+            _currentlyLooping = false;
+            _loopCount = 0;
+            _loopCounter = 0;
 
             if (IsPlaying)
             {
@@ -338,64 +306,24 @@ namespace SmallEngine.Audio
             }
         }
 
-        /// <summary>
-        /// Fades the volume in to <see cref=" pEndingVolume"/> over the specified number of steps and duration.
-        /// </summary>
-        /// <param name="pDeltaTime">Delta time</param>
-        /// <param name="pStep">Number of steps to fade</param>
-        /// <param name="pDuration">Duration to fade in milliseconds</param>
-        /// <param name="pEndingVolume">Volume to fade to</param>
-        public void FadeIn(float pDeltaTime, float pStep, float pDuration, float pEndingVolume)
-        {
-            if (FadeTimer > pDuration * pStep && Volume < pEndingVolume)
-            {
-                Volume += pStep;
-                FadeTimer = 0;
-            }
-            else
-                FadeTimer += pDeltaTime;
-        }
-
-        /// <summary>
-        /// Fades the volume out to <see cref="MinVolume"/> over the specified number of steps and duration.
-        /// </summary>
-        /// <param name="pDeltaTime">Delta time</param>
-        /// <param name="pStep">Number of steps to fade</param>
-        /// <param name="pDuration">Duration to fade in milliseconds</param>
-        /// <param name="pEndingVolume">Volume to fade to</param>
-        public void FadeOut(float pDeltaTime, float pStep, float pDuration, float pEndingVolume)
-        {
-            if (FadeTimer > pDuration * pStep && Volume > pEndingVolume)
-            {
-                Volume -= pStep;
-                FadeTimer = 0;
-            }
-            else
-                FadeTimer += pDeltaTime;
-        }
-
         private void OnSoundEnd(IntPtr pInt)
         {
-            Voice.BufferEnd -= OnSoundEnd;
-            ReuseVoice(ref Voice, this);
+            var voice = new SourceVoice(pInt);
+            voice.BufferEnd -= OnSoundEnd;
+
             //if we are looping
-            if (CurrentlyLooping)
+            if (_currentlyLooping)
             {
                 //Check if we have a loop counter and we should continue looping
-                if (LoopCount == -1)
+                if (_loopCounter++ <= _loopCount)
                 {
-                    Play();
-                }
-                else if (LoopCounter + 1 <= LoopCount)
-                {
-                    LoopCounter++;
                     Play();
                 }
                 else //We are done looping
                 {
-                    CurrentlyLooping = false;
-                    LoopCount = -1;
-                    LoopCounter = -1;
+                    _currentlyLooping = false;
+                    _loopCount = 0;
+                    _loopCounter = 0;
 
                     //Rethrow event for other classes to handle
                     SoundEnd?.Invoke(this, new SoundEventArgs(pInt));
@@ -418,46 +346,45 @@ namespace SmallEngine.Audio
             Device = new XAudio2();
             _mv = new MasteringVoice(Device);
             _mv.SetVolume(MaxVolume);
-            FreeVoices = new List<SourceVoice>();
+            _freeVoices = new List<SourceVoice>();
         }
 
         /// <summary>
         /// Gets a free voice from the voice pool.  If none are available a new one is created
         /// </summary>
         /// <param name="pSound">Sound to play with the voice</param>
-        public static void GetVoice(AudioResource pSound)
+        public static void GetVoice(AudioResource pSound, out SourceVoice pVoice)
         {
-            SourceVoice voice;
-            lock (FreeVoices)
+            lock (_freeVoices)
             {
-                if (FreeVoices.Count == 0)
+                if (_freeVoices.Count == 0)
                 {
-                    voice = new SourceVoice(Device, pSound.Stream, true);
+                    pVoice = new SourceVoice(Device, pSound.Stream, true);
+                    pVoice.BufferEnd += (new SoundCompleteCallback(pVoice)).OnSoundFinished;
                 }
                 else
                 {
-                    voice = FreeVoices[FreeVoices.Count - 1];
-                    FreeVoices.RemoveAt(FreeVoices.Count - 1);
+                    pVoice = _freeVoices[_freeVoices.Count - 1];
+                    _freeVoices.RemoveAt(_freeVoices.Count - 1);
                 }
             }
 
-            if(voice.Volume != pSound.Volume)
+            if (pVoice.Volume != pSound.Volume)
             {
-                voice.SetVolume(pSound.Volume);
+                pVoice.SetVolume(pSound.Volume);
                 Device.CommitChanges();
             }
-            pSound.Voice = voice;
         }
 
         /// <summary>
         /// Puts the voice back into the pool of eligible free voices
         /// </summary>
         /// <param name="pVoice">Voice to mark for reuse</param>
-        public static void ReuseVoice(ref SourceVoice pVoice, AudioResource pSound)
+        public static void ReuseVoice(ref SourceVoice pVoice)
         {
-            lock (FreeVoices)
+            lock (_freeVoices)
             {
-                FreeVoices.Add(pVoice);
+                _freeVoices.Add(pVoice);
             }
         }
         #endregion
@@ -465,11 +392,11 @@ namespace SmallEngine.Audio
         #region "Disposable support"
         public static void DisposeVoices()
         {
-            lock (FreeVoices)
+            lock (_freeVoices)
             {
-                for (int i = 0; i < FreeVoices.Count; i++)
+                for (int i = 0; i < _freeVoices.Count; i++)
                 {
-                    FreeVoices[i].Dispose();
+                    _freeVoices[i].Dispose();
                 }
             }
 
@@ -477,24 +404,18 @@ namespace SmallEngine.Audio
         }
         #endregion
 
-        public override string ToString()
-        {
-            return FileName;
-        }
-
         #region "Callback"
         protected struct SoundCompleteCallback
         {
             private SourceVoice _voice;
-            private readonly AudioResource _sound;
-            public SoundCompleteCallback(SourceVoice pVoice, AudioResource pSound)
+            public SoundCompleteCallback(SourceVoice pVoice)
             {
                 _voice = pVoice;
-                _sound = pSound;
             }
             public void OnSoundFinished(IntPtr arg)
             {
-                ReuseVoice(ref _voice, _sound);
+                _voice.BufferEnd -= OnSoundFinished;
+                ReuseVoice(ref _voice);
             }
         }
         #endregion
