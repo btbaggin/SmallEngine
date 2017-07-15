@@ -12,6 +12,8 @@ namespace SmallEngine.UI
     {
         private static List<UIElement> _elements;
 
+
+        //TODO measure on window resize
         static UIManager()
         {
             _elements = new List<UI.UIElement>();

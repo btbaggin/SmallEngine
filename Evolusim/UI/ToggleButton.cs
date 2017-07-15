@@ -20,7 +20,6 @@ namespace Evolusim.UI
 
         ToggleButtonGroup _group;
         System.Drawing.RectangleF _rect;
-        bool _mouseOver;
 
         public bool IsSelected { get; internal set; }
 

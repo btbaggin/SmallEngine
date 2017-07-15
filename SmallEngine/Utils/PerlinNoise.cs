@@ -12,7 +12,6 @@ namespace SmallEngine
 
         private float[,] _grid;
         private readonly int _size;
-        private readonly Random _random;
         private readonly float[] _gradients = new float[GradientSizeTable * 3];
         private readonly byte[] _perm = new byte[] { 225,155,210,108,175,199,221,144,203,116, 70,213, 69,158, 33,252,
                                                        5, 82,173,133,222,139,174, 27,  9, 71, 90,246, 75,130, 91,191,
@@ -34,13 +33,12 @@ namespace SmallEngine
         public PerlinNoise(int pSize)
         {
             _size = pSize;
-            _random = new Random();
 
             for (int i = 0; i < GradientSizeTable; i++)
             {
-                float z = 1f - 2f * _random.NextFloat();
+                float z = 1f - 2f * Game.RandomFloat();
                 float r = MathF.Sqrt(1f - z * z);
-                float theta = 2 * MathF.PI * _random.NextFloat();
+                float theta = 2 * MathF.PI * Game.RandomFloat();
                 _gradients[i * 3] = r * MathF.Cos(theta);
                 _gradients[i * 3 + 1] = r * MathF.Sin(theta);
                 _gradients[i * 3 + 2] = z;

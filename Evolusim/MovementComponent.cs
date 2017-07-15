@@ -7,7 +7,7 @@ using SmallEngine;
 
 namespace Evolusim
 {
-    class MovementComponent : Component
+    class MovementComponent : DependencyComponent
     {
         public enum MovementType
         {
@@ -19,13 +19,14 @@ namespace Evolusim
 
         public MovementType Movement { get; set; }
 
-        Random r;
+        [ImportComponent]
+        private TraitComponent _traits = null;
+
         Vector2 _destination;
         bool _destinationSet;
-        public MovementComponent()
+        public MovementComponent() : base()
         {
             Movement = MovementType.Wander;
-            r = new Random();
         }
 
         public void Move(float pDeltaTime)
@@ -36,7 +37,7 @@ namespace Evolusim
             }
 
             //TODO use pathing
-            GameObject.Position = Vector2.MoveTowards(GameObject.Position, _destination, 200 * pDeltaTime);
+            GameObject.Position = Vector2.MoveTowards(GameObject.Position, _destination, _traits.GetTrait<int>(TraitComponent.Traits.Speed) * pDeltaTime);
 
             if(Vector2.DistanceSqrd(GameObject.Position, _destination) < 25)
             {
@@ -49,7 +50,7 @@ namespace Evolusim
             switch(Movement)
             {
                 case MovementType.Wander:
-                    _destination = new Vector2(r.Next(0, Evolusim.WorldSize), r.Next(0, Evolusim.WorldSize));
+                    _destination = new Vector2(Game.RandomInt(0, Evolusim.WorldSize), Game.RandomInt(0, Evolusim.WorldSize));
                     break;
                 case MovementType.Hungry:
                     break;

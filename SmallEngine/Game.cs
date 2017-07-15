@@ -30,6 +30,7 @@ namespace SmallEngine
         private InputManager _inputManager;
         private float _timeElapsed;
         private int _frameCount;
+        private static Random _random;
 
         #region Properties
         public static IGraphicsSystem Graphics { get; private set; }
@@ -78,6 +79,8 @@ namespace SmallEngine
 
             Graphics = Render == RenderSystem.DirectX ? new DirectXGraphicSystem() : null;
             Graphics.Initialize(Form, false);
+
+            _random = new Random();
         }
 
         #region Overridable game functions
@@ -243,5 +246,35 @@ namespace SmallEngine
             public System.Drawing.Point p;
         }
         #endregion
+
+        public static int RandomInt()
+        {
+            return _random.Next();
+        }
+
+        public static int RandomInt(int pMin, int pMax)
+        {
+            return _random.Next(pMin, pMax);
+        }
+
+        public static float RandomFloat()
+        {
+            return _random.NextFloat();
+        }
+
+        public static float RandomFloat(float pMin, float pMax)
+        {
+            return _random.Range(pMin, pMax);
+        }
+
+        public static double RandomDouble()
+        {
+            return _random.NextDouble();
+        }
+
+        public static double RandomDouble(double pMin, double pMax)
+        {
+            return pMin + (pMax - pMin) * _random.NextDouble();
+        }
     }
 }

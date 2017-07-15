@@ -29,7 +29,7 @@ namespace SmallEngine
             }
         }
 
-        public IGameObject GameObject { get; private set; }
+        public IGameObject GameObject { get; protected set; }
 
         public static IComponent Create(Type pType)
         {

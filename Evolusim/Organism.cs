@@ -13,12 +13,10 @@ namespace Evolusim
         private MovementComponent _movement;
         static Organism()
         {
-            r = new Random();
             SceneManager.Define("organism", typeof(BitmapRenderComponent),
                                             typeof(MovementComponent));
         }
 
-        static Random r;
         public static Organism Create()
         {
             return SceneManager.Current.CreateGameObject<Organism>("organism");
@@ -26,7 +24,7 @@ namespace Evolusim
 
         public Organism()
         {
-            Position = new Vector2(r.Next(0, 1000), r.Next(0, 1000));
+            Position = new Vector2(Game.RandomInt(0, Evolusim.WorldSize), Game.RandomInt(0, Evolusim.WorldSize));
             Scale = new Vector2(30);
         }
 

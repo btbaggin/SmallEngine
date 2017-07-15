@@ -22,6 +22,7 @@ namespace SmallEngine
 
         public override void OnAdded(IGameObject pGameObject)
         {
+            GameObject = pGameObject;
             foreach (var d in _dependencies)
             {
                 var component = pGameObject.GetComponent(d.Key.FieldType) ?? Create(d.Key.FieldType);

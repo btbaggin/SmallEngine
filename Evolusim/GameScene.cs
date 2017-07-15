@@ -32,10 +32,10 @@ namespace Evolusim
 
             InputManager.Listen(Mouse.Left);
 
-            //for(int i = 0; i < 100; i++)
-            //{
+            for(int i = 0; i < 100; i++)
+            {
                 Organism.Create();
-            //}
+            }
         }
 
         protected override void Draw(IGraphicsSystem pSystem)

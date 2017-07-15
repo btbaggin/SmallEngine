@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using System.Drawing;
 using SmallEngine;
 using SmallEngine.Graphics;
-using SmallEngine.Input;
 
 namespace Evolusim
 {

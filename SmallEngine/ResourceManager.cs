@@ -10,14 +10,12 @@ namespace SmallEngine
     {
         private static Dictionary<string, Resource> _resources;
         private static Dictionary<string, string[]> _groups;
-        private static Random rand;
 
         #region "Constructor"
         static ResourceManager()
         {
             _resources = new Dictionary<string, Resource>();
             _groups = new Dictionary<string, string[]>();
-            rand = new Random();
         }
         #endregion
 
@@ -165,7 +163,7 @@ namespace SmallEngine
         public static T RequestFromGroup<T>(string pGroup) where T : Resource, new()
         {
             System.Diagnostics.Debug.Assert(_groups.ContainsKey(pGroup));
-            return Request<T>(_groups[pGroup][rand.Next(0, _groups[pGroup].Length)]);
+            return Request<T>(_groups[pGroup][Game.RandomInt(0, _groups[pGroup].Length)]);
         }
 
         /// <summary>
