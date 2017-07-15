@@ -33,6 +33,8 @@ namespace Evolusim
         BitmapResource _mountain;
         BitmapResource _forest;
         BitmapResource _desert;
+        HeightMap _height;
+        HeightMap _climate;
 
         public Terrain()
         {
@@ -46,25 +48,14 @@ namespace Evolusim
             _forest = ResourceManager.Request<BitmapResource>("forest");
             _desert = ResourceManager.Request<BitmapResource>("desert");
 
-            var n = new DiamondSquareNoise(Size);
-            var h = n.Generate(0, 20, .4f);
+            _height = new HeightMap(false, Size, 50, -50);
+            _climate = new HeightMap(true, Size, 50, -50);
 
-            float minValue = 0;
-            float maxValue = 0;
-            for(int x = 0; x < Size; x++)
+            for (int x = 0; x < Size; x++)
             {
                 for(int y = 0; y < Size; y++)
                 {
-                    if (h[x, y] > maxValue) maxValue = h[x, y];
-                    if (h[x, y] < minValue) minValue = h[x, y];
-                }
-            }
-
-            for(int x = 0; x < Size; x++)
-            {
-                for(int y = 0; y < Size; y++)
-                {
-                    var hh = (h[x, y] + Math.Abs(minValue)) / maxValue;
+                    var hh = (_height.Query(x, y) + 50) / 100;
                     if(hh < .45)
                     {
                         _terrain[x, y] = Type.Water;
