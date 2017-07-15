@@ -20,7 +20,7 @@ namespace Evolusim
         {
             base.Begin();
 
-            _terrain = new Terrain(513, 513);
+            _terrain = new Terrain();
             _toolbar = new Toolbar();
             UIManager.Register(_toolbar);
             InputManager.Listen(Keys.T);

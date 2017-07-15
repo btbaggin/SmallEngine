@@ -17,9 +17,11 @@ namespace Evolusim
          * Minimap
          * Creatures
          * Terrain bitmasking
+         * Terrain climate
+         * Only allow changing height / climate
          */
 
-        public static int WorldSize { get { return 64 * 513; } } //TODO dont hardcode
+        public static int WorldSize { get { return 64 * Terrain.Size; } }
 
         public override void LoadContent()
         {

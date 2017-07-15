@@ -21,8 +21,7 @@ namespace Evolusim
             Desert
         }
 
-        int _width;
-        int _height;
+        public static int Size { get { return 513; } }
 
         float _bitmapWidth;
         float _bitmapHeight;
@@ -35,13 +34,11 @@ namespace Evolusim
         BitmapResource _forest;
         BitmapResource _desert;
 
-        public Terrain(int pWidth, int pHeight)
+        public Terrain()
         {
-            _width = pWidth;
-            _height = pHeight;
-            _bitmapWidth = _width * 64;
-            _bitmapHeight = _height * 64;
-            _terrain = new Type[_width, _height];
+            _bitmapWidth = Size * 64;
+            _bitmapHeight = Size * 64;
+            _terrain = new Type[Size, Size];
 
             _plains = ResourceManager.Request<BitmapResource>("plains");
             _water = ResourceManager.Request<BitmapResource>("water");
@@ -49,23 +46,23 @@ namespace Evolusim
             _forest = ResourceManager.Request<BitmapResource>("forest");
             _desert = ResourceManager.Request<BitmapResource>("desert");
 
-            var n = new DiamondSquareNoise(_width);
+            var n = new DiamondSquareNoise(Size);
             var h = n.Generate(0, 20, .4f);
 
             float minValue = 0;
             float maxValue = 0;
-            for(int x = 0; x < _width; x++)
+            for(int x = 0; x < Size; x++)
             {
-                for(int y = 0; y < _width; y++)
+                for(int y = 0; y < Size; y++)
                 {
                     if (h[x, y] > maxValue) maxValue = h[x, y];
                     if (h[x, y] < minValue) minValue = h[x, y];
                 }
             }
 
-            for(int x = 0; x < _width; x++)
+            for(int x = 0; x < Size; x++)
             {
-                for(int y = 0; y < _height; y++)
+                for(int y = 0; y < Size; y++)
                 {
                     var hh = (h[x, y] + Math.Abs(minValue)) / maxValue;
                     if(hh < .45)
@@ -100,18 +97,18 @@ namespace Evolusim
             float numTilesY = Evolusim.ActiveCamera.Height / 64f;
 
             //Width and height should be the same
-            float tileSize = Game.Form.Width / numTilesX;
+            var tileSize = (int)(Game.Form.Width / numTilesX);
             var startPoint = Evolusim.ActiveCamera.ToCameraSpace(new Vector2(x * 64, y * 64));
 
             Vector2 scale = new Vector2(tileSize, tileSize);
-            var currentX = startPoint.X;
-            var currentY = startPoint.Y;
+            var currentX = (int)startPoint.X;
+            var currentY = (int)startPoint.Y;
             for(int i = x; i <= x + numTilesX + 2; i++)
             {
-                if (i >= _width) break;
+                if (i >= Size) break;
                 for(int j = y; j <= y + numTilesY + 2; j++)
                 {
-                    if (j >= _height) break;
+                    if (j >= Size) break;
                     switch(_terrain[i, j])
                     {
                         case Type.Desert:
@@ -132,7 +129,7 @@ namespace Evolusim
                     }
                     currentY += tileSize;
                 }
-                currentY = startPoint.Y;
+                currentY = (int)startPoint.Y;
                 currentX += tileSize;
             }
         }
