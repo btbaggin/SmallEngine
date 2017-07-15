@@ -36,7 +36,7 @@ namespace Evolusim
             }
 
             //TODO use pathing
-            GameObject.Position += Vector2.Unit * 100 * pDeltaTime;//Vector2.MoveTowards(GameObject.Position, _destination, .05f) * pDeltaTime;//100 * pDeltaTime);
+            GameObject.Position = Vector2.MoveTowards(GameObject.Position, _destination, 200 * pDeltaTime);
 
             if(Vector2.DistanceSqrd(GameObject.Position, _destination) < 25)
             {

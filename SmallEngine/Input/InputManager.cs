@@ -10,7 +10,6 @@ namespace SmallEngine.Input
 {
     public class InputManager
     {
-        //TODO add if mouse is dragging
         private static List<InputInfo> _keys;
         private IntPtr _handle;
         private static InputState _inputState;

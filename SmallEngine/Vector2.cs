@@ -184,8 +184,14 @@ namespace SmallEngine
             if (pVectorFrom == null) throw new ArgumentNullException("pV1");
             if (pVectorTo == null) throw new ArgumentNullException("pV2");
 
+            float d = DistanceSqrd(pVectorFrom, pVectorTo);
+            Vector2 direction = pVectorFrom + Normalize(pVectorTo - pVectorFrom) * pAmount;
+            if(Vector2.DistanceSqrd(pVectorFrom, direction) >= d)
+            {
+                direction = pVectorTo;
+            }
             //TODO
-            return Lerp(pVectorFrom, pVectorTo, pAmount);
+            return direction;
         }
 
         /// <summary>

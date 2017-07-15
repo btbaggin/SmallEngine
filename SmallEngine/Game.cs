@@ -115,8 +115,7 @@ namespace SmallEngine
             _toRender.Clear();
             foreach(var r in RenderComponent.Renderers)
             { 
-                //var b = r.GameObject.Bounds;
-                var onScreen = ActiveCamera.IsVisible(r.GameObject);//TODO need to use camera // b.IntersectsWith(Form.ClientRectangle);
+                var onScreen = ActiveCamera.IsVisible(r.GameObject);
                 if(onScreen && r.Visible && r.Opacity > 0f)
                 {
                     _toRender.Add(r);
