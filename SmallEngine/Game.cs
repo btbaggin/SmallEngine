@@ -9,6 +9,7 @@ using SmallEngine.Input;
 using SmallEngine.Audio;
 using SmallEngine.Graphics;
 using SmallEngine.Physics;
+using SmallEngine.UI;
 
 namespace SmallEngine
 {
@@ -24,6 +25,7 @@ namespace SmallEngine
             OpenGL
         }
 
+        private UIManager _uiManager;
         private SceneManager _sceneManager;
         private InputManager _inputManager;
         private float _timeElapsed;
@@ -66,6 +68,7 @@ namespace SmallEngine
         public Game()
         {
             Form = new GameForm();
+            _uiManager = new UIManager();
             _sceneManager = new SceneManager(this);
             _inputManager = new InputManager(Form.Handle);
             GameWorld = new World();
@@ -92,6 +95,7 @@ namespace SmallEngine
 
         public virtual void Update(float pDeltaTime)
         {
+            _uiManager.Update(pDeltaTime);
             Scene.Update(pDeltaTime);
             ActiveCamera.Update(pDeltaTime);
 
@@ -130,6 +134,8 @@ namespace SmallEngine
                 r.Draw(Graphics);
                 r.EndDraw(Graphics);
             }
+
+            _uiManager.Draw(Graphics);
         }
         #endregion
 

@@ -7,6 +7,7 @@ using SmallEngine;
 using SmallEngine.Graphics;
 using SmallEngine.Input;
 using Evolusim.UI;
+using SmallEngine.UI;
 
 namespace Evolusim
 {
@@ -21,6 +22,7 @@ namespace Evolusim
 
             _terrain = new Terrain(513, 513);
             _toolbar = new Toolbar();
+            UIManager.Register(_toolbar);
             InputManager.Listen(Keys.T);
             InputManager.Listen(Keys.Escape);
             InputManager.Listen(Keys.Up);
@@ -40,14 +42,11 @@ namespace Evolusim
         {
             base.Draw(pSystem);
             _terrain.Draw(pSystem);
-            _toolbar.Draw(pSystem);
         }
 
         protected override void Update(float pDeltaTime)
         {
             base.Update(pDeltaTime);
-
-            _toolbar.Update(pDeltaTime);
 
             if(InputManager.KeyPressed(Keys.Escape))
             {
@@ -68,6 +67,8 @@ namespace Evolusim
         protected override void End()
         {
             base.End();
+
+            UIManager.Unregister(_toolbar);
 
             InputManager.StopListening(Keys.T);
             InputManager.StopListening(Keys.Escape);
