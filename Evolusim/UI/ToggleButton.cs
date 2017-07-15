@@ -6,37 +6,35 @@ using System.Threading.Tasks;
 using SmallEngine;
 using SmallEngine.Graphics;
 using SmallEngine.Input;
+using SmallEngine.UI;
 
 namespace Evolusim.UI
 {
-    class ToggleButton
+    class ToggleButton : UIElement
     {
         Brush _highlightBrush;
         Font _font;
         BitmapResource _image;
         string _text;
         float _imageSize;
-        float _width, _height;
 
         ToggleButtonGroup _group;
         System.Drawing.RectangleF _rect;
         bool _mouseOver;
 
-        public Vector2 Position { get; set; }
-
         public bool IsSelected { get; internal set; }
 
-        public ToggleButton(BitmapResource pImage, string pText, float pWidth, float pHeight) : this(pImage, pText, pWidth, pHeight, null)
+        public ToggleButton(BitmapResource pImage, string pText) : this(pImage, pText, null)
         {
         }
 
-        public ToggleButton(BitmapResource pImage, string pText, float pWidth, float pHeight, ToggleButtonGroup pGroup)
+        public ToggleButton(BitmapResource pImage, string pText, ToggleButtonGroup pGroup)
         {
+            WidthPercent = .8f;
+            Height = 50;
             _image = pImage;
             _text = pText;
-            _width = pWidth;
-            _height = pHeight;
-            _imageSize = pHeight - 8;
+            _imageSize = 32;//pHeight - 8;
 
             _highlightBrush = Game.Graphics.CreateBrush(System.Drawing.Color.Yellow);
             _font = Game.Graphics.CreateFont("Arial", 18, System.Drawing.Color.White);
@@ -49,10 +47,10 @@ namespace Evolusim.UI
             }
         }
 
-        public void Draw(IGraphicsSystem pSystem)
+        public override void Draw(IGraphicsSystem pSystem)
         {
-            _rect = new System.Drawing.RectangleF(Position.X, Position.Y, _width, _height);
-            var textRect = new System.Drawing.RectangleF(Position.X + _height, Position.Y, _width - _height, _height);
+            _rect = new System.Drawing.RectangleF(Position.X, Position.Y, Width, Height);
+            var textRect = new System.Drawing.RectangleF(Position.X + Height, Position.Y + Height / 2, Width - Height, Height / 2);
 
             pSystem.DrawBitmap(_image, 1, new Vector2(_rect.X + 4, _rect.Y + 4), new Vector2(_imageSize, _imageSize));
             pSystem.DrawText(_text, textRect, _font);
@@ -63,14 +61,12 @@ namespace Evolusim.UI
             }
         }
 
-        public void Update(float pDeltaTime)
+        public override void Update(float pDeltaTime)
         {
-            var p = InputManager.MousePosition;
-            _mouseOver = _rect.Contains(new System.Drawing.PointF(p.X, p.Y));
-            if(InputManager.KeyPressed(Mouse.Left) && _mouseOver)
+            if(InputManager.KeyPressed(Mouse.Left) && IsMouseOver)
             {
                 _group?.SetAllOff();
-                IsSelected = _mouseOver;
+                IsSelected = IsMouseOver;
             }
         }
     }

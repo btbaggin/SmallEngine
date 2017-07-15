@@ -18,7 +18,11 @@ namespace SmallEngine.UI
             set
             {
                 var diff = value - Position;
-                SetPositionInternal(diff);
+                _position = value;
+                foreach(var c in Children)
+                {
+                    c.SetPositionInternal(diff);
+                }
             }
         }
 
@@ -30,9 +34,9 @@ namespace SmallEngine.UI
             {
                 _width = value;
                 var s = new SizeF(Width, Height);
-                foreach (var c in _children)
+                foreach (var c in Children)
                 {
-                    c.Measure(s);
+                    c.Measure(s, Position);
                 }
             }
         }
@@ -45,36 +49,71 @@ namespace SmallEngine.UI
             {
                 _height = value;
                 var s = new SizeF(Width, Height);
-                foreach (var c in _children)
+                foreach (var c in Children)
                 {
-                    c.Measure(s);
+                    c.Measure(s, Position);
                 }
             }
         }
 
-        public float HeightPercent { get; set; }
+        private float _heightPercent;
+        public float HeightPercent
+        {
+            get { return _heightPercent; }
+            set
+            {
+                _heightPercent = value;
+                Height = (int)(Game.Form.Height * HeightPercent);
+            }
+        }
 
-        public float WidthPercent { get; set; }
+        private float _widthPercent;
+        public float WidthPercent
+        {
+            get { return _widthPercent; }
+            set
+            {
+                _widthPercent = value;
+                Width = (int)(Game.Form.Width * WidthPercent);
+            }
+        }
 
         public bool Visible { get; set; }
 
         public bool Enabled { get; set; }
 
         public Vector2 Margin { get; set; }
+
+        protected List<UIElement> Children { get; private set; }
+
+        public RectangleF Bounds
+        {
+            get { return new RectangleF(Position.X, Position.Y, Width, Height); }
+        }
+
+        public bool IsMouseOver
+        {
+            get
+            {
+                var p = Input.InputManager.MousePosition;
+                return Bounds.Contains(new System.Drawing.PointF(p.X, p.Y));
+            }
+        }
         #endregion
 
-        private List<UIElement> _children;
         private AnchorDirection _anchor;
         private Vector2 _anchorPoint;
 
         public UIElement()
         {
-            _children = new List<UIElement>();
+            Children = new List<UIElement>();
+            Visible = true;
+            Enabled = true;
         }
 
         public virtual void Update(float pDeltaTime)
         {
-            foreach (var e in _children)
+            foreach (var e in Children)
             {
                 if (e.Visible && e.Enabled)
                 {
@@ -85,7 +124,7 @@ namespace SmallEngine.UI
 
         public virtual void Draw(IGraphicsSystem pSystem)
         {
-            foreach (var e in _children)
+            foreach (var e in Children)
             {
                 if (e.Visible)
                 {
@@ -98,19 +137,20 @@ namespace SmallEngine.UI
         {
             pElement._anchor = pAnchor;
             pElement._anchorPoint = pAnchorPoint;
-            _children.Add(pElement);
+            Children.Add(pElement);
+            //pElement.Measure(new Size(Width, Height), Position);
         }
 
         private void SetPositionInternal(Vector2 pDiff)
         {
-            _position -= pDiff;
-            foreach (var c in _children)
+            _position += pDiff;
+            foreach (var c in Children)
             {
                 c.SetPositionInternal(pDiff);
             }
         }
 
-        public void Measure(SizeF pSize)
+        public virtual void Measure(SizeF pSize, Vector2 pPosition)
         {
             if (_anchor.HasFlag(AnchorDirection.Left))
             {
@@ -131,6 +171,7 @@ namespace SmallEngine.UI
             {
                 _position = new Vector2(Position.X, pSize.Height - _anchorPoint.Y);
             }
+            _position += pPosition;
 
             if (HeightPercent > 0)
             {
@@ -144,12 +185,12 @@ namespace SmallEngine.UI
 
             _position.X = Math.Max(Margin.X, _position.X);
             _position.Y = Math.Max(Margin.Y, _position.Y);
-            Width = (int)Math.Min(pSize.Width - Width, Margin.X);
-            Height = (int)Math.Min(pSize.Height - Height, Margin.Y);
+            Width = (int)Math.Min(pSize.Width - Margin.X, Width);
+            Height = (int)Math.Min(pSize.Height - Margin.Y, Height);
 
-            foreach (var c in _children)
+            foreach (var c in Children)
             {
-                c.Measure(new SizeF(Width, Height));
+                c.Measure(new SizeF(Width, Height), Position);
             }
         }
     }
