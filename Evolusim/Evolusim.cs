@@ -30,6 +30,8 @@ namespace Evolusim
             ResourceManager.Add<BitmapResource>("mountain", "Graphics/mountain.jpg");
             ResourceManager.Add<BitmapResource>("desert", "Graphics/desert.jpg");
             ResourceManager.Add<BitmapResource>("forest", "Graphics/forest.jpg");
+            ResourceManager.Add<BitmapResource>("snow", "Graphics/snow.jpg");
+            ResourceManager.Add<BitmapResource>("ice", "Graphics/ice.jpg");
             ResourceManager.Add<BitmapResource>("organism", "Graphics/water.png");
 
             ResourceManager.Add<AudioResource>("menu", "Audio/misc_menu.wav");
