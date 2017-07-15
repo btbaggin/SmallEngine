@@ -14,6 +14,7 @@ namespace Evolusim
         static Organism()
         {
             SceneManager.Define("organism", typeof(BitmapRenderComponent),
+                                            typeof(TraitComponent),
                                             typeof(MovementComponent));
         }
 
@@ -30,10 +31,10 @@ namespace Evolusim
 
         public override void Initialize()
         {
-            _render = (BitmapRenderComponent)GetComponent(typeof(BitmapRenderComponent));
+            _render = GetComponent<BitmapRenderComponent>();
             _render.SetBitmap("organism");
 
-            _movement = (MovementComponent)GetComponent(typeof(MovementComponent));
+            _movement = GetComponent<MovementComponent>();
         }
 
         public override void Update(float pDeltaTime)

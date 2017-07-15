@@ -23,7 +23,7 @@ namespace SmallEngine
         bool Persistant { get; set; }
         #endregion
 
-        T GetComponent<T>() where T : class, IComponent;
+        //T GetComponent<T>() where T : class, IComponent;
         IComponent GetComponent(Type pType);
         IEnumerable<IComponent> GetComponents();
         bool HasComponent<T>() where T : class, IComponent;

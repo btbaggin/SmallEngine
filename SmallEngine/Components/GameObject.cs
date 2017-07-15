@@ -36,14 +36,14 @@ namespace SmallEngine
             _components = new Dictionary<Type, IComponent>();
         }
 
-        T IGameObject.GetComponent<T>()
+        public T GetComponent<T>()
         {
             if (_components.ContainsKey(typeof(T)))
             {
                 return (T)_components[typeof(T)];
             }
 
-            return null;
+            return default(T);
         }
 
         public IComponent GetComponent(Type pType)
