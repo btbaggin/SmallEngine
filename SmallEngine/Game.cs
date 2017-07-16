@@ -17,6 +17,7 @@ namespace SmallEngine
     {
         /*TODO
          * MessageBus dropping messages if too busy
+         * Generic render component?
          */
 
         public enum RenderSystem

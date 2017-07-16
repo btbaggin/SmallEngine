@@ -26,6 +26,7 @@ namespace Evolusim
 
         float _bitmapWidth;
         float _bitmapHeight;
+        bool _updateBitmap;
 
         Type[,] _terrain;
 
@@ -63,6 +64,7 @@ namespace Evolusim
                     _terrain[x, y] = CalculateType(x, y);
                 }
             }
+            _updateBitmap = true;
         }
 
         public void Draw(IGraphicsSystem pSystem)
@@ -104,11 +106,62 @@ namespace Evolusim
                     _terrain[x, y] = pType;
                 }
             }
+            _updateBitmap = true;
         }
 
         public Type GetType(int pX, int pY)
         {
             return _terrain[pX, pY];
+        }
+
+        internal void BitmapData(ref BitmapResource pResource, int pResolution)
+        {
+            if (!_updateBitmap)
+                return;
+
+            var memory = new byte[pResolution * pResolution * 4];
+            var step = (int)Math.Floor((double)Terrain.Size / pResolution);
+            for (int x = 0; x < pResolution; x++)
+            {
+                for (int y = 0; y < pResolution; y++)
+                {
+                    Terrain.Type t = GetType(x * step, y * step);
+
+                    var i = (int)(pResolution * 4 * y + x * 4);
+                    var color = ColorFromType(t);
+                    memory[i] = color.R;
+                    memory[i + 1] = color.G;
+                    memory[i + 2] = color.B;
+                    memory[i + 3] = color.A;
+                }
+            }
+
+            if (pResource != null) pResource.Dispose();
+            pResource = ((DirectXGraphicSystem)Game.Graphics).FromByte(memory, pResolution, pResolution);
+            _updateBitmap = false;
+        }
+
+        private System.Drawing.Color ColorFromType(Terrain.Type pType)
+        {
+            switch (pType)
+            {
+                case Terrain.Type.Desert:
+                    return System.Drawing.Color.Brown;
+                case Terrain.Type.Forest:
+                    return System.Drawing.Color.DarkGreen;
+                case Terrain.Type.Ice:
+                    return System.Drawing.Color.White;
+                case Terrain.Type.Mountain:
+                    return System.Drawing.Color.Gray;
+                case Terrain.Type.Plains:
+                    return System.Drawing.Color.Green;
+                case Terrain.Type.Snow:
+                    return System.Drawing.Color.Snow;
+                case Terrain.Type.Water:
+                    return System.Drawing.Color.Blue;
+                default:
+                    throw new Exception();
+            }
         }
 
         private BitmapResource GetBitmap(int x, int y)

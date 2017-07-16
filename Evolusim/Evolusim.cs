@@ -14,10 +14,8 @@ namespace Evolusim
     {
         /*
          *TODO
-         * Minimap
          * Creatures
          * Terrain bitmasking
-         * Terrain climate
          * Only allow changing height / climate
          */
 
@@ -50,8 +48,10 @@ namespace Evolusim
             InputManager.Listen(Keys.Up);
             InputManager.Listen(Keys.Down);
 
-            ActiveCamera = new Camera(889, 4444, 500, 2500);
-            ActiveCamera.Bounds = new System.Drawing.RectangleF(0, 0, WorldSize, WorldSize);
+            ActiveCamera = new Camera(889, 4444, 500, 2500)
+            {
+                Bounds = new System.Drawing.RectangleF(0, 0, WorldSize, WorldSize)
+            };
         }
 
         public override void Update(float pDeltaTime)

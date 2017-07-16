@@ -112,8 +112,11 @@ namespace Evolusim
         {
             base.End();
 
-            InputManager.StopListening(Keys.Up);
-            InputManager.StopListening(Keys.Down);
+            if(!_inGame)
+            {
+                InputManager.StopListening(Keys.Up);
+                InputManager.StopListening(Keys.Down);
+            }
             InputManager.StopListening(Keys.Enter);
 
             _font.Dispose();
@@ -123,19 +126,13 @@ namespace Evolusim
             {
                 case 0:
                     if(!_inGame)
-                    {
                         SceneManager.BeginScene(new GameScene());
-                    }
                     break;
                 case 1:
-                    if(_inGame)
-                    {
-                        Game.IsPlaying = false;
-                    }
-                    else
-                    {
+                    if (!_inGame)
                         SceneManager.BeginScene(new GameScene());
-                    }
+                    else
+                        Game.IsPlaying = false;
                     break;
                 case 2:
                     Game.IsPlaying = false;

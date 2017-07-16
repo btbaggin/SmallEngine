@@ -86,6 +86,10 @@ namespace SmallEngine.UI
 
         protected List<UIElement> Children { get; private set; }
 
+        protected AnchorDirection Anchor { get; set; }
+
+        protected Vector2 AnchorPoint { get; set; }
+
         public RectangleF Bounds
         {
             get { return new RectangleF(Position.X, Position.Y, Width, Height); }
@@ -100,9 +104,6 @@ namespace SmallEngine.UI
             }
         }
         #endregion
-
-        private AnchorDirection _anchor;
-        private Vector2 _anchorPoint;
 
         public UIElement()
         {
@@ -135,8 +136,8 @@ namespace SmallEngine.UI
 
         public void AddChild(UIElement pElement, AnchorDirection pAnchor, Vector2 pAnchorPoint)
         {
-            pElement._anchor = pAnchor;
-            pElement._anchorPoint = pAnchorPoint;
+            pElement.Anchor = pAnchor;
+            pElement.AnchorPoint = pAnchorPoint;
             Children.Add(pElement);
             //pElement.Measure(new Size(Width, Height), Position);
         }
@@ -152,24 +153,24 @@ namespace SmallEngine.UI
 
         public virtual void Measure(SizeF pSize, Vector2 pPosition)
         {
-            if (_anchor.HasFlag(AnchorDirection.Left))
+            if (Anchor.HasFlag(AnchorDirection.Left))
             {
-                _position = new Vector2(_anchorPoint.X, Position.Y);
+                _position = new Vector2(AnchorPoint.X, Position.Y);
             }
 
-            if (_anchor.HasFlag(AnchorDirection.Top))
+            if (Anchor.HasFlag(AnchorDirection.Top))
             {
-                _position = new Vector2(Position.X, _anchorPoint.Y);
+                _position = new Vector2(Position.X, AnchorPoint.Y);
             }
 
-            if (_anchor.HasFlag(AnchorDirection.Right))
+            if (Anchor.HasFlag(AnchorDirection.Right))
             {
-                _position = new Vector2(pSize.Width - _anchorPoint.X, Position.Y);
+                _position = new Vector2(pSize.Width - AnchorPoint.X, Position.Y);
             }
 
-            if (_anchor.HasFlag(AnchorDirection.Bottom))
+            if (Anchor.HasFlag(AnchorDirection.Bottom))
             {
-                _position = new Vector2(Position.X, pSize.Height - _anchorPoint.Y);
+                _position = new Vector2(Position.X, pSize.Height - AnchorPoint.Y);
             }
             _position += pPosition;
 

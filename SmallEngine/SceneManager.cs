@@ -50,27 +50,19 @@ namespace SmallEngine
         {
             if(pMode == SceneLoadMode.Additive)
             {
-                //TODO fix
-                _scenes.Push(pScene);
+                _scenes.Push(Current);
             }
-            else
-            {
-                //_scenes.Pop();
-                _scenes.Push(pScene);
-            }
+
             Current = pScene;
             Current.BeginScene(_game);
         }
 
         public static void EndScene()
         {
-            if(_scenes.Count > 1)
+            Current.End();
+            if(_scenes.Count > 0)
             {
                 Current = _scenes.Pop();
-            }
-            else
-            {
-                Current.End();
             }
         } 
     }
