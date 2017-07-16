@@ -14,6 +14,7 @@ namespace Evolusim
     class GameScene : Scene
     {
         Terrain _terrain;
+        Minimap _minimap;
         Toolbar _toolbar;
 
         protected override void Begin()
@@ -21,6 +22,7 @@ namespace Evolusim
             base.Begin();
 
             _terrain = new Terrain();
+            _minimap = new Minimap(_terrain, 200, 256);
             _toolbar = new Toolbar();
             UIManager.Register(_toolbar);
             InputManager.Listen(Keys.T);
@@ -42,6 +44,7 @@ namespace Evolusim
         {
             base.Draw(pSystem);
             _terrain.Draw(pSystem);
+            _minimap.Draw(pSystem);
         }
 
         protected override void Update(float pDeltaTime)

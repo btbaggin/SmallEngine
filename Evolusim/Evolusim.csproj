@@ -51,6 +51,7 @@
     <Compile Include="GameScene.cs" />
     <Compile Include="HeightMap.cs" />
     <Compile Include="MenuScene.cs" />
+    <Compile Include="Minimap.cs" />
     <Compile Include="MovementComponent.cs" />
     <Compile Include="Organism.cs" />
     <Compile Include="Program.cs" />

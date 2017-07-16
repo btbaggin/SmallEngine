@@ -25,13 +25,17 @@ namespace SmallEngine
             GameObject = pGameObject;
             foreach (var d in _dependencies)
             {
-                var component = pGameObject.GetComponent(d.Key.FieldType) ?? Create(d.Key.FieldType);
+                var component = pGameObject.GetComponent(d.Key.FieldType);
+                if(component == null)
+                {
+                    component = Create(d.Key.FieldType);
+                    pGameObject.AddComponent(component);
+                }
                 if (component == null)
                 {
                     continue;
                 }
 
-                pGameObject.AddComponent(component);
                 d.Key.SetValue(this, component);
             }
         }
