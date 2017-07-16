@@ -23,17 +23,20 @@ namespace Evolusim.UI
 
         public bool IsSelected { get; internal set; }
 
-        public ToggleButton(BitmapResource pImage, string pText) : this(pImage, pText, null)
+        public object Data { get; private set; }
+
+        public ToggleButton(BitmapResource pImage, string pText, object pData) : this(pImage, pText, pData, null)
         {
         }
 
-        public ToggleButton(BitmapResource pImage, string pText, ToggleButtonGroup pGroup)
+        public ToggleButton(BitmapResource pImage, string pText, object pData, ToggleButtonGroup pGroup)
         {
             WidthPercent = .8f;
             Height = 50;
             _image = pImage;
             _text = pText;
             _imageSize = 32;//pHeight - 8;
+            Data = pData;
 
             _highlightBrush = Game.Graphics.CreateBrush(System.Drawing.Color.Yellow);
             _font = Game.Graphics.CreateFont("Arial", 18, System.Drawing.Color.White);

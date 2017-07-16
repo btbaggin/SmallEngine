@@ -9,7 +9,7 @@ using SmallEngine.Graphics;
 
 namespace Evolusim
 {
-    class Minimap : UIElement
+    class Minimap : UIElement, IDisposable
     {
         Terrain _terrain;
         Vector2 _scale;
@@ -27,7 +27,6 @@ namespace Evolusim
             _cameraOutline = Game.Graphics.CreateBrush(System.Drawing.Color.Black);
             Anchor = AnchorDirection.Top | AnchorDirection.Right;
             AnchorPoint = new Vector2(pSize);
-            UIManager.Register(this);
         }
 
         public override void Draw(IGraphicsSystem pSystem)
@@ -39,6 +38,11 @@ namespace Evolusim
             var w = Game.ActiveCamera.Width * _ratio;
             var h = Game.ActiveCamera.Height * _ratio;
             pSystem.DrawRect(new System.Drawing.RectangleF(Game.Form.Width - _scale.X + x.X, x.Y, w, h), _cameraOutline, 1);
+        }
+
+        public void Dispose()
+        {
+            _cameraOutline.Dispose();
         }
     }
 }

@@ -27,5 +27,18 @@ namespace Evolusim.UI
                 b.IsSelected = false;
             }
         }
+
+        public T GetSelectedData<T>()
+        {
+            foreach(var b in _buttons)
+            {
+                if(b.IsSelected)
+                {
+                    return (T)b.Data;
+                }
+            }
+
+            return default(T);
+        }
     }
 }

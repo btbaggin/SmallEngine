@@ -25,6 +25,7 @@ namespace Evolusim
             _minimap = new Minimap(_terrain, 200, 256);
             _toolbar = new Toolbar();
             UIManager.Register(_toolbar);
+            UIManager.Register(_minimap);
             InputManager.Listen(Keys.T);
             InputManager.Listen(Keys.Escape);
             InputManager.Listen(Keys.Up);
@@ -72,6 +73,9 @@ namespace Evolusim
             base.End();
 
             UIManager.Unregister(_toolbar);
+            UIManager.Unregister(_minimap);
+            _minimap.Dispose();
+            _toolbar.Dispose();
 
             InputManager.StopListening(Keys.T);
             InputManager.StopListening(Keys.Escape);

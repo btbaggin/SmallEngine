@@ -78,6 +78,7 @@ namespace Evolusim
             var tileSize = (int)(Game.Form.Width / numTilesX);
             var startPoint = Evolusim.ActiveCamera.ToCameraSpace(new Vector2(x * 64, y * 64));
 
+            //TODO this throws off setting tiles
             Vector2 scale = new Vector2(tileSize, tileSize);
             var currentX = (int)startPoint.X;
             var currentY = (int)startPoint.Y;

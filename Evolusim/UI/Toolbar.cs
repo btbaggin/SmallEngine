@@ -10,7 +10,7 @@ using SmallEngine.UI;
 
 namespace Evolusim.UI
 {
-    class Toolbar : StackPanel
+    class Toolbar : StackPanel, IDisposable
     { 
         private const float dx = 5;
 
@@ -18,11 +18,7 @@ namespace Evolusim.UI
 
         SmallEngine.Graphics.Brush _background;
 
-        //ToggleButton _plainsButton;
-        //ToggleButton _waterButton;
-        //ToggleButton _desertButton;
-        //ToggleButton _forestButton;
-        //ToggleButton _mountainButton;
+        ToggleButtonGroup _group;
 
         public Terrain.Type SelectedType { get; private set; }
 
@@ -33,13 +29,13 @@ namespace Evolusim.UI
             HeightPercent = 1f;
             Position = new Vector2(Game.Form.Width, 0);
 
-            var group = new ToggleButtonGroup();
+            _group = new ToggleButtonGroup();
             var anchor = AnchorDirection.Left | AnchorDirection.Top;
-            AddChild(new ToggleButton(ResourceManager.Request<BitmapResource>("plains"), "Plains", group), anchor, Vector2.Zero);
-            AddChild(new ToggleButton(ResourceManager.Request<BitmapResource>("water"), "Water", group), anchor, Vector2.Zero);
-            AddChild(new ToggleButton(ResourceManager.Request<BitmapResource>("desert"), "Desert", group), anchor, Vector2.Zero);
-            AddChild(new ToggleButton(ResourceManager.Request<BitmapResource>("forest"), "Forest", group), anchor, Vector2.Zero);
-            AddChild(new ToggleButton(ResourceManager.Request<BitmapResource>("mountain"), "Mountains", group), anchor, Vector2.Zero);
+            AddChild(new ToggleButton(ResourceManager.Request<BitmapResource>("plains"), "Plains", Terrain.Type.Plains, _group), anchor, Vector2.Zero);
+            AddChild(new ToggleButton(ResourceManager.Request<BitmapResource>("water"), "Water", Terrain.Type.Water, _group), anchor, Vector2.Zero);
+            AddChild(new ToggleButton(ResourceManager.Request<BitmapResource>("desert"), "Desert", Terrain.Type.Desert, _group), anchor, Vector2.Zero);
+            AddChild(new ToggleButton(ResourceManager.Request<BitmapResource>("forest"), "Forest", Terrain.Type.Forest, _group), anchor, Vector2.Zero);
+            AddChild(new ToggleButton(ResourceManager.Request<BitmapResource>("mountain"), "Mountains", Terrain.Type.Mountain, _group), anchor, Vector2.Zero);
             Measure(new Size(Width, Height), Position);
         }
 
@@ -57,11 +53,7 @@ namespace Evolusim.UI
         public override void Update(float pDeltaTime)
         {
             base.Update(pDeltaTime);
-            //if (_plainsButton.IsSelected) SelectedType = Terrain.Type.Plains;
-            //if (_waterButton.IsSelected) SelectedType = Terrain.Type.Water;
-            //if (_desertButton.IsSelected) SelectedType = Terrain.Type.Desert;
-            //if (_forestButton.IsSelected) SelectedType = Terrain.Type.Forest;
-            //if (_mountainButton.IsSelected) SelectedType = Terrain.Type.Mountain;
+            SelectedType = _group.GetSelectedData<Terrain.Type>();
 
             if(IsOpen)
             {
@@ -79,6 +71,11 @@ namespace Evolusim.UI
                     Position = new Vector2(Game.Form.Width, 0);
                 }
             }
+        }
+
+        public void Dispose()
+        {
+            _background.Dispose();
         }
     }
 }
