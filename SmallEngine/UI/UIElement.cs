@@ -148,16 +148,16 @@ namespace SmallEngine.UI
             _height = (int)Math.Min(pSize.Height - Margin.Y, Height);
 
             if (Anchor.HasFlag(AnchorDirection.Left))
-                Position = new Vector2(AnchorPoint.X, Position.Y);
+                Position = new Vector2(AnchorPoint.X, _position.Y);
 
             if (Anchor.HasFlag(AnchorDirection.Top))
-                Position = new Vector2(Position.X, AnchorPoint.Y);
+                Position = new Vector2(_position.X, AnchorPoint.Y);
 
             if (Anchor.HasFlag(AnchorDirection.Right))
-                Position = new Vector2(pSize.Width - (AnchorPoint.X + Width), Position.Y);
+                Position = new Vector2(pSize.Width - (AnchorPoint.X + Width), _position.Y);
 
             if (Anchor.HasFlag(AnchorDirection.Bottom))
-                Position = new Vector2(Position.X, pSize.Height - (AnchorPoint.Y + Height));
+                Position = new Vector2(_position.X, pSize.Height - (AnchorPoint.Y + Height));
             _position += new Vector2(pLeft, pTop);// pPosition;
 
             _position.X = Math.Max(Margin.X, _position.X);
