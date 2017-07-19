@@ -77,6 +77,7 @@ namespace SmallEngine
 
             Form.WindowActivateChanged += WindowActivateChanged;
             Form.WindowDestory += WindowDestroyed;
+            Form.WindowSizeChanged += WindowSizeChanged;
 
             Graphics = Render == RenderSystem.DirectX ? new DirectXGraphicSystem() : null;
             Graphics.Initialize(Form, false);
@@ -178,6 +179,11 @@ namespace SmallEngine
         private void WindowActivateChanged(object sender, WindowEventArgs e)
         {
             Paused = !e.Activated && !PlayInBackground;
+        }
+
+        private void WindowSizeChanged(object sender, WindowEventArgs e)
+        {
+            _uiManager.Resize();
         }
 
         private void OnIdle(object pSender, EventArgs pEventArgs)

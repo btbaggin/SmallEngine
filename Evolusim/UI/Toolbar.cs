@@ -10,7 +10,7 @@ using SmallEngine.UI;
 
 namespace Evolusim.UI
 {
-    class Toolbar : StackPanel, IDisposable
+    class Toolbar : UIElement, IDisposable
     { 
         private const float dx = 5;
 
@@ -22,12 +22,14 @@ namespace Evolusim.UI
 
         public Terrain.Type SelectedType { get; private set; }
 
-        public Toolbar() : base(Orientation.Vertical)
+        public Toolbar() : base()
         {
             _background = Game.Graphics.CreateBrush(Color.FromArgb(150, 0, 0, 0));
             WidthPercent = .2f;
             HeightPercent = 1f;
-            Position = new Vector2(Game.Form.Width, 0);
+            Position = new Vector2(-Width, 0);
+            Orientation = ElementOrientation.Vertical;
+            Order = 10;
 
             _group = new ToggleButtonGroup();
             var anchor = AnchorDirection.Left | AnchorDirection.Top;
@@ -36,7 +38,7 @@ namespace Evolusim.UI
             AddChild(new ToggleButton(ResourceManager.Request<BitmapResource>("desert"), "Desert", Terrain.Type.Desert, _group), anchor, Vector2.Zero);
             AddChild(new ToggleButton(ResourceManager.Request<BitmapResource>("forest"), "Forest", Terrain.Type.Forest, _group), anchor, Vector2.Zero);
             AddChild(new ToggleButton(ResourceManager.Request<BitmapResource>("mountain"), "Mountains", Terrain.Type.Mountain, _group), anchor, Vector2.Zero);
-            Measure(new Size(Width, Height), Position);
+            SetLayout();
         }
 
         public void Toggle()
@@ -57,18 +59,18 @@ namespace Evolusim.UI
 
             if(IsOpen)
             {
-                Position = new Vector2(Position.X - dx, 0);
-                if(Position.X <= Game.Form.Width - Game.Form.Width / 5)
+                Position = new Vector2(Position.X + dx, Position.Y);
+                if(Position.X >= 0)
                 {
-                    Position = new Vector2(Game.Form.Width - Game.Form.Width / 5, 0);
+                    Position = new Vector2(0, Position.Y);
                 }
             }
             else
             {
-                Position = new Vector2(Position.X + dx, 0);
-                if (Position.X >= Game.Form.Width)
+                Position = new Vector2(Position.X - dx, Position.Y);
+                if (Position.X <= -Width)
                 {
-                    Position = new Vector2(Game.Form.Width, 0);
+                    Position = new Vector2(-Width, Position.Y);
                 }
             }
         }

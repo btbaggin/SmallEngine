@@ -31,7 +31,8 @@ namespace SmallEngine.UI
 
         internal void Draw(IGraphicsSystem pSystem)
         {
-            foreach (var e in _elements)
+            //TODO speed
+            foreach (var e in _elements.OrderBy((pE) => pE.Order))
             {
                 if (e.Visible)
                 {
@@ -48,6 +49,14 @@ namespace SmallEngine.UI
                 {
                     e.Update(pDeltaTime);
                 }
+            }
+        }
+
+        internal void Resize()
+        {
+            foreach(var e in _elements)
+            {
+                e.Measure(new SizeF(Game.Form.Width, Game.Form.Height), Vector2.Zero);
             }
         }
     }

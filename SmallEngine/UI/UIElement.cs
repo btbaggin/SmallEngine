@@ -19,7 +19,7 @@ namespace SmallEngine.UI
             {
                 var diff = value - Position;
                 _position = value;
-                foreach(var c in Children)
+                foreach (var c in Children)
                 {
                     c.SetPositionInternal(diff);
                 }
@@ -82,6 +82,8 @@ namespace SmallEngine.UI
 
         public bool Enabled { get; set; }
 
+        public int Order { get; set; }
+
         public Vector2 Margin { get; set; }
 
         protected List<UIElement> Children { get; private set; }
@@ -89,6 +91,8 @@ namespace SmallEngine.UI
         protected AnchorDirection Anchor { get; set; }
 
         protected Vector2 AnchorPoint { get; set; }
+
+        protected ElementOrientation Orientation { get; set; }
 
         public RectangleF Bounds
         {
@@ -110,6 +114,11 @@ namespace SmallEngine.UI
             Children = new List<UIElement>();
             Visible = true;
             Enabled = true;
+        }
+
+        protected void SetLayout()
+        {
+            Measure(new SizeF(Game.Form.Width, Game.Form.Height), Vector2.Zero);
         }
 
         public virtual void Update(float pDeltaTime)
@@ -139,7 +148,6 @@ namespace SmallEngine.UI
             pElement.Anchor = pAnchor;
             pElement.AnchorPoint = pAnchorPoint;
             Children.Add(pElement);
-            //pElement.Measure(new Size(Width, Height), Position);
         }
 
         private void SetPositionInternal(Vector2 pDiff)
@@ -153,6 +161,20 @@ namespace SmallEngine.UI
 
         public virtual void Measure(SizeF pSize, Vector2 pPosition)
         {
+
+            if (HeightPercent > 0)
+            {
+                _height = (int)(pSize.Height * HeightPercent);
+            }
+
+            if (WidthPercent > 0)
+            {
+                _width = (int)(pSize.Width * WidthPercent);
+            }
+
+            _width = (int)Math.Min(pSize.Width - Margin.X, Width);
+            _height = (int)Math.Min(pSize.Height - Margin.Y, Height);
+
             if (Anchor.HasFlag(AnchorDirection.Left))
             {
                 _position = new Vector2(AnchorPoint.X, Position.Y);
@@ -165,33 +187,32 @@ namespace SmallEngine.UI
 
             if (Anchor.HasFlag(AnchorDirection.Right))
             {
-                _position = new Vector2(pSize.Width - AnchorPoint.X, Position.Y);
+                _position = new Vector2(pSize.Width - (AnchorPoint.X + Width), Position.Y);
             }
 
             if (Anchor.HasFlag(AnchorDirection.Bottom))
             {
-                _position = new Vector2(Position.X, pSize.Height - AnchorPoint.Y);
+                _position = new Vector2(Position.X, pSize.Height - (AnchorPoint.Y + Height));
             }
             _position += pPosition;
 
-            if (HeightPercent > 0)
-            {
-                Height = (int)(pSize.Height * HeightPercent);
-            }
-
-            if (WidthPercent > 0)
-            {
-                Width = (int)(pSize.Width * WidthPercent);
-            }
-
             _position.X = Math.Max(Margin.X, _position.X);
             _position.Y = Math.Max(Margin.Y, _position.Y);
-            Width = (int)Math.Min(pSize.Width - Margin.X, Width);
-            Height = (int)Math.Min(pSize.Height - Margin.Y, Height);
 
+            pSize = new SizeF(Width, Height);
             foreach (var c in Children)
             {
-                c.Measure(new SizeF(Width, Height), Position);
+                c.Measure(pSize, pPosition);
+                if (Orientation == ElementOrientation.Horizontal)
+                {
+                    pPosition.X += c.Width;
+                    pSize.Width -= c.Width;
+                }
+                else
+                {
+                    pPosition.Y += c.Height;
+                    pSize.Height -= c.Height;
+                }
             }
         }
     }

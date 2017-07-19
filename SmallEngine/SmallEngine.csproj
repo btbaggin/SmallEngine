@@ -110,6 +110,7 @@
     <Compile Include="Input\Keys.cs" />
     <Compile Include="Input\Mouse.cs" />
     <Compile Include="UI\AnchorDirection.cs" />
+    <Compile Include="UI\ElementOrientation.cs" />
     <Compile Include="UI\UIElement.cs" />
     <Compile Include="UI\UIManager.cs" />
     <Compile Include="Utils\DiamondSquareNoise.cs" />

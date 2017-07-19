@@ -59,7 +59,6 @@
     <Compile Include="Terrain.cs" />
     <Compile Include="Traits\Trait.cs" />
     <Compile Include="Traits\TraitComponent.cs" />
-    <Compile Include="UI\StackPanel.cs" />
     <Compile Include="UI\Toolbar.cs" />
     <Compile Include="UI\ToggleButton.cs" />
     <Compile Include="UI\ToggleButtonGroup.cs" />

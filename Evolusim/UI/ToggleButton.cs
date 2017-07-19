@@ -19,7 +19,6 @@ namespace Evolusim.UI
         float _imageSize;
 
         ToggleButtonGroup _group;
-        System.Drawing.RectangleF _rect;
 
         public bool IsSelected { get; internal set; }
 
@@ -33,9 +32,10 @@ namespace Evolusim.UI
         {
             WidthPercent = .8f;
             Height = 50;
+            Margin = new Vector2(10, 0);
             _image = pImage;
             _text = pText;
-            _imageSize = 32;//pHeight - 8;
+            _imageSize = 32;
             Data = pData;
 
             _highlightBrush = Game.Graphics.CreateBrush(System.Drawing.Color.Yellow);
@@ -47,19 +47,20 @@ namespace Evolusim.UI
                 _group = pGroup;
                 _group.AddToGroup(this);
             }
+            SetLayout();
         }
 
         public override void Draw(IGraphicsSystem pSystem)
         {
-            _rect = new System.Drawing.RectangleF(Position.X, Position.Y, Width, Height);
-            var textRect = new System.Drawing.RectangleF(Position.X + Height, Position.Y + Height / 2, Width - Height, Height / 2);
+            var y = (Height - 32) / 2;
+            var textRect = new System.Drawing.RectangleF(Position.X + _imageSize + y, Position.Y + y, Width - (_imageSize + y), 32);
 
-            pSystem.DrawBitmap(_image, 1, new Vector2(_rect.X + 4, _rect.Y + 4), new Vector2(_imageSize, _imageSize));
+            pSystem.DrawBitmap(_image, 1, new Vector2(Position.X + y, Position.Y + y), new Vector2(_imageSize, _imageSize));
             pSystem.DrawText(_text, textRect, _font);
 
             if(IsSelected)
             {
-                pSystem.DrawRect(_rect, _highlightBrush, 3);
+                pSystem.DrawRect(new System.Drawing.RectangleF(Position.X, Position.Y, Width, Height), _highlightBrush, 3);
             }
         }
 
