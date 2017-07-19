@@ -3,26 +3,42 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SmallEngine;
+using SmallEngine.UI;
+using SmallEngine.Input;
 
 namespace Evolusim.UI
 {
-    class ToggleButtonGroup
+    class ToggleButtonGroup : UIElement
     {
-        List<ToggleButton> _buttons;
-
         public ToggleButtonGroup(params ToggleButton[] pButtons)
         {
-            _buttons = new List<ToggleButton>();
+            Height = 50;
+            WidthPercent = 1f;
+            foreach(var b in pButtons)
+            {
+                AddChild(b, AnchorDirection.Left, Vector2.Zero);
+            }
+            Orientation = ElementOrientation.Horizontal;
+            SetLayout();
         }
 
-        internal void AddToGroup(ToggleButton pButton)
+        public override void Update(float pDeltaTime)
         {
-            _buttons.Add(pButton);
+            base.Update(pDeltaTime);
+            foreach(var c in Children)
+            {
+                if (InputManager.KeyPressed(Mouse.Left) && IsMouseOver)
+                {
+                    SetAllOff();
+                    ((ToggleButton)c).IsSelected = IsMouseOver;
+                }
+            }
         }
 
         public void SetAllOff()
         {
-            foreach(ToggleButton b in _buttons)
+            foreach(ToggleButton b in Children)
             {
                 b.IsSelected = false;
             }
@@ -30,11 +46,11 @@ namespace Evolusim.UI
 
         public T GetSelectedData<T>()
         {
-            foreach(var b in _buttons)
+            foreach(var b in Children)
             {
-                if(b.IsSelected)
+                if(((ToggleButton)b).IsSelected)
                 {
-                    return (T)b.Data;
+                    return (T)((ToggleButton)b).Data;
                 }
             }
 

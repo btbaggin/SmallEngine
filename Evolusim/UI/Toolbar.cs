@@ -17,7 +17,6 @@ namespace Evolusim.UI
         public bool IsOpen { get; private set; }
 
         SmallEngine.Graphics.Brush _background;
-
         ToggleButtonGroup _group;
 
         public Terrain.Type SelectedType { get; private set; }
@@ -31,13 +30,12 @@ namespace Evolusim.UI
             Orientation = ElementOrientation.Vertical;
             Order = 10;
 
-            _group = new ToggleButtonGroup();
-            var anchor = AnchorDirection.Left | AnchorDirection.Top;
-            AddChild(new ToggleButton(ResourceManager.Request<BitmapResource>("plains"), "Plains", Terrain.Type.Plains, _group), anchor, Vector2.Zero);
-            AddChild(new ToggleButton(ResourceManager.Request<BitmapResource>("water"), "Water", Terrain.Type.Water, _group), anchor, Vector2.Zero);
-            AddChild(new ToggleButton(ResourceManager.Request<BitmapResource>("desert"), "Desert", Terrain.Type.Desert, _group), anchor, Vector2.Zero);
-            AddChild(new ToggleButton(ResourceManager.Request<BitmapResource>("forest"), "Forest", Terrain.Type.Forest, _group), anchor, Vector2.Zero);
-            AddChild(new ToggleButton(ResourceManager.Request<BitmapResource>("mountain"), "Mountains", Terrain.Type.Mountain, _group), anchor, Vector2.Zero);
+            _group = new ToggleButtonGroup(new ToggleButton("plains", "Plains", Terrain.Type.Plains) { Orientation = ElementOrientation.Vertical },
+                new ToggleButton("water", "Water", Terrain.Type.Water) { Orientation = ElementOrientation.Vertical },
+                new ToggleButton("desert", "Desert", Terrain.Type.Desert) { Orientation = ElementOrientation.Vertical },
+                new ToggleButton("forest", "Forest", Terrain.Type.Forest) { Orientation = ElementOrientation.Vertical },
+                new ToggleButton("mountain", "Mountains", Terrain.Type.Mountain) { Orientation = ElementOrientation.Vertical });
+            AddChild(_group, AnchorDirection.Left | AnchorDirection.Top, Vector2.Zero);
             SetLayout();
         }
 

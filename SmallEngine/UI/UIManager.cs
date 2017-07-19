@@ -56,7 +56,7 @@ namespace SmallEngine.UI
         {
             foreach(var e in _elements)
             {
-                e.Measure(new SizeF(Game.Form.Width, Game.Form.Height), Vector2.Zero);
+                e.Measure(new SizeF(Game.Form.Width, Game.Form.Height), 0, 0);
             }
         }
     }
