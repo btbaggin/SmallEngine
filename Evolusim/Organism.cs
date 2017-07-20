@@ -11,6 +11,12 @@ namespace Evolusim
     {
         private BitmapRenderComponent _render;
         private MovementComponent _movement;
+        private TraitComponent _traits;
+
+        private Terrain.Type _preferredTerrain;
+        private int _currentHunger;
+        private int _hunger;
+
         static Organism()
         {
             SceneManager.Define("organism", typeof(BitmapRenderComponent),
@@ -27,6 +33,7 @@ namespace Evolusim
         {
             Position = new Vector2(Game.RandomInt(0, Evolusim.WorldSize), Game.RandomInt(0, Evolusim.WorldSize));
             Scale = new Vector2(30);
+            _preferredTerrain = Terrain.GetTypeAt(Position); 
         }
 
         public override void Initialize()
@@ -35,11 +42,33 @@ namespace Evolusim
             _render.SetBitmap("organism");
 
             _movement = GetComponent<MovementComponent>();
+
+            _traits = GetComponent<TraitComponent>();
+            _hunger = _traits.GetTrait<int>(TraitComponent.Traits.Hunger);
+            _currentHunger = _hunger;
+            Coroutine.Start(UseHunger);
         }
 
         public override void Update(float pDeltaTime)
         {
-            _movement.Move(pDeltaTime);
+            _movement.Move(pDeltaTime, _preferredTerrain);
+        }
+
+        private IEnumerator<WaitEvent> UseHunger()
+        {
+            while(!MarkedForDestroy)
+            {
+                _currentHunger -= 1;
+                if(_currentHunger <= 0)
+                {
+                    Destroy();
+                }
+                else if(_currentHunger <= 4)
+                {
+                    _movement.Movement = MovementComponent.MovementType.Hungry;
+                }
+                yield return new WaitForSeconds(1);
+            }
         }
     }
 }

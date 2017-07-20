@@ -26,6 +26,8 @@ namespace SmallEngine
 
         protected Game Game { get; private set; }
 
+        protected bool MarkedForDestroy { get; private set; }
+
         private Dictionary<Type, IComponent> _components;
 
         public GameObject() : this(null) { }
@@ -95,6 +97,7 @@ namespace SmallEngine
 
         public void Destroy()
         {
+            MarkedForDestroy = true;
             Game.Destroy(this);
         }
 

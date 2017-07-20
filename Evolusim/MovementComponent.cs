@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SmallEngine;
+﻿using SmallEngine;
 
 namespace Evolusim
 {
@@ -22,18 +17,20 @@ namespace Evolusim
         [ImportComponent]
         private TraitComponent _traits = null;
 
+        int _distance;
         Vector2 _destination;
         bool _destinationSet;
         public MovementComponent() : base()
         {
             Movement = MovementType.Wander;
+            _distance = 5;
         }
 
-        public void Move(float pDeltaTime)
+        public void Move(float pDeltaTime, Terrain.Type pTerrain)
         {
             if (!_destinationSet)
             {
-                GetDestination();
+                GetDestination(pTerrain);
             }
 
             //TODO use pathing
@@ -45,12 +42,15 @@ namespace Evolusim
             }
         }
 
-        private void GetDestination()
+        private void GetDestination(Terrain.Type pTerrain)
         {
             switch(Movement)
             {
                 case MovementType.Wander:
-                    _destination = new Vector2(Game.RandomInt(0, Evolusim.WorldSize), Game.RandomInt(0, Evolusim.WorldSize));
+                    //TODO only move to preferred terrain
+                    var t = Terrain.GetTile(GameObject.Position);
+                    var p = new Vector2(t.X + Game.RandomInt(-_distance, _distance), t.Y + Game.RandomInt(-_distance, _distance));
+                    _destination = Terrain.GetPosition(p);
                     break;
                 case MovementType.Hungry:
                     break;

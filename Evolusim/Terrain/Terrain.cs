@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Drawing;
 using SmallEngine;
 using SmallEngine.Graphics;
 
@@ -13,6 +8,7 @@ namespace Evolusim
     {
         public enum Type
         {
+            None,
             Mountain,
             Water,
             Plains,
@@ -22,13 +18,15 @@ namespace Evolusim
             Snow
         }
 
+        public const int BitmapSize = 64;
         public static int Size { get { return 513; } }
+        static Type[,] _terrain;
+        static bool _updateBitmap;
 
         float _bitmapWidth;
         float _bitmapHeight;
-        bool _updateBitmap;
 
-        Type[,] _terrain;
+        VegetationMap _vegetation;
 
         BitmapResource _plains;
         BitmapResource _water;
@@ -42,8 +40,8 @@ namespace Evolusim
 
         public Terrain()
         {
-            _bitmapWidth = Size * 64;
-            _bitmapHeight = Size * 64;
+            _bitmapWidth = Size * BitmapSize;
+            _bitmapHeight = Size * BitmapSize;
             _terrain = new Type[Size, Size];
 
             _plains = ResourceManager.Request<BitmapResource>("plains");
@@ -65,23 +63,25 @@ namespace Evolusim
                 }
             }
             _updateBitmap = true;
+
+            _vegetation = new VegetationMap(_terrain);
         }
 
         public void Draw(IGraphicsSystem pSystem)
         {
-            int x = (int)(Evolusim.ActiveCamera.Position.X / 64);
-            int y = (int)(Evolusim.ActiveCamera.Position.Y / 64);
-            float numTilesX = Evolusim.ActiveCamera.Width / 64f;
-            float numTilesY = Evolusim.ActiveCamera.Height / 64f;
+            int x = (int)(Evolusim.ActiveCamera.Position.X / BitmapSize);
+            int y = (int)(Evolusim.ActiveCamera.Position.Y / BitmapSize);
+            float numTilesX = Evolusim.ActiveCamera.Width / BitmapSize;
+            float numTilesY = Evolusim.ActiveCamera.Height / BitmapSize;
 
             //Width and height should be the same
-            var tileSize = (int)(Game.Form.Width / numTilesX);
-            var startPoint = Evolusim.ActiveCamera.ToCameraSpace(new Vector2(x * 64, y * 64));
+            var tileSize = (Game.Form.Width / numTilesX);
+            var startPoint = Evolusim.ActiveCamera.ToCameraSpace(new Vector2(x * BitmapSize, y * BitmapSize));
 
             //TODO this throws off setting tiles
-            Vector2 scale = new Vector2(tileSize, tileSize);
-            var currentX = (int)startPoint.X;
-            var currentY = (int)startPoint.Y;
+            Vector2 scale = new Vector2(tileSize);
+            var currentX = startPoint.X;
+            var currentY = startPoint.Y;
             for(int i = x; i <= x + numTilesX + 2; i++)
             {
                 if (i >= Size) break;
@@ -94,12 +94,14 @@ namespace Evolusim
                 currentY = (int)startPoint.Y;
                 currentX += tileSize;
             }
+
+            _vegetation.Draw(pSystem);
         }
 
-        public void SetTypeAt(Type pType, Vector2 pPoint)
+        public static void SetTypeAt(Type pType, Vector2 pPoint)
         {
-            int x = (int)Math.Floor(pPoint.X / 64);
-            int y = (int)Math.Floor(pPoint.Y / 64);
+            int x = (int)Math.Floor(pPoint.X / BitmapSize);
+            int y = (int)Math.Floor(pPoint.Y / BitmapSize);
             if(x >= 0 && y >= 0 && x < _terrain.GetUpperBound(0) && y < _terrain.GetUpperBound(1))
             {
                 if (_terrain[x, y] != pType)
@@ -110,9 +112,31 @@ namespace Evolusim
             _updateBitmap = true;
         }
 
-        public Type GetType(int pX, int pY)
+        public static Type GetTypeAt(Vector2 pPosition)
+        {
+            int x = (int)Math.Floor(pPosition.X / BitmapSize);
+            int y = (int)Math.Floor(pPosition.Y / BitmapSize);
+            if(x >= 0 && y >= 0 && x < _terrain.GetUpperBound(0) && y < _terrain.GetUpperBound(1))
+            {
+                return GetType(x, y);
+            }
+
+            return Type.None;
+        }
+
+        public static Type GetType(int pX, int pY)
         {
             return _terrain[pX, pY];
+        }
+
+        public static Vector2 GetTile(Vector2 pPosition)
+        {
+            return new Vector2((float)Math.Floor(pPosition.X / BitmapSize), (float)Math.Floor(pPosition.Y / BitmapSize));
+        }
+
+        public static Vector2 GetPosition(Vector2 pTile)
+        {
+            return pTile * BitmapSize;
         }
 
         internal void BitmapData(ref BitmapResource pResource, int pResolution)
@@ -160,6 +184,8 @@ namespace Evolusim
                     return System.Drawing.Color.Snow;
                 case Terrain.Type.Water:
                     return System.Drawing.Color.Blue;
+                case Terrain.Type.None:
+                    return System.Drawing.Color.Black;
                 default:
                     throw new Exception();
             }
