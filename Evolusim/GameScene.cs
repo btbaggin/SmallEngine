@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SmallEngine;
+﻿using SmallEngine;
 using SmallEngine.Graphics;
 using SmallEngine.Input;
 using Evolusim.UI;
@@ -54,6 +49,7 @@ namespace Evolusim
 
             if(InputManager.KeyPressed(Keys.Escape))
             {
+                _toolbar.Hide();
                 SceneManager.BeginScene(new MenuScene(true), SceneLoadMode.Additive);
             }
 

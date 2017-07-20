@@ -28,10 +28,10 @@ namespace Evolusim.UI
             base.Update(pDeltaTime);
             foreach(var c in Children)
             {
-                if (InputManager.KeyPressed(Mouse.Left) && IsMouseOver)
+                if (InputManager.KeyPressed(Mouse.Left) && c.IsMouseOver)
                 {
                     SetAllOff();
-                    ((ToggleButton)c).IsSelected = IsMouseOver;
+                    ((ToggleButton)c).IsSelected = c.IsMouseOver;
                 }
             }
         }

@@ -52,6 +52,10 @@ namespace SmallEngine.UI
             }
         }
 
+        public int TotalWidth { get { return Width + (int)(Margin.X * 2); } }
+
+        public int TotalHeight { get { return Height + (int)(Margin.Y * 2); } }
+
         public float HeightPercent { get; set; }
 
         public float WidthPercent { get; set; }
@@ -137,11 +141,13 @@ namespace SmallEngine.UI
             if (HeightPercent > 0)
             {
                 _height = (int)(pSize.Height * HeightPercent);
+                _height -= (int)(Margin.Y * 2);
             }
 
             if (WidthPercent > 0)
             {
                 _width = (int)(pSize.Width * WidthPercent);
+                _width -= (int)(Margin.X * 2);
             }
 
             _width = (int)Math.Min(pSize.Width - Margin.X, Width);
@@ -170,11 +176,11 @@ namespace SmallEngine.UI
                 c.Measure(pSize, pLeft, pTop);
                 if (Orientation == ElementOrientation.Horizontal)
                 {
-                    pLeft += c.Width;
+                    pLeft += c.TotalWidth;
                 }
                 else
                 {
-                    pTop += c.Height;
+                    pTop += c.TotalHeight;
                 }
             }
         }

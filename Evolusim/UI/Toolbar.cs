@@ -30,11 +30,11 @@ namespace Evolusim.UI
             Orientation = ElementOrientation.Vertical;
             Order = 10;
 
-            _group = new ToggleButtonGroup(new ToggleButton("plains", "Plains", Terrain.Type.Plains) { Orientation = ElementOrientation.Vertical },
-                new ToggleButton("water", "Water", Terrain.Type.Water) { Orientation = ElementOrientation.Vertical },
-                new ToggleButton("desert", "Desert", Terrain.Type.Desert) { Orientation = ElementOrientation.Vertical },
-                new ToggleButton("forest", "Forest", Terrain.Type.Forest) { Orientation = ElementOrientation.Vertical },
-                new ToggleButton("mountain", "Mountains", Terrain.Type.Mountain) { Orientation = ElementOrientation.Vertical });
+            _group = new ToggleButtonGroup(new ToggleButton("plains", "Plains", Terrain.Type.Plains) { Orientation = ElementOrientation.Vertical, Margin = new Vector2(2, 0) },
+                new ToggleButton("water", "Water", Terrain.Type.Water) { Orientation = ElementOrientation.Vertical, Margin = new Vector2(2, 0) },
+                new ToggleButton("desert", "Desert", Terrain.Type.Desert) { Orientation = ElementOrientation.Vertical, Margin = new Vector2(2, 0) },
+                new ToggleButton("forest", "Forest", Terrain.Type.Forest) { Orientation = ElementOrientation.Vertical, Margin = new Vector2(2, 0) },
+                new ToggleButton("mountain", "Mountains", Terrain.Type.Mountain) { Orientation = ElementOrientation.Vertical, Margin = new Vector2(2, 0) });
             AddChild(_group, AnchorDirection.Left | AnchorDirection.Top, Vector2.Zero);
             SetLayout();
         }
@@ -42,6 +42,12 @@ namespace Evolusim.UI
         public void Toggle()
         {
             IsOpen = !IsOpen;
+        }
+
+        public void Hide()
+        {
+            IsOpen = false;
+            Position = new Vector2(-Width, Position.Y);
         }
 
         public override void Draw(IGraphicsSystem pSystem)

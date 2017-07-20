@@ -25,7 +25,7 @@ namespace Evolusim.UI
             Orientation = ElementOrientation.Vertical;
             Data = pData;
             AddChild(new ImageElement(pAlias) { WidthPercent = 1, HeightPercent = .75f }, AnchorDirection.Top | AnchorDirection.Left, Vector2.Zero);
-            AddChild(new LabelElement("*", "Arial", 16, System.Drawing.Color.White) { WidthPercent = 1, HeightPercent = .25f }, AnchorDirection.Top | AnchorDirection.Left, Vector2.Zero);
+            AddChild(new LabelElement(pText, "Arial", 12, System.Drawing.Color.White) { WidthPercent = 1, HeightPercent = .25f }, AnchorDirection.Top | AnchorDirection.Left, Vector2.Zero);
 
             _highlightBrush = Game.Graphics.CreateBrush(System.Drawing.Color.Yellow);
             SetLayout();
