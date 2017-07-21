@@ -21,7 +21,7 @@ namespace Evolusim
         {
             _traits = new Dictionary<Traits, Trait>();
             _traits.Add(Traits.Speed, new Trait(Game.RandomInt(50, 200)));
-            _traits.Add(Traits.Hunger, new Trait(Game.RandomInt(10, 20)));
+            _traits.Add(Traits.Hunger, new Trait(Game.RandomInt(20, 40)));
         }
 
         public T GetTrait<T>(Traits pTrait)

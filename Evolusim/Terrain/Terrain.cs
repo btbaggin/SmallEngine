@@ -4,7 +4,7 @@ using SmallEngine.Graphics;
 
 namespace Evolusim
 {
-    class Terrain
+    class Terrain : IDrawable
     {
         public enum Type
         {
@@ -25,8 +25,6 @@ namespace Evolusim
 
         float _bitmapWidth;
         float _bitmapHeight;
-
-        VegetationMap _vegetation;
 
         BitmapResource _plains;
         BitmapResource _water;
@@ -63,8 +61,6 @@ namespace Evolusim
                 }
             }
             _updateBitmap = true;
-
-            _vegetation = new VegetationMap(_terrain);
         }
 
         public void Draw(IGraphicsSystem pSystem)
@@ -78,7 +74,6 @@ namespace Evolusim
             var tileSize = (Game.Form.Width / numTilesX);
             var startPoint = Evolusim.ActiveCamera.ToCameraSpace(new Vector2(x * BitmapSize, y * BitmapSize));
 
-            //TODO this throws off setting tiles
             Vector2 scale = new Vector2(tileSize);
             var currentX = startPoint.X;
             var currentY = startPoint.Y;
@@ -94,8 +89,6 @@ namespace Evolusim
                 currentY = (int)startPoint.Y;
                 currentX += tileSize;
             }
-
-            _vegetation.Draw(pSystem);
         }
 
         public static void SetTypeAt(Type pType, Vector2 pPoint)

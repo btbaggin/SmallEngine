@@ -9,7 +9,7 @@ namespace SmallEngine
 {
     public interface IGameObject : IDisposable
     {
-        #region "Properties"
+        #region Properties
         string Name { get; }
 
         Vector2 Position { get; set; }

@@ -54,6 +54,11 @@ namespace Evolusim
             _movement.Move(pDeltaTime, _preferredTerrain);
         }
 
+        public void Eat()
+        {
+            _currentHunger = _hunger;
+        }
+
         private IEnumerator<WaitEvent> UseHunger()
         {
             while(!MarkedForDestroy)
@@ -63,7 +68,7 @@ namespace Evolusim
                 {
                     Destroy();
                 }
-                else if(_currentHunger <= 4)
+                else if(_currentHunger <= 10)
                 {
                     _movement.Movement = MovementComponent.MovementType.Hungry;
                 }

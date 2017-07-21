@@ -8,7 +8,7 @@ using SmallEngine.Graphics;
 
 namespace SmallEngine.UI
 {
-    public abstract class UIElement
+    public abstract class UIElement : IDrawable, IUpdatable
     {
         #region Properties
         private Vector2 _position;

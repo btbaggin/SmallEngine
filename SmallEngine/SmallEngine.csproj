@@ -89,9 +89,11 @@
     <Compile Include="Camera.cs" />
     <Compile Include="Components\Component.cs" />
     <Compile Include="Components\DependencyComponent.cs" />
+    <Compile Include="Components\IDrawable.cs" />
     <Compile Include="Components\IGameObject.cs" />
     <Compile Include="Components\ImportComponentAttribute.cs" />
     <Compile Include="Audio\AudioResource.cs" />
+    <Compile Include="Components\IUpdatable.cs" />
     <Compile Include="Coroutine.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="Components\GameObject.cs" />

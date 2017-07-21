@@ -61,7 +61,7 @@ namespace Evolusim
             _highlightFont.Alignment = Alignment.Center;
         }
 
-        protected override void Draw(IGraphicsSystem pSystem)
+        public override void Draw(IGraphicsSystem pSystem)
         {
             base.Draw(pSystem);
 
@@ -84,7 +84,7 @@ namespace Evolusim
             }
         }
 
-        protected override void Update(float pDeltaTime)
+        public override void Update(float pDeltaTime)
         {
             base.Update(pDeltaTime);
 

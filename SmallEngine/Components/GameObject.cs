@@ -108,6 +108,7 @@ namespace SmallEngine
                 c.OnRemoved();
                 c.Dispose();
             }
+            _components.Clear();
         }
     }
 }

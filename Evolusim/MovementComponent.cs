@@ -36,10 +36,28 @@ namespace Evolusim
             //TODO use pathing
             GameObject.Position = Vector2.MoveTowards(GameObject.Position, _destination, _traits.GetTrait<int>(TraitComponent.Traits.Speed) * pDeltaTime);
 
-            if(Vector2.DistanceSqrd(GameObject.Position, _destination) < 25)
+            if(GameObject.Position ==  _destination)
             {
-                _destinationSet = false;
+                ResolveDestination();
             }
+        }
+
+        private void ResolveDestination()
+        {
+            switch(Movement)
+            {
+                case MovementType.Wander:
+                    break;
+
+                case MovementType.Hungry:
+                    if(VegetationMap.Eat(GameObject.Position))
+                    {
+                        Movement = MovementType.Wander;
+                        ((Organism)GameObject).Eat();
+                    }
+                    break;
+            }
+            _destinationSet = false;
         }
 
         private void GetDestination(Terrain.Type pTerrain)
@@ -53,6 +71,7 @@ namespace Evolusim
                     _destination = Terrain.GetPosition(p);
                     break;
                 case MovementType.Hungry:
+                    _destination = VegetationMap.GetNearestFood(GameObject.Position);
                     break;
                 case MovementType.Defensive:
                     break;
@@ -60,6 +79,7 @@ namespace Evolusim
                     break;
             }
             _destinationSet = true;
+            _destination = Vector2.Clamp(_destination, Vector2.Zero, new Vector2(Evolusim.WorldSize, Evolusim.WorldSize));
         }
     }
 }

@@ -8,7 +8,7 @@ using SmallEngine.Graphics;
 
 namespace Evolusim
 {
-    class VegetationMap
+    class VegetationMap : IDrawable, IUpdatable
     {
         public enum VegetationType
         {
@@ -17,18 +17,23 @@ namespace Evolusim
             Wheat,
             Cactus,
             Thing,
-            Lily
+            Lily,
+            Dead
         }
 
-        Terrain.Type[,] _terrain;
-        VegetationType[,] _vegetation;
-        BitmapResource _plant;
+        static VegetationType[,] _vegetation;
 
-        public VegetationMap(Terrain.Type[,] pTerrain)
+        const int SpreadSize = 2;
+        const int GrowthTime = 10;
+        float _growthTimer;
+        BitmapResource _plant;
+        BitmapResource _plantDead;
+
+        public VegetationMap()
         {
-            _terrain = pTerrain;
             _vegetation = new VegetationType[Terrain.Size, Terrain.Size];
             _plant = ResourceManager.Request<BitmapResource>("plant");
+            _plantDead = ResourceManager.Request<BitmapResource>("plant_dead");
             GenerateVegetation();
         }
 
@@ -63,8 +68,72 @@ namespace Evolusim
                             break;
 
                         case VegetationType.Wheat:
-                            pSystem.DrawBitmap(_plant, 1, Terrain.GetPosition(new Vector2(x, y)), new Vector2(10));
+                            pSystem.DrawBitmap(_plant, 1, Game.ActiveCamera.ToCameraSpace(Terrain.GetPosition(new Vector2(x, y))), scale);
                             break;
+
+                        case VegetationType.Dead:
+                            pSystem.DrawBitmap(_plantDead, 1, Game.ActiveCamera.ToCameraSpace(Terrain.GetPosition(new Vector2(x, y))), scale);
+                            break;
+                    }
+                }
+            }
+        }
+
+        public void Update(float pDeltaTime)
+        {
+            if((_growthTimer += pDeltaTime) >= GrowthTime)
+            {
+                _growthTimer = 0;
+                Spread();
+            }
+        }
+
+        public static Vector2 GetNearestFood(Vector2 pPosition)
+        {
+            var xy = Terrain.GetTile(pPosition);
+            for(int x = (int)xy.X; x < Terrain.Size; x++)
+            {
+                for (int y = (int)xy.Y; y < Terrain.Size; y++)
+                {
+                    if(_vegetation[x, y] != VegetationType.None &&
+                        _vegetation[x, y] != VegetationType.Dead)
+                    {
+                        return Terrain.GetPosition(new Vector2(x, y));
+                    }
+                }
+            }
+            return pPosition;
+        }
+
+        public static bool Eat(Vector2 pPosition)
+        {
+            var xy = Terrain.GetTile(pPosition);
+            int x = (int)xy.X;
+            int y = (int)xy.Y;
+            var success = _vegetation[x, y] != VegetationType.None &&
+                          _vegetation[x, y] != VegetationType.Dead;
+            _vegetation[x, y] = VegetationType.None;
+            return success;
+        }
+
+        private void Spread()
+        {
+            for(int x = 0; x < Terrain.Size; x++)
+            {
+                for(int y = 0; y < Terrain.Size; y++)
+                {
+                    if (_vegetation[x, y] == VegetationType.Dead)
+                    {
+                        _vegetation[x, y] = VegetationType.None;
+                    }
+                    else if (_vegetation[x, y] != VegetationType.None)
+                    {
+                        //TODO should they all spread?
+                        var dx = Game.RandomInt(Math.Max(0, x - SpreadSize), Math.Min(Terrain.Size, x + SpreadSize));
+                        var dy = Game.RandomInt(Math.Max(0, y - SpreadSize), Math.Min(Terrain.Size, y + SpreadSize));
+
+                        _vegetation[dx, dy] = _vegetation[x, y];
+                        _vegetation[x, y] = VegetationType.Dead;
                     }
                 }
             }
@@ -86,7 +155,7 @@ namespace Evolusim
 
         private VegetationType GetVegetationType(int pX, int pY)
         {
-            switch(_terrain[pX,pY])
+            switch(Terrain.GetType(pX,pY))
             {
                 case Terrain.Type.Forest:
                     return VegetationType.Berry;

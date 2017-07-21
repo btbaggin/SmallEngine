@@ -7,7 +7,7 @@ using SmallEngine.Graphics;
 
 namespace SmallEngine
 {
-    public class Scene
+    public class Scene : IDrawable, IUpdatable
     {
         private List<IGameObject> _gameObjects;
         private Dictionary<string, IGameObject> _namedObjects;
@@ -37,11 +37,11 @@ namespace SmallEngine
         }
         #endregion
 
-        protected internal virtual void Draw(IGraphicsSystem pSystem)
+        public virtual void Draw(IGraphicsSystem pSystem)
         {
         }
 
-        protected internal virtual void Update(float pDeltaTime)
+        public virtual void Update(float pDeltaTime)
         {
         }
 
@@ -186,6 +186,7 @@ namespace SmallEngine
             foreach(var go in _toRemove)
             {
                 _gameObjects.Remove(go);
+                go.Dispose();
                 //TODO named objects?
             }
 
