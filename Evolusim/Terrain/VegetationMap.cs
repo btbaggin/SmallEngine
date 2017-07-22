@@ -25,7 +25,10 @@ namespace Evolusim
 
         const int SpreadSize = 2;
         const int GrowthTime = 10;
+        const int DeadClearTime = 1;
         float _growthTimer;
+        float _deadClearTimer;
+        bool _clearDead;
         BitmapResource _plant;
         BitmapResource _plantDead;
 
@@ -81,10 +84,26 @@ namespace Evolusim
 
         public void Update(float pDeltaTime)
         {
-            if((_growthTimer += pDeltaTime) >= GrowthTime)
+            if ((_growthTimer += pDeltaTime) >= GrowthTime)
             {
                 _growthTimer = 0;
                 Spread();
+                _clearDead = true;
+            }
+            else if (_clearDead && (_deadClearTimer += pDeltaTime) >= DeadClearTime)
+            {
+                for(int x = 0; x < Terrain.Size; x++)
+                {
+                    for(int y = 0; y < Terrain.Size; y++)
+                    {
+                        if(_vegetation[x, y] == VegetationType.Dead)
+                        {
+                            _vegetation[x, y] = VegetationType.None;
+                        }
+                    }
+                }
+                _deadClearTimer = 0;
+                _clearDead = false;
             }
         }
 
