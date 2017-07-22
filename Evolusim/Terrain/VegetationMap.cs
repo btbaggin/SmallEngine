@@ -129,9 +129,11 @@ namespace Evolusim
             var xy = Terrain.GetTile(pPosition);
             int x = (int)xy.X;
             int y = (int)xy.Y;
-            var success = _vegetation[x, y] != VegetationType.None &&
+            var success = x < Terrain.Size &&
+                          y < Terrain.Size &&
+                          _vegetation[x, y] != VegetationType.None &&
                           _vegetation[x, y] != VegetationType.Dead;
-            _vegetation[x, y] = VegetationType.None;
+            if(success) _vegetation[x, y] = VegetationType.None;
             return success;
         }
 

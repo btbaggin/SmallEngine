@@ -9,7 +9,7 @@ namespace Evolusim
 {
     class Organism : GameObject
     {
-        private BitmapRenderComponent _render;
+        private AnimationRenderComponent _render;
         private MovementComponent _movement;
         private TraitComponent _traits;
 
@@ -19,7 +19,7 @@ namespace Evolusim
 
         static Organism()
         {
-            SceneManager.Define("organism", typeof(BitmapRenderComponent),
+            SceneManager.Define("organism", typeof(AnimationRenderComponent),
                                             typeof(TraitComponent),
                                             typeof(MovementComponent));
         }
@@ -38,8 +38,8 @@ namespace Evolusim
 
         public override void Initialize()
         {
-            _render = GetComponent<BitmapRenderComponent>();
-            _render.SetBitmap("organism");
+            _render = GetComponent<AnimationRenderComponent>();
+            _render.SetBitmap("organism", 4, new Vector2(16, 32));
 
             _movement = GetComponent<MovementComponent>();
 
@@ -49,9 +49,40 @@ namespace Evolusim
             Coroutine.Start(UseHunger);
         }
 
+        private float _animationTimer;
         public override void Update(float pDeltaTime)
         {
             _movement.Move(pDeltaTime, _preferredTerrain);
+            if (Math.Abs(_movement.Speed.X) - Math.Abs(_movement.Speed.Y) > 0)
+            {
+                if(_movement.Speed.X > 0)
+                {
+                    _render.AnimationNum = 3;
+                }
+                else
+                {
+                    _render.AnimationNum = 1;
+                }
+            }
+            else
+            {
+                if(_movement.Speed.Y > 0)
+                {
+                    _render.AnimationNum = 2;
+                }
+                else
+                {
+                    _render.AnimationNum = 0;
+                }
+            }
+
+            if ((_animationTimer += pDeltaTime) >= .5)
+            {
+                _render.MoveNextFrame();
+                _animationTimer = 0;
+            }
+
+            
         }
 
         public void Eat()

@@ -11,7 +11,7 @@ namespace SmallEngine
         private static Dictionary<string, Resource> _resources;
         private static Dictionary<string, string[]> _groups;
 
-        #region "Constructor"
+        #region Constructor
         static ResourceManager()
         {
             _resources = new Dictionary<string, Resource>();
@@ -19,7 +19,7 @@ namespace SmallEngine
         }
         #endregion
 
-        #region "Public functions"
+        #region Public functions
         /// <summary>
         /// Synchronously loads the resource
         /// Will return if the resource is already loaded

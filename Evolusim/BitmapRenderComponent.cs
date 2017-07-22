@@ -25,5 +25,10 @@ namespace Evolusim
         {
             pSystem.DrawBitmap(_bitmap, 1, Evolusim.ActiveCamera.ToCameraSpace(GameObject.Position), GameObject.Scale);
         }
+
+        public override void Dispose()
+        {
+            ResourceManager.Dispose<BitmapResource>(_bitmap.Alias);
+        }
     }
 }

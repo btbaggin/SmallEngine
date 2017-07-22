@@ -14,6 +14,8 @@ namespace Evolusim
 
         public MovementType Movement { get; set; }
 
+        public Vector2 Speed { get; private set; }
+
         [ImportComponent]
         private TraitComponent _traits = null;
 
@@ -34,7 +36,9 @@ namespace Evolusim
             }
 
             //TODO use pathing
-            GameObject.Position = Vector2.MoveTowards(GameObject.Position, _destination, _traits.GetTrait<int>(TraitComponent.Traits.Speed) * pDeltaTime);
+            var nextPos = Vector2.MoveTowards(GameObject.Position, _destination, _traits.GetTrait<int>(TraitComponent.Traits.Speed) * pDeltaTime);
+            Speed = GameObject.Position - nextPos;
+            GameObject.Position = nextPos;
 
             if(GameObject.Position ==  _destination)
             {

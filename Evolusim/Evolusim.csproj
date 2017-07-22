@@ -46,6 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AnimationRenderComponent.cs" />
     <Compile Include="BitmapRenderComponent.cs" />
     <Compile Include="Evolusim.cs" />
     <Compile Include="GameScene.cs" />

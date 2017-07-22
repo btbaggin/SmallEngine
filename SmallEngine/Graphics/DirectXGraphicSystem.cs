@@ -205,7 +205,12 @@ namespace SmallEngine.Graphics
         {
             var x = pPosition.X;
             var y = pPosition.Y;
-            RenderTarget2D.DrawBitmap(pBitmap.DirectXBitmap, new RawRectangleF(x, y, x + pScale.X, y + pScale.Y), pOpacity, BitmapInterpolationMode.NearestNeighbor, new RawRectangleF(pSourceRect.Left, pSourceRect.Top, pSourceRect.Right, pSourceRect.Bottom));
+            var source = new RawRectangleF(pSourceRect.Left, pSourceRect.Top, pSourceRect.Right, pSourceRect.Bottom);
+            RenderTarget2D.DrawBitmap(pBitmap.DirectXBitmap,
+                                      new RawRectangleF(x, y, x + pScale.X, y + pScale.Y),
+                                      pOpacity,
+                                      BitmapInterpolationMode.NearestNeighbor,
+                                      source);
         }
 
         public void DrawPoint(Vector2 pPoint, Brush pBrush)

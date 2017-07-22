@@ -119,7 +119,7 @@ namespace SmallEngine
             //Filter out ones not on screen
             _toRender.Clear();
             foreach(var r in RenderComponent.Renderers)
-            { 
+            {
                 var onScreen = ActiveCamera.IsVisible(r.GameObject);
                 if(onScreen && r.Visible && r.Opacity > 0f)
                 {

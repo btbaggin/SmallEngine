@@ -190,7 +190,6 @@ namespace SmallEngine
             {
                 direction = pVectorTo;
             }
-            //TODO
             return direction;
         }
 

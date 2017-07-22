@@ -8,7 +8,7 @@ namespace SmallEngine
 {
     public abstract class Resource
     {
-        #region "Public properties"
+        #region Public properties
         /// <summary>
         /// Path to the resource for loading.
         /// </summary>
@@ -17,7 +17,7 @@ namespace SmallEngine
         /// <summary>
         /// Name to refer to the resource
         /// </summary>
-        internal string Alias { get; set; }
+        public string Alias { get; internal set; }
 
         /// <summary>
         /// Number of references to this resource
