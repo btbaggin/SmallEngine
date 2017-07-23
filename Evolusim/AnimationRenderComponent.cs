@@ -8,12 +8,16 @@ using SmallEngine.Graphics;
 
 namespace Evolusim
 {
-    class AnimationRenderComponent : RenderComponent
+    class AnimationRenderComponent : RenderComponent, IUpdatable
     {
         BitmapResource _bitmap;
         int _currentFrame;
         int _maxFrames;
         Vector2 _frameSize;
+        float _frameDuration;
+        Action _evaluator;
+
+        float _frameTimer;
 
         public int AnimationNum { get; set; }
 
@@ -21,18 +25,36 @@ namespace Evolusim
         {
         }
 
-        public void SetBitmap(string pAlias, int pMaxFrames, Vector2 pFrameSize)
+        public void SetBitmap(string pAlias)
         {
             _bitmap = ResourceManager.Request<BitmapResource>(pAlias);
-            _maxFrames = pMaxFrames - 1;
-            _frameSize = pFrameSize;
         }
 
-        public override void Draw(IGraphicsSystem pSystem)
+        public void SetAnimation(int pMaxFrames, Vector2 pFrameSize, float pFrameDuration, Action pEvaluator)
         {
-            pSystem.DrawBitmap(_bitmap, Opacity, Evolusim.ActiveCamera.ToCameraSpace(GameObject.Position), GameObject.Scale, new System.Drawing.RectangleF(_currentFrame * _frameSize.X,
-                                                                                                                                                     AnimationNum * _frameSize.Y,
-                                                                                                                                                     _frameSize.X, _frameSize.Y));
+            _maxFrames = pMaxFrames - 1;
+            _frameSize = pFrameSize;
+            _frameDuration = pFrameDuration;
+            _evaluator = pEvaluator;
+        }
+
+        protected override void DoDraw(IGraphicsSystem pSystem)
+        {
+            pSystem.DrawBitmap(_bitmap, 
+                Opacity, 
+                GameObject.ScreenPosition, 
+                GameObject.Scale, 
+                new System.Drawing.RectangleF(_currentFrame * _frameSize.X, AnimationNum * _frameSize.Y, _frameSize.X, _frameSize.Y));
+        }
+
+        public void Update(float pDeltaTime)
+        {
+            _evaluator.Invoke();
+            if((_frameTimer += pDeltaTime) >= _frameDuration)
+            {
+                MoveNextFrame();
+                _frameTimer = 0;
+            }
         }
 
         public void MoveNextFrame()

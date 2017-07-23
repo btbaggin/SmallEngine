@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SmallEngine.Graphics;
 
 namespace SmallEngine
 {
@@ -12,6 +13,11 @@ namespace SmallEngine
         public string Name { get; private set; }
 
         public Vector2 Position { get; set; }
+
+        public Vector2 ScreenPosition
+        {
+            get { return Game.ActiveCamera.ToCameraSpace(Position); }
+        }
 
         public Vector2 Scale { get; set; }
 
@@ -94,6 +100,8 @@ namespace SmallEngine
         public virtual void Initialize() { }
 
         public virtual void Update(float pDeltaTime) { }
+
+        public virtual void Draw(IGraphicsSystem pSystem) { }
 
         public void Destroy()
         {

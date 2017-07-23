@@ -19,30 +19,31 @@ namespace SmallEngine.Graphics
         }
     }
 
-    public abstract class RenderComponent : Component
+    public abstract class RenderComponent : Component, IDrawable
     {
-        internal static List<RenderComponent> Renderers;
-
         public bool Visible { get; set; }
         public float Opacity { get; set; }
         public int Order { get; set; }
-        public void BeginDraw(IGraphicsSystem pSystem)
+        private void BeginDraw(IGraphicsSystem pSystem)
         {
             var center = GameObject.Position + (GameObject.Scale / 2);
             pSystem.SetTransform(GameObject.Rotation, new Vector2(center.X, center.Y));
         }
 
-        public abstract void Draw(IGraphicsSystem pSystem);
+        public void Draw(IGraphicsSystem pSystem)
+        {
+            if (!IsVisible()) return;
+            BeginDraw(pSystem);
+            DoDraw(pSystem);
+            EndDraw(pSystem);
+        }
 
-        public void EndDraw(IGraphicsSystem pSystem)
+        private void EndDraw(IGraphicsSystem pSystem)
         {
             pSystem.ResetTransform();
         }
 
-        static RenderComponent()
-        {
-            Renderers = new List<RenderComponent>();
-        }
+        protected abstract void DoDraw(IGraphicsSystem pSystem);
 
         public RenderComponent()
         {
@@ -50,22 +51,10 @@ namespace SmallEngine.Graphics
             Opacity = 1f;
         }
 
-        public override void OnAdded(IGameObject pGameObject)
+        private bool IsVisible()
         {
-            Renderers.Add(this);
-            base.OnAdded(pGameObject);
-        }
-
-        public override void OnRemoved()
-        {
-            Renderers.Remove(this);
-            base.OnRemoved();
-        }
-
-        public override void OnActiveChanged(bool pActive)
-        {
-            if(pActive) { Renderers.Add(this); }
-            else { Renderers.Remove(this); }   
+            var onScreen = Game.ActiveCamera.IsVisible(GameObject);
+            return onScreen && Visible && Opacity > 0f;
         }
     }
 }

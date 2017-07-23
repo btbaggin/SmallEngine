@@ -7,12 +7,14 @@ using System.Threading.Tasks;
 
 namespace SmallEngine
 {
-    public interface IGameObject : IDisposable
+    public interface IGameObject : IUpdatable, IDrawable, IDisposable
     {
         #region Properties
         string Name { get; }
 
         Vector2 Position { get; set; }
+
+        Vector2 ScreenPosition { get; }
 
         Vector2 Scale { get; set; }
 
@@ -33,7 +35,6 @@ namespace SmallEngine
 
         void SetGame(Game pGame);
         void Initialize();
-        void Update(float pDeltaTime);
         void Destroy();
     }
 }

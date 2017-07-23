@@ -113,30 +113,14 @@ namespace SmallEngine
             GameWorld.Update(pDeltaTime);
         }
 
-        private SortedSet<RenderComponent> _toRender = new SortedSet<RenderComponent>(new RenderComponentComparer());
-        private void FilterVisible()
-        {
-            //Filter out ones not on screen
-            _toRender.Clear();
-            foreach(var r in RenderComponent.Renderers)
-            {
-                var onScreen = ActiveCamera.IsVisible(r.GameObject);
-                if(onScreen && r.Visible && r.Opacity > 0f)
-                {
-                    _toRender.Add(r);
-                }
-            }        
-        }
-
         private void Draw()
         {
             Scene.Draw(Graphics);
 
-            foreach (var r in _toRender)
+            //Update game objects
+            foreach (var go in Scene.GameObjects)
             {
-                r.BeginDraw(Graphics);
-                r.Draw(Graphics);
-                r.EndDraw(Graphics);
+                go.Draw(Graphics);
             }
 
             _uiManager.Draw(Graphics);
@@ -207,7 +191,6 @@ namespace SmallEngine
                 Coroutine.Update(GameTime.DeltaTime);
 
                 Update(GameTime.DeltaTime);
-                FilterVisible();
                 InputManager.MouseWheelDelta = 0;
 
                 Graphics.BeginDraw();

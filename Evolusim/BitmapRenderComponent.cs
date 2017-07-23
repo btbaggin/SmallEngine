@@ -21,9 +21,9 @@ namespace Evolusim
             _bitmap = ResourceManager.Request<BitmapResource>(pAlias);
         }
 
-        public override void Draw(IGraphicsSystem pSystem)
+        protected override void DoDraw(IGraphicsSystem pSystem)
         {
-            pSystem.DrawBitmap(_bitmap, 1, Evolusim.ActiveCamera.ToCameraSpace(GameObject.Position), GameObject.Scale);
+            pSystem.DrawBitmap(_bitmap, 1, GameObject.ScreenPosition, GameObject.Scale);
         }
 
         public override void Dispose()
