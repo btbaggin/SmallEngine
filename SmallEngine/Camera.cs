@@ -31,6 +31,11 @@ namespace SmallEngine
         }
 
         public int ZoomSpeed { get; set; }
+
+        public float Zoom
+        {
+            get { return Game.Form.Width / Width; }
+        }
         #endregion
 
         private float _zoomXSpeed;
@@ -102,17 +107,15 @@ namespace SmallEngine
 
         public Vector2 ToCameraSpace(Vector2 pWorldSpace)
         {
-            var dx = Width / Game.Form.Width;
-            var dy = Height / Game.Form.Height;
             var p = pWorldSpace - _position;
-            return new Vector2(p.X / dx, p.Y / dy);
+            return p * Zoom;
         }
 
         public bool IsVisible(IGameObject pGameObject)
         {
-            var p = ToCameraSpace(pGameObject.Position);
-            return p.X + pGameObject.Scale.X > 0 && p.X < Width &&
-                   p.Y + pGameObject.Scale.Y > 0 && p.Y < Height;
+            var p = pGameObject.Position - _position;
+            return p.X + (pGameObject.Scale.X * Zoom) > 0 && p.X < Width &&
+                   p.Y + (pGameObject.Scale.Y * Zoom) > 0 && p.Y < Height;
         }
     }
 }

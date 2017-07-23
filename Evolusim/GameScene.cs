@@ -9,7 +9,6 @@ namespace Evolusim
     class GameScene : Scene
     {
         Terrain _terrain;
-        VegetationMap _vegetationMap;
         Minimap _minimap;
         Toolbar _toolbar;
 
@@ -18,7 +17,6 @@ namespace Evolusim
             base.Begin();
 
             _terrain = new Terrain();
-            _vegetationMap = new VegetationMap();
             _minimap = new Minimap(_terrain, 200, 256);
             _toolbar = new Toolbar();
             UIManager.Register(_toolbar);
@@ -42,14 +40,11 @@ namespace Evolusim
         {
             base.Draw(pSystem);
             _terrain.Draw(pSystem);
-            _vegetationMap.Draw(pSystem);
         }
 
         public override void Update(float pDeltaTime)
         {
             base.Update(pDeltaTime);
-
-            _vegetationMap.Update(pDeltaTime);
 
             if(InputManager.KeyPressed(Keys.Escape))
             {

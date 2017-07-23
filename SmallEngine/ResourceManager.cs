@@ -225,7 +225,7 @@ namespace SmallEngine
             r.CreateAsync();
         }
 
-        public static void AddGroup(string pGroup, string[] pAlias)
+        public static void AddGroup(string pGroup, params string[] pAlias)
         {
             if(!_groups.ContainsKey(pGroup))
             {

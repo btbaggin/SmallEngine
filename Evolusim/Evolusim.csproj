@@ -58,7 +58,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Terrain\Terrain.cs" />
-    <Compile Include="Terrain\VegetationMap.cs" />
+    <Compile Include="Terrain\Vegetation.cs" />
     <Compile Include="Traits\Trait.cs" />
     <Compile Include="Traits\TraitComponent.cs" />
     <Compile Include="UI\Toolbar.cs" />

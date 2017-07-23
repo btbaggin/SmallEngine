@@ -54,11 +54,12 @@ namespace Evolusim
                     break;
 
                 case MovementType.Hungry:
-                    if(VegetationMap.Eat(GameObject.Position))
-                    {
-                        Movement = MovementType.Wander;
-                        ((Organism)GameObject).Eat();
-                    }
+                    //TODO
+                    //if(VegetationMap.Eat(GameObject.Position))
+                    //{
+                    //    Movement = MovementType.Wander;
+                    //    ((Organism)GameObject).Eat();
+                    //}
                     break;
             }
             _destinationSet = false;
@@ -75,7 +76,7 @@ namespace Evolusim
                     _destination = Terrain.GetPosition(p);
                     break;
                 case MovementType.Hungry:
-                    _destination = VegetationMap.GetNearestFood(GameObject.Position);
+                    //TODO _destination = VegetationMap.GetNearestFood(GameObject.Position);
                     break;
                 case MovementType.Defensive:
                     break;

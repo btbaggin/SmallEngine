@@ -10,6 +10,7 @@ namespace SmallEngine
     public class Scene : IDrawable, IUpdatable
     {
         private List<IGameObject> _gameObjects;
+        private List<IGameObject> _requestedGO;
         private Dictionary<string, IGameObject> _namedObjects;
         private static List<IGameObject> _persistantObjects;
         private static List<IGameObject> _toRemove;
@@ -33,6 +34,7 @@ namespace SmallEngine
         public Scene()
         {
             _gameObjects = new List<IGameObject>();
+            _requestedGO = new List<IGameObject>();
             _namedObjects = new Dictionary<string, IGameObject>();
         }
         #endregion
@@ -157,7 +159,23 @@ namespace SmallEngine
 
         private void AddGameObject(IGameObject pGameObject)
         {
-            _gameObjects.Add(pGameObject);
+            if(Game._isInUpdate)
+            {
+                _requestedGO.Add(pGameObject);
+            }
+            else
+            {
+                _gameObjects.Add(pGameObject);
+            }
+        }
+
+        internal void AddRequestedGameObjects()
+        {
+            foreach(var go in _requestedGO)
+            {
+                _gameObjects.Add(go);
+            }
+            _requestedGO.Clear();
         }
 
         internal void AddGameObject(IGameObject pGameObject, string pName)

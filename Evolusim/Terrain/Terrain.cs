@@ -53,6 +53,7 @@ namespace Evolusim
             _height = new HeightMap(false, Size);
             _climate = new HeightMap(true, Size);
 
+            //Create terrain
             for (int x = 0; x < Size; x++)
             {
                 for(int y = 0; y < Size; y++)
@@ -60,6 +61,19 @@ namespace Evolusim
                     _terrain[x, y] = CalculateType(x, y);
                 }
             }
+
+            //Create vegetation
+            for (int x = 0; x < Terrain.Size; x++)
+            {
+                for (int y = 0; y < Terrain.Size; y++)
+                {
+                    if (Game.RandomFloat() < .01f)
+                    {
+                        Vegetation.Create(x, y);
+                    }
+                }
+            }
+
             _updateBitmap = true;
         }
 
@@ -83,7 +97,7 @@ namespace Evolusim
                 for(int j = y; j <= y + numTilesY + 2; j++)
                 {
                     if (j >= Size) break;
-                    pSystem.DrawBitmap(GetBitmap(i, j), 1, new Vector2(currentX, currentY), scale);
+                    pSystem.DrawBitmap(GetBitmap(i, j), 1, new Vector2(currentX, currentY), new Vector2(64) * Game.ActiveCamera.Zoom);
                     currentY += tileSize;
                 }
                 currentY = (int)startPoint.Y;
@@ -202,9 +216,9 @@ namespace Evolusim
                     return _snow;
                 case Type.Ice:
                     return _ice;
+                default:
+                    return _plains;
             }
-
-            return null;
         }
         //x axis is temp; y axis is height
         private Type[,] _terrainMap = { { Type.Water,    Type.Water,    Type.Water,  Type.Ice,    Type.Ice },
