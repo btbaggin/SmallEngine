@@ -12,7 +12,12 @@ namespace Evolusim
             Defensive
         }
 
-        public MovementType Movement { get; set; }
+        private MovementType _movement;
+        public MovementType Movement
+        {
+            get { return _movement; }
+            set { _movement = value; _destinationSet = false; }
+        }
 
         public Vector2 Speed { get; private set; }
 
@@ -21,6 +26,7 @@ namespace Evolusim
 
         int _distance;
         Vector2 _destination;
+        Vegetation _food;
         bool _destinationSet;
         public MovementComponent() : base()
         {
@@ -36,9 +42,7 @@ namespace Evolusim
             }
 
             //TODO use pathing
-            var nextPos = Vector2.MoveTowards(GameObject.Position, _destination, _traits.GetTrait<int>(TraitComponent.Traits.Speed) * pDeltaTime);
-            Speed = GameObject.Position - nextPos;
-            GameObject.Position = nextPos;
+            MoveTowardsDestination(pDeltaTime);
 
             if(GameObject.Position ==  _destination)
             {
@@ -54,15 +58,32 @@ namespace Evolusim
                     break;
 
                 case MovementType.Hungry:
-                    //TODO
-                    //if(VegetationMap.Eat(GameObject.Position))
-                    //{
-                    //    Movement = MovementType.Wander;
-                    //    ((Organism)GameObject).Eat();
-                    //}
+                    Movement = MovementType.Wander;
+                    ((Organism)GameObject).Eat(_food);
                     break;
             }
             _destinationSet = false;
+        }
+
+        private void MoveTowardsDestination(float pDeltaTime)
+        {
+            switch(Movement)
+            {
+                case MovementType.Hungry:
+                    if(_food.MarkedForDestroy)
+                    {
+                        GetDestination(Terrain.Type.None);
+                    }
+                    break;
+
+                default:
+                    break;
+
+            }
+
+            var nextPos = Vector2.MoveTowards(GameObject.Position, _destination, _traits.GetTrait<int>(TraitComponent.Traits.Speed) * pDeltaTime);
+            Speed = GameObject.Position - nextPos;
+            GameObject.Position = nextPos;
         }
 
         private void GetDestination(Terrain.Type pTerrain)
@@ -76,7 +97,8 @@ namespace Evolusim
                     _destination = Terrain.GetPosition(p);
                     break;
                 case MovementType.Hungry:
-                    //TODO _destination = VegetationMap.GetNearestFood(GameObject.Position);
+                    _food = Vegetation.FindNearestVegetation(GameObject.Position);
+                    _destination = Terrain.GetPosition(new Vector2(_food.X, _food.Y));
                     break;
                 case MovementType.Defensive:
                     break;

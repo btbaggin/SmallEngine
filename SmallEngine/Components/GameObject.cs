@@ -32,7 +32,7 @@ namespace SmallEngine
 
         protected Game Game { get; private set; }
 
-        protected bool MarkedForDestroy { get; private set; }
+        public bool MarkedForDestroy { get; private set; }
 
         private Dictionary<Type, IComponent> _components;
 
@@ -109,7 +109,7 @@ namespace SmallEngine
             Game.Destroy(this);
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             foreach(var c in _components.Values)
             {

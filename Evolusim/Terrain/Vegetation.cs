@@ -35,9 +35,12 @@ namespace Evolusim
 
         BitmapRenderComponent _render;
 
+        private static List<Vegetation> _vegetation;
+
         static Vegetation()
         {
             SceneManager.Define("vegetation", typeof(BitmapRenderComponent));
+            _vegetation = new List<Vegetation>();
         }
 
         public static Vegetation Create(int pX, int pY)
@@ -45,6 +48,7 @@ namespace Evolusim
             var v = SceneManager.Current.CreateGameObject<Vegetation>("vegetation");
             v.X = pX; v.Y = pY;
             v.Position = Terrain.GetPosition(new Vector2(pX, pY));
+            _vegetation.Add(v);
             return v;
         }
 
@@ -92,8 +96,10 @@ namespace Evolusim
 
         private void Spread()
         {
-            var dx = Game.RandomInt(Math.Max(0, X - SpreadSize), Math.Min(Terrain.Size, X + SpreadSize));
-            var dy = Game.RandomInt(Math.Max(0, Y - SpreadSize), Math.Min(Terrain.Size, Y + SpreadSize));
+            var dx = Game.RandomInt(X - SpreadSize, X + SpreadSize);
+            var dy = Game.RandomInt(Y - SpreadSize, Y + SpreadSize);
+            dx = (int)MathF.Clamp(dx, 0, Terrain.Size);
+            dy = (int)MathF.Clamp(dy, 0, Terrain.Size);
 
             if (dx < Terrain.Size && dy < Terrain.Size) Vegetation.Create(dx, dy);
         }
@@ -124,6 +130,30 @@ namespace Evolusim
         public override void Draw(IGraphicsSystem pSystem)
         {
             _render.Draw(pSystem);
+        }
+
+        public static Vegetation FindNearestVegetation(Vector2 pPosition)
+        {
+            var t = Terrain.GetTile(pPosition);
+            Vegetation best = null;
+            float d = 999999;
+            foreach (var v in _vegetation)
+            {
+                var distance = Vector2.DistanceSqrd(new Vector2(v.X, v.Y), t);
+                if (distance < d)
+                {
+                    d = distance;
+                    best = v;
+                }
+            }
+
+            return best;
+        }
+
+        public override void Dispose()
+        {
+            base.Dispose();
+            _vegetation.Remove(this);
         }
     }
 }

@@ -32,6 +32,7 @@ namespace Evolusim
             ResourceManager.Add<BitmapResource>("ice", "Graphics/ice.jpg");
 
             ResourceManager.Add<BitmapResource>("organism", "Graphics/organism.png", true);
+            ResourceManager.Add<BitmapResource>("organism_hungry", "Graphics/organism_hungry.png", true); //TODO eww... tint instead
 
             ResourceManager.Add<BitmapResource>("cactus", "Graphics/cactus.png", true);
 

@@ -62,9 +62,11 @@ namespace Evolusim
             _render.Draw(pSystem);
         }
 
-        public void Eat()
+        public void Eat(Vegetation pFood)
         {
             _currentHunger = _hunger;
+            pFood.Destroy();
+            _render.SetBitmap("organism");
         }
 
         private IEnumerator<WaitEvent> UseHunger()
@@ -79,6 +81,7 @@ namespace Evolusim
                 else if(_currentHunger <= 10)
                 {
                     _movement.Movement = MovementComponent.MovementType.Hungry;
+                    _render.SetBitmap("organism_hungry");
                 }
                 yield return new WaitForSeconds(1);
             }
