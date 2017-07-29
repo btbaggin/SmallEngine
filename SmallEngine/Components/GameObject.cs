@@ -10,6 +10,7 @@ namespace SmallEngine
 {
     public class GameObject : IGameObject
     {
+        #region Properties
         public string Name { get; private set; }
 
         public Vector2 Position { get; set; }
@@ -33,6 +34,9 @@ namespace SmallEngine
         protected Game Game { get; private set; }
 
         public bool MarkedForDestroy { get; private set; }
+
+        public string Tag { get; set; }
+        #endregion  
 
         private Dictionary<Type, IComponent> _components;
 

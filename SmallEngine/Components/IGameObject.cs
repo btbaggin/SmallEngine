@@ -23,6 +23,8 @@ namespace SmallEngine
         RectangleF Bounds { get; }
 
         bool Persistant { get; set; }
+
+        string Tag { get; set; }
         #endregion
 
         //T GetComponent<T>() where T : class, IComponent;

@@ -35,12 +35,9 @@ namespace Evolusim
 
         BitmapRenderComponent _render;
 
-        private static List<Vegetation> _vegetation;
-
         static Vegetation()
         {
             SceneManager.Define("vegetation", typeof(BitmapRenderComponent));
-            _vegetation = new List<Vegetation>();
         }
 
         public static Vegetation Create(int pX, int pY)
@@ -48,7 +45,7 @@ namespace Evolusim
             var v = SceneManager.Current.CreateGameObject<Vegetation>("vegetation");
             v.X = pX; v.Y = pY;
             v.Position = Terrain.GetPosition(new Vector2(pX, pY));
-            _vegetation.Add(v);
+            v.Tag = "Vegetation";
             return v;
         }
 
@@ -132,28 +129,9 @@ namespace Evolusim
             _render.Draw(pSystem);
         }
 
-        public static Vegetation FindNearestVegetation(Vector2 pPosition)
-        {
-            var t = Terrain.GetTile(pPosition);
-            Vegetation best = null;
-            float d = 999999;
-            foreach (var v in _vegetation)
-            {
-                var distance = Vector2.DistanceSqrd(new Vector2(v.X, v.Y), t);
-                if (distance < d)
-                {
-                    d = distance;
-                    best = v;
-                }
-            }
-
-            return best;
-        }
-
         public override void Dispose()
         {
             base.Dispose();
-            _vegetation.Remove(this);
         }
     }
 }

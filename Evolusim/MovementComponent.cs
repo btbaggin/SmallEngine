@@ -1,4 +1,5 @@
-﻿using SmallEngine;
+﻿using System.Linq;
+using SmallEngine;
 
 namespace Evolusim
 {
@@ -9,7 +10,8 @@ namespace Evolusim
             Wander,
             Hungry,
             Aggressive,
-            Defensive
+            Defensive,
+            Mate
         }
 
         private MovementType _movement;
@@ -24,14 +26,23 @@ namespace Evolusim
         [ImportComponent]
         private TraitComponent _traits = null;
 
-        int _distance;
-        Vector2 _destination;
+        int _speed;
+        int _vision;
+        public Vector2 _destination;
         Vegetation _food;
+        Organism _mate;
         bool _destinationSet;
         public MovementComponent() : base()
         {
             Movement = MovementType.Wander;
-            _distance = 5;
+        }
+
+        public override void OnAdded(IGameObject pGameObject)
+        {
+            base.OnAdded(pGameObject);
+
+            _vision = _traits.GetTrait<int>(TraitComponent.Traits.Vision);
+            _speed = _traits.GetTrait<int>(TraitComponent.Traits.Speed);
         }
 
         public void Move(float pDeltaTime, Terrain.Type pTerrain)
@@ -58,11 +69,21 @@ namespace Evolusim
                     break;
 
                 case MovementType.Hungry:
-                    Movement = MovementType.Wander;
+                    if (_food == null) return;
+
                     ((Organism)GameObject).Eat(_food);
+                    _food = null;
+                    break;
+
+                case MovementType.Mate:
+                    if (_mate == null) return;
+
+                    ((Organism)GameObject).Mate(_mate);
+                    _mate = null;
                     break;
             }
             _destinationSet = false;
+            Movement = MovementType.Wander;
         }
 
         private void MoveTowardsDestination(float pDeltaTime)
@@ -70,10 +91,11 @@ namespace Evolusim
             switch(Movement)
             {
                 case MovementType.Hungry:
-                    if(_food.MarkedForDestroy)
-                    {
-                        GetDestination(Terrain.Type.None);
-                    }
+                    if(_food == null || _food.MarkedForDestroy) GetDestination(Terrain.Type.None);
+                    break;
+
+                case MovementType.Mate:
+                    if (_mate == null || _mate.MarkedForDestroy) GetDestination(Terrain.Type.None);
                     break;
 
                 default:
@@ -81,7 +103,7 @@ namespace Evolusim
 
             }
 
-            var nextPos = Vector2.MoveTowards(GameObject.Position, _destination, _traits.GetTrait<int>(TraitComponent.Traits.Speed) * pDeltaTime);
+            var nextPos = Vector2.MoveTowards(GameObject.Position, _destination, _speed * pDeltaTime);
             Speed = GameObject.Position - nextPos;
             GameObject.Position = nextPos;
         }
@@ -92,21 +114,52 @@ namespace Evolusim
             {
                 case MovementType.Wander:
                     //TODO only move to preferred terrain
-                    var t = Terrain.GetTile(GameObject.Position);
-                    var p = new Vector2(t.X + Game.RandomInt(-_distance, _distance), t.Y + Game.RandomInt(-_distance, _distance));
-                    _destination = Terrain.GetPosition(p);
+                    RandomDestination();
                     break;
                 case MovementType.Hungry:
-                    _food = Vegetation.FindNearestVegetation(GameObject.Position);
-                    _destination = Terrain.GetPosition(new Vector2(_food.X, _food.Y));
+                    foreach(var go in SceneManager.Current.GameObjects.Where(pGo => pGo.Tag == "Vegetation"))
+                    {
+                        var v = go as Vegetation;
+                        if (Vector2.Distance(v.Position, GameObject.Position) < _vision * 64 && v != GameObject)
+                        {
+                            _food = v;
+                            break;
+                        }
+                    }
+                    if (_food != null) _destination = _food.Position;
+                    else if(!_destinationSet) RandomDestination();
                     break;
                 case MovementType.Defensive:
                     break;
                 case MovementType.Aggressive:
                     break;
+                case MovementType.Mate:
+                    foreach(var go in SceneManager.Current.GameObjects.Where(pGo => pGo.Tag == "Organism"))
+                    {
+                        var o = go as Organism;
+                        if(Vector2.Distance(o.Position, GameObject.Position) < _vision * 64 && o != GameObject)
+                        {
+                            _mate = o;
+                            break;
+                        }
+                    }
+                    if (_mate != null) _destination = _mate.Position;
+                    else if(!_destinationSet) RandomDestination();
+                    break;
             }
             _destinationSet = true;
             _destination = Vector2.Clamp(_destination, Vector2.Zero, new Vector2(Evolusim.WorldSize, Evolusim.WorldSize));
+        }
+
+        private void RandomDestination()
+        {
+            var u = Game.RandomFloat();
+            var v = Game.RandomFloat();
+            var w = (_vision * 64) * MathF.Sqrt(u);
+            var t = 2 * MathF.PI * v;
+            var x = w * MathF.Cos(t);
+            var y = w * MathF.Sin(t);
+            _destination = GameObject.Position + new Vector2(x, y);
         }
     }
 }
