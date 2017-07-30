@@ -27,6 +27,7 @@ namespace Evolusim
 
         private BitmapResource _heart;
 
+        private int _mateDuration;
         private int _currentMate;
         private int _mateTimer;
         private bool _isMating;
@@ -45,6 +46,14 @@ namespace Evolusim
         {
             var go = SceneManager.Current.CreateGameObject<Organism>("organism");
             go.Tag = "Organism";
+            return go;
+        }
+
+        public static Organism CreateFrom(Organism pOrgansihm, Organism pOrganism)
+        {
+            var go = SceneManager.Current.CreateGameObject<Organism>("organism");
+            go.Tag = "Organism";
+            go.Position = pOrganism.Position;
             return go;
         }
 
@@ -79,7 +88,7 @@ namespace Evolusim
             if (mateRate == 0) _mateTimer = _lifeTime;
             else _mateTimer = _lifeTime / mateRate;
 
-
+            _currentMate = _mateTimer;
             _currentHunger = _hunger;
             Coroutine.Start(LifeCycleTick);
         }
@@ -122,8 +131,7 @@ namespace Evolusim
 
         public void Mate(Organism pMate)
         {
-            Organism.Create();
-            System.Diagnostics.Debug.WriteLine("Baby making time!!!");
+            Organism.CreateFrom(this, pMate);
             _currentMate = _mateTimer;
             _isMating = false;
         }
@@ -139,34 +147,41 @@ namespace Evolusim
                     break;
                 }
 
-                //Hunger
+                _currentMate -= 1;
                 _currentHunger -= 1;
+
+                //Hunger
                 if(_currentHunger <= 0)
                 {
                     Destroy();
                     break;
                 }
-                else if(_currentHunger <= 10 && !_isMating)
+                else if(_currentHunger <= 10)
                 {
                     _movement.Movement = MovementComponent.MovementType.Hungry;
                     _render.SetBitmap("organism_hungry");
+                    goto yield;
                 }
 
                 //Mating
-                _currentMate -= 1;
-                if(!_isMating && _currentMate <= 0)
+                if(_currentMate <= 0)
                 {
-                    _isMating = true;
-                    _currentMate = 10;
+                    if(!_isMating)
+                    {
+                        _isMating = true;
+                        _mateDuration = 11;
+                    }
+                    _mateDuration -= 1;
                     _movement.Movement = MovementComponent.MovementType.Mate;
                 }
-                else if(_isMating && _currentMate <= 0)
+                else if(_isMating && _mateDuration <= 0)
                 {
                     _movement.Movement = MovementComponent.MovementType.Wander;
                     _currentMate = _mateTimer;
                     _isMating = false;
                 }
 
+                yield:
                 yield return new WaitForSeconds(1);
             }
         }

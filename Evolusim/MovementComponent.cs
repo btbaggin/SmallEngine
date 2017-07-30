@@ -104,6 +104,7 @@ namespace Evolusim
 
                 case MovementType.Mate:
                     if (_mate == null || _mate.MarkedForDestroy) GetDestination(Terrain.Type.None);
+                    else _destination = _mate.Position;
                     break;
 
                 default:
@@ -125,11 +126,7 @@ namespace Evolusim
                     RandomDestination();
                     break;
                 case MovementType.Hungry:
-                    foreach(var go in SceneManager.Current.GameObjects.WithinDistance(GameObject, _vision * 64, "Vegetation"))
-                    {
-                        _food = (Vegetation)go;
-                        break;
-                    }
+                    _food = (Vegetation)SceneManager.Current.GameObjects.NearestWithinDistance(GameObject, _vision * 64, "Vegetation");
                     if (_food != null) _destination = _food.Position;
                     else if(!_destinationSet) RandomDestination();
                     break;
@@ -138,11 +135,7 @@ namespace Evolusim
                 case MovementType.Aggressive:
                     break;
                 case MovementType.Mate:
-                    foreach(var go in SceneManager.Current.GameObjects.WithinDistance(GameObject, _vision * 64, "Organism"))
-                    {
-                        _mate = (Organism)go;
-                        break;
-                    }
+                    _mate = (Organism)SceneManager.Current.GameObjects.NearestWithinDistance(GameObject, _vision * 64, "Organism");
                     if (_mate != null) _destination = _mate.Position;
                     else if(!_destinationSet) RandomDestination();
                     break;

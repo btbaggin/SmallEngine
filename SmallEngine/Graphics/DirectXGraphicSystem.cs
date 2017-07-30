@@ -253,7 +253,7 @@ namespace SmallEngine.Graphics
             Device.ImmediateContext.Rasterizer.SetViewport(new Viewport(0, 0, _form.Width, _form.Height));
             Device.ImmediateContext.OutputMerger.SetTargets(_backBufferView);
             RenderTarget2D.BeginDraw();
-            RenderTarget2D.Clear(new RawColor4(255, 255, 255, 255));
+            RenderTarget2D.Clear(Color4.Black);
         }
 
         public void EndDraw()

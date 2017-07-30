@@ -49,10 +49,10 @@ namespace Evolusim
             InputManager.Listen(Keys.Down);
             InputManager.Listen(Keys.Enter);
 
-            _titleFont = Game.Graphics.CreateFont("Arial", 28, System.Drawing.Color.Blue);
-            _font = Game.Graphics.CreateFont("Arial", 16, System.Drawing.Color.Black);
-            _highlightFont = Game.Graphics.CreateFont("Arial", 18, System.Drawing.Color.White);
-            _backgroundBrush = Game.Graphics.CreateBrush(System.Drawing.Color.Aqua);
+            _titleFont = Game.Graphics.CreateFont("Arial", 64, System.Drawing.Color.Blue);
+            _font = Game.Graphics.CreateFont("Arial", 32, System.Drawing.Color.Black);
+            _highlightFont = Game.Graphics.CreateFont("Arial", 40, System.Drawing.Color.White);
+            _backgroundBrush = Game.Graphics.CreateBrush(System.Drawing.Color.FromArgb(128, 128, 128, 128));
 
             _menu = ResourceManager.Request<AudioResource>("menu");
 
@@ -69,7 +69,7 @@ namespace Evolusim
 
             pSystem.DrawText("Evolusim", new System.Drawing.RectangleF(0, 50, Game.Form.Width, 30), _titleFont);
 
-            float y = 100;
+            float y = 120;
             for(int i = 0; i < mItems.Count; i++)
             {
                 if(mCurrentIndex == i)
@@ -80,7 +80,7 @@ namespace Evolusim
                 {
                     pSystem.DrawText(mItems[i], new System.Drawing.RectangleF(0, y, Game.Form.Width, 20), _font);
                 }
-                y += 20;
+                y += 40;
             }
         }
 

@@ -24,5 +24,21 @@ namespace SmallEngine
                                              pGo != pGameObject && 
                                              Vector2.Distance(pGo.Position, pGameObject.Position) <= pDistance);
         }
+
+        public static IGameObject NearestWithinDistance(this IEnumerable<IGameObject> pGameObjects, IGameObject pGameObject, float pDistance, string pTag)
+        {
+            float bestDistance = pDistance;
+            IGameObject closest = null;
+            foreach(var go in pGameObjects.Where(pGo => pGo.Tag == pTag && pGo != pGameObject))
+            {
+                var d = Vector2.Distance(go.Position, pGameObject.Position);
+                if (d < bestDistance)
+                {
+                    closest = go;
+                    bestDistance = d; 
+                }
+            }
+            return closest;
+        }
     }
 }

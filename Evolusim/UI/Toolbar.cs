@@ -12,7 +12,7 @@ namespace Evolusim.UI
 {
     class Toolbar : UIElement, IMessageReceiver, IDisposable
     { 
-        private const float dx = 5;
+        private const float dx = 10;
 
         public bool IsOpen { get; private set; }
 

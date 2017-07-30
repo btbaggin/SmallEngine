@@ -29,7 +29,7 @@ namespace Evolusim
             _traits.Add(Traits.Lifetime, new Trait(Game.RandomInt(60, 120)));
             _traits.Add(Traits.Attractive, new Trait(Game.RandomInt(0, 10)));
             _traits.Add(Traits.MateRate, new Trait(Game.RandomInt(0, 3)));
-            _traits.Add(Traits.Vision, new Trait(Game.RandomInt(5, 10)));
+            _traits.Add(Traits.Vision, new Trait(Game.RandomInt(20, 20)));
         }
 
         public T GetTrait<T>(Traits pTrait)

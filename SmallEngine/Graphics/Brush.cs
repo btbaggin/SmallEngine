@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SharpDX.Direct2D1;
+using SharpDX.Mathematics.Interop;
 using System.Drawing;
 
 namespace SmallEngine.Graphics
@@ -11,10 +13,10 @@ namespace SmallEngine.Graphics
     {
         static Dictionary<Color, Brush> _cache = new Dictionary<Color, Brush>();
 
-        public SharpDX.Direct2D1.SolidColorBrush ColorBrush { get; private set; }
-        private Brush(Color pColor, SharpDX.Direct2D1.RenderTarget pTarget)
+        public SolidColorBrush ColorBrush { get; private set; }
+        private Brush(Color pColor, RenderTarget pTarget)
         {
-            ColorBrush = new SharpDX.Direct2D1.SolidColorBrush(pTarget, new SharpDX.Mathematics.Interop.RawColor4(pColor.R, pColor.G, pColor.B, pColor.A));
+            ColorBrush = new SolidColorBrush(pTarget, new RawColor4(pColor.R, pColor.G, pColor.B, pColor.A));
             ColorBrush.Opacity = pColor.A / 255f;
         }
 
