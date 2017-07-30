@@ -106,11 +106,13 @@
     <Compile Include="Graphics\IGraphicsSystem.cs" />
     <Compile Include="Components\IComponent.cs" />
     <Compile Include="Graphics\RenderComponent.cs" />
+    <Compile Include="IMessageReciever.cs" />
     <Compile Include="Input\InputManager.cs" />
     <Compile Include="Input\InputInfo.cs" />
     <Compile Include="Input\InputState.cs" />
     <Compile Include="Input\Keys.cs" />
     <Compile Include="Input\Mouse.cs" />
+    <Compile Include="MessageBus.cs" />
     <Compile Include="UI\AnchorDirection.cs" />
     <Compile Include="UI\ElementOrientation.cs" />
     <Compile Include="UI\ImageElement.cs" />

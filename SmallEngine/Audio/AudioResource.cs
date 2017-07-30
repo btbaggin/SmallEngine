@@ -45,9 +45,11 @@ namespace SmallEngine.Audio
 
         public override void Dispose()
         {
-            if (IsPlaying)
+            if (_voice != null)
             {
-                Stop();
+                _voice.Stop();
+                _voice.FlushSourceBuffers();
+                _voice.Dispose();
             }
         }
         #endregion

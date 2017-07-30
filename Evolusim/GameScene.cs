@@ -59,7 +59,8 @@ namespace Evolusim
 
             if(InputManager.KeyPressed(Keys.T))
             {
-                _toolbar.Toggle();
+                MessageBus.SendMessage(new GameMessage("ToolbarToggle", null));
+                //_toolbar.Toggle();
             }
         }
 

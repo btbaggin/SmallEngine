@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace SmallEngine
 {
-    public interface IGameObject : IUpdatable, IDrawable, IDisposable
+    public interface IGameObject : IUpdatable, IDrawable, IMessageReceiver, IDisposable
     {
         #region Properties
         string Name { get; }
@@ -35,6 +35,7 @@ namespace SmallEngine
         void AddComponent(IComponent pComponent);
         void RemoveComponent(Type pComponent);
 
+        bool IsMouseOver();
         void SetGame(Game pGame);
         void Initialize();
         void Destroy();

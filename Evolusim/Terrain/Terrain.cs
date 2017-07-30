@@ -26,6 +26,8 @@ namespace Evolusim
         float _bitmapWidth;
         float _bitmapHeight;
 
+        Vector2 _scale;
+
         BitmapResource _plains;
         BitmapResource _water;
         BitmapResource _mountain;
@@ -41,6 +43,7 @@ namespace Evolusim
             _bitmapWidth = Size * BitmapSize;
             _bitmapHeight = Size * BitmapSize;
             _terrain = new Type[Size, Size];
+            _scale = new Vector2(64);
 
             _plains = ResourceManager.Request<BitmapResource>("plains");
             _water = ResourceManager.Request<BitmapResource>("water");
@@ -97,10 +100,10 @@ namespace Evolusim
                 for(int j = y; j <= y + numTilesY + 2; j++)
                 {
                     if (j >= Size) break;
-                    pSystem.DrawBitmap(GetBitmap(i, j), 1, new Vector2(currentX, currentY), new Vector2(64) * Game.ActiveCamera.Zoom);
+                    pSystem.DrawBitmap(GetBitmap(i, j), 1, new Vector2(currentX, currentY), _scale * Game.ActiveCamera.Zoom);
                     currentY += tileSize;
                 }
-                currentY = (int)startPoint.Y;
+                currentY = startPoint.Y;
                 currentX += tileSize;
             }
         }

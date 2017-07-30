@@ -10,7 +10,7 @@ using SmallEngine.UI;
 
 namespace Evolusim.UI
 {
-    class Toolbar : UIElement, IDisposable
+    class Toolbar : UIElement, IMessageReceiver, IDisposable
     { 
         private const float dx = 5;
 
@@ -37,6 +37,9 @@ namespace Evolusim.UI
                 new ToggleButton("mountain", "Mountains", Terrain.Type.Mountain) { Orientation = ElementOrientation.Vertical, Margin = new Vector2(2, 0) });
             AddChild(_group, AnchorDirection.Left | AnchorDirection.Top, Vector2.Zero);
             SetLayout();
+
+            MessageBus.Register(this);
+            SelectedType = Terrain.Type.None;
         }
 
         public void Toggle()
@@ -76,6 +79,20 @@ namespace Evolusim.UI
                 {
                     Position = new Vector2(-Width, Position.Y);
                 }
+            }
+        }
+
+        public void ReceiveMessage(GameMessage pM)
+        {
+            switch(pM.MessageType)
+            {
+                case "ToolbarToggle":
+                    IsOpen = !IsOpen;
+                    break;
+
+                case "ToolbarOpen":
+                    IsOpen = true;
+                    break;
             }
         }
 

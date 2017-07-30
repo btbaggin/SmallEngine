@@ -32,7 +32,7 @@ namespace Evolusim
 
             ResourceManager.Add<BitmapResource>("organism", "Graphics/organism.png", true);
             ResourceManager.Add<BitmapResource>("organism_hungry", "Graphics/organism_hungry.png", true); //TODO eww... tint instead
-            ResourceManager.Add<BitmapResource>("organism_frisky", "Graphics/organism_frisky.png", true);
+            ResourceManager.Add<BitmapResource>("heart", "Graphics/heart.png", true);
 
             ResourceManager.Add<BitmapResource>("cactus", "Graphics/cactus.png", true);
 
@@ -41,9 +41,12 @@ namespace Evolusim
             ResourceManager.Add<BitmapResource>("plant3", "Graphics/plant3.png", true);
             ResourceManager.AddGroup("plants", "plant1", "plant2", "plant3");
 
+            ResourceManager.Add<BitmapResource>("lily", "Graphics/lily.png", true);
+
             ResourceManager.Add<BitmapResource>("plant_dead", "Graphics/plant_dead.png", true);
 
             ResourceManager.Add<AudioResource>("menu", "Audio/misc_menu.wav");
+            ResourceManager.Add<AudioResource>("nom", "Audio/nom.wav");
         }
 
         public override void Initialize()

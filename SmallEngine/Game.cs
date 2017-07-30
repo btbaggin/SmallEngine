@@ -18,6 +18,7 @@ namespace SmallEngine
         /*TODO
          * MessageBus dropping messages if too busy
          * Generic render component?
+         * Way to check if mouseclick is handled
          */
 
         public enum RenderSystem
@@ -29,6 +30,7 @@ namespace SmallEngine
         private UIManager _uiManager;
         private SceneManager _sceneManager;
         private InputManager _inputManager;
+        private MessageBus _messageBus;
         private float _timeElapsed;
         private int _frameCount;
         private static Random _random;
@@ -42,10 +44,7 @@ namespace SmallEngine
 
         public bool IsPlaying { get; set; }
 
-        protected Scene Scene
-        {
-            get { return SceneManager.Current; }
-        }
+        protected Scene Scene { get { return SceneManager.Current; } }
 
         public static GameForm Form { get; private set; }
 
@@ -73,6 +72,7 @@ namespace SmallEngine
             _uiManager = new UIManager();
             _sceneManager = new SceneManager(this);
             _inputManager = new InputManager(Form.Handle);
+            _messageBus = new MessageBus();
             GameWorld = new World();
 
             Form.WindowActivateChanged += WindowActivateChanged;
@@ -142,6 +142,7 @@ namespace SmallEngine
             IsPlaying = true;
             LoadContent();
             Initialize();
+            _messageBus.Start();
             GameTime.Reset();
 
             Application.Idle += OnIdle;
@@ -181,6 +182,7 @@ namespace SmallEngine
             {
                 if (!IsPlaying)
                 {
+                    _messageBus.Stop();
                     SceneManager.EndScene();
                     UnloadContent();
                     Application.Exit();

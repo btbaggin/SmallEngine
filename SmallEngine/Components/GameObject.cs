@@ -96,6 +96,15 @@ namespace SmallEngine
             _components.Remove(pComponent);
         }
 
+        public bool IsMouseOver()
+        {
+            var mp = Input.InputManager.MousePosition;
+            var s = Scale * Game.ActiveCamera.Zoom;
+            var sp = ScreenPosition;
+            return mp.X >= sp.X && mp.X <= sp.X + s.X &&
+                   mp.Y >= sp.Y && mp.Y <= sp.Y + s.Y;
+        }
+
         public void SetGame(Game pGame)
         {
             Game = pGame;
@@ -106,6 +115,8 @@ namespace SmallEngine
         public virtual void Update(float pDeltaTime) { }
 
         public virtual void Draw(IGraphicsSystem pSystem) { }
+
+        public virtual void ReceiveMessage(GameMessage pM) { }
 
         public void Destroy()
         {

@@ -63,6 +63,10 @@ namespace Evolusim
                     _render.SetBitmap("cactus");
                     break;
 
+                case VegetationType.Lily:
+                    _render.SetBitmap("lily");
+                    break;
+
                 default:
                     _render.SetBitmapFromGroup("plants");
                     break;

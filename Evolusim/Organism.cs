@@ -4,13 +4,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SmallEngine;
+using SmallEngine.Audio;
 using SmallEngine.Graphics;
+using SmallEngine.Input;
 
 namespace Evolusim
 {
     class Organism : GameObject
     {
         private AnimationRenderComponent _render;
+        private AudioComponent _audio;
         private MovementComponent _movement;
         private TraitComponent _traits;
 
@@ -22,6 +25,8 @@ namespace Evolusim
         private int _vision;
         private Brush _visionBrush;
 
+        private BitmapResource _heart;
+
         private int _currentMate;
         private int _mateTimer;
         private bool _isMating;
@@ -31,6 +36,7 @@ namespace Evolusim
         static Organism()
         {
             SceneManager.Define("organism", typeof(AnimationRenderComponent),
+                                            typeof(AudioComponent),
                                             typeof(TraitComponent),
                                             typeof(MovementComponent));
         }
@@ -48,6 +54,7 @@ namespace Evolusim
             Scale = new Vector2(64);
             _preferredTerrain = Terrain.GetTypeAt(Position);
             _visionBrush = Game.Graphics.CreateBrush(System.Drawing.Color.Yellow);
+            _heart = ResourceManager.Request<BitmapResource>("heart");
         }
 
         public override void Initialize()
@@ -55,6 +62,9 @@ namespace Evolusim
             _render = GetComponent<AnimationRenderComponent>();
             _render.SetBitmap("organism");
             _render.SetAnimation(4, new Vector2(16, 32), .5f, AnimationEval);
+
+            _audio = GetComponent<AudioComponent>();
+            _audio.SetAudio("nom");
 
             _movement = GetComponent<MovementComponent>();
 
@@ -69,7 +79,7 @@ namespace Evolusim
             if (mateRate == 0) _mateTimer = _lifeTime;
             else _mateTimer = _lifeTime / mateRate;
 
-            _currentMate = _mateTimer;
+
             _currentHunger = _hunger;
             Coroutine.Start(LifeCycleTick);
         }
@@ -78,14 +88,28 @@ namespace Evolusim
         {
             _movement.Move(pDeltaTime, _preferredTerrain);
             _render.Update(pDeltaTime);
+
+            if(InputManager.KeyPressed(Mouse.Left) && IsMouseOver())
+            {
+                MessageBus.SendMessage(new GameMessage("ToolbarOpen", null));
+            }
+
         }
 
         public override void Draw(IGraphicsSystem pSystem)
         {
             _render.Draw(pSystem);
+
+            if(_isMating)
+            {
+                var heartScale = new Vector2(Scale.X / 2, Scale.X / 2) * Game.ActiveCamera.Zoom;
+                pSystem.DrawBitmap(_heart, 1, ScreenPosition + new Vector2(heartScale.X / 4, 0),  heartScale);
+            }
+#if DEBUG
             pSystem.DrawElipse(ScreenPosition, _vision * 64 * Game.ActiveCamera.Zoom, _visionBrush);
             var p = Game.ActiveCamera.ToCameraSpace(_movement._destination);
             pSystem.DrawFillRect(new System.Drawing.RectangleF(p.X, p.Y, 5, 5), _visionBrush);
+#endif
         }
 
         public void Eat(Vegetation pFood)
@@ -93,6 +117,7 @@ namespace Evolusim
             _currentHunger = _hunger;
             pFood.Destroy();
             _render.SetBitmap("organism");
+            _audio.PlayImmediate();
         }
 
         public void Mate(Organism pMate)
@@ -101,7 +126,6 @@ namespace Evolusim
             System.Diagnostics.Debug.WriteLine("Baby making time!!!");
             _currentMate = _mateTimer;
             _isMating = false;
-            _render.SetBitmap("organism");
         }
 
         private IEnumerator<WaitEvent> LifeCycleTick()
@@ -133,8 +157,7 @@ namespace Evolusim
                 if(!_isMating && _currentMate <= 0)
                 {
                     _isMating = true;
-                    _currentMate = 5;
-                    _render.SetBitmap("organism_frisky");
+                    _currentMate = 10;
                     _movement.Movement = MovementComponent.MovementType.Mate;
                 }
                 else if(_isMating && _currentMate <= 0)

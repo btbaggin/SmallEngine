@@ -69,14 +69,22 @@ namespace Evolusim
                     break;
 
                 case MovementType.Hungry:
-                    if (_food == null) return;
+                    if (_food == null)
+                    {
+                        _destinationSet = false;
+                        return;
+                    }
 
                     ((Organism)GameObject).Eat(_food);
                     _food = null;
                     break;
 
                 case MovementType.Mate:
-                    if (_mate == null) return;
+                    if (_mate == null)
+                    {
+                        _destinationSet = false;
+                        return;
+                    }
 
                     ((Organism)GameObject).Mate(_mate);
                     _mate = null;
@@ -117,14 +125,10 @@ namespace Evolusim
                     RandomDestination();
                     break;
                 case MovementType.Hungry:
-                    foreach(var go in SceneManager.Current.GameObjects.Where(pGo => pGo.Tag == "Vegetation"))
+                    foreach(var go in SceneManager.Current.GameObjects.WithinDistance(GameObject, _vision * 64, "Vegetation"))
                     {
-                        var v = go as Vegetation;
-                        if (Vector2.Distance(v.Position, GameObject.Position) < _vision * 64 && v != GameObject)
-                        {
-                            _food = v;
-                            break;
-                        }
+                        _food = (Vegetation)go;
+                        break;
                     }
                     if (_food != null) _destination = _food.Position;
                     else if(!_destinationSet) RandomDestination();
@@ -134,14 +138,10 @@ namespace Evolusim
                 case MovementType.Aggressive:
                     break;
                 case MovementType.Mate:
-                    foreach(var go in SceneManager.Current.GameObjects.Where(pGo => pGo.Tag == "Organism"))
+                    foreach(var go in SceneManager.Current.GameObjects.WithinDistance(GameObject, _vision * 64, "Organism"))
                     {
-                        var o = go as Organism;
-                        if(Vector2.Distance(o.Position, GameObject.Position) < _vision * 64 && o != GameObject)
-                        {
-                            _mate = o;
-                            break;
-                        }
+                        _mate = (Organism)go;
+                        break;
                     }
                     if (_mate != null) _destination = _mate.Position;
                     else if(!_destinationSet) RandomDestination();

@@ -6,13 +6,9 @@ using System.Threading.Tasks;
 
 namespace SmallEngine.Audio
 {
-    class AudioComponent : Component
+    public class AudioComponent : Component
     {
         private AudioResource _sound;
-        public AudioResource Sound
-        {
-            get { return _sound; }
-        }
 
         public AudioComponent()
         {
@@ -21,6 +17,27 @@ namespace SmallEngine.Audio
         public AudioComponent(string pAlias)
         {
             _sound = ResourceManager.Request<AudioResource>(pAlias);
+        }
+
+        public void SetAudio(string pAlias)
+        {
+            _sound = ResourceManager.Request<AudioResource>(pAlias);
+        }
+
+        public void Play()
+        {
+            if(Game.ActiveCamera.IsVisible(GameObject))
+            {
+                _sound.Play();
+            }
+        }
+
+        public void PlayImmediate()
+        {
+            if(Game.ActiveCamera.IsVisible(GameObject))
+            {
+                _sound.PlayImmediate();
+            }
         }
 
         public override void Dispose()

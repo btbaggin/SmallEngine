@@ -17,5 +17,12 @@ namespace SmallEngine
         {
             return min + r.NextFloat() * (max - min);
         }
+
+        public static IEnumerable<IGameObject> WithinDistance(this IEnumerable<IGameObject> pGameObjects, IGameObject pGameObject, float pDistance, string pTag)
+        {
+            return pGameObjects.Where(pGo => pGo.Tag == pTag && 
+                                             pGo != pGameObject && 
+                                             Vector2.Distance(pGo.Position, pGameObject.Position) <= pDistance);
+        }
     }
 }
