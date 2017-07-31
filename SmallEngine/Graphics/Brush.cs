@@ -14,10 +14,12 @@ namespace SmallEngine.Graphics
         static Dictionary<Color, Brush> _cache = new Dictionary<Color, Brush>();
 
         public SolidColorBrush ColorBrush { get; private set; }
+        public Color Color { get; private set; }
         private Brush(Color pColor, RenderTarget pTarget)
         {
             ColorBrush = new SolidColorBrush(pTarget, new RawColor4(pColor.R, pColor.G, pColor.B, pColor.A));
             ColorBrush.Opacity = pColor.A / 255f;
+            Color = pColor;
         }
 
         internal static Brush Create(Color pColor, SharpDX.Direct2D1.RenderTarget pTarget)

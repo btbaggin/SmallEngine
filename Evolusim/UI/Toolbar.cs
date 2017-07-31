@@ -30,12 +30,12 @@ namespace Evolusim.UI
             Orientation = ElementOrientation.Vertical;
             Order = 10;
 
-            _group = new ToggleButtonGroup(new ToggleButton("plains", "Plains", Terrain.Type.Plains) { Orientation = ElementOrientation.Vertical, Margin = new Vector2(2, 0) },
-                new ToggleButton("water", "Water", Terrain.Type.Water) { Orientation = ElementOrientation.Vertical, Margin = new Vector2(2, 0) },
-                new ToggleButton("desert", "Desert", Terrain.Type.Desert) { Orientation = ElementOrientation.Vertical, Margin = new Vector2(2, 0) },
-                new ToggleButton("forest", "Forest", Terrain.Type.Forest) { Orientation = ElementOrientation.Vertical, Margin = new Vector2(2, 0) },
-                new ToggleButton("mountain", "Mountains", Terrain.Type.Mountain) { Orientation = ElementOrientation.Vertical, Margin = new Vector2(2, 0) });
-            AddChild(_group, AnchorDirection.Left | AnchorDirection.Top, Vector2.Zero);
+            //_group = new ToggleButtonGroup(new ToggleButton("plains", "Plains", Terrain.Type.Plains) { Orientation = ElementOrientation.Vertical, Margin = new Vector2(2, 0) },
+            //    new ToggleButton("water", "Water", Terrain.Type.Water) { Orientation = ElementOrientation.Vertical, Margin = new Vector2(2, 0) },
+            //    new ToggleButton("desert", "Desert", Terrain.Type.Desert) { Orientation = ElementOrientation.Vertical, Margin = new Vector2(2, 0) },
+            //    new ToggleButton("forest", "Forest", Terrain.Type.Forest) { Orientation = ElementOrientation.Vertical, Margin = new Vector2(2, 0) },
+            //    new ToggleButton("mountain", "Mountains", Terrain.Type.Mountain) { Orientation = ElementOrientation.Vertical, Margin = new Vector2(2, 0) });
+            //AddChild(_group, AnchorDirection.Left | AnchorDirection.Top, Vector2.Zero);
             SetLayout();
 
             MessageBus.Register(this);
@@ -53,6 +53,12 @@ namespace Evolusim.UI
             Position = new Vector2(-Width, Position.Y);
         }
 
+        public void SetContent(UIElement pContent)
+        {
+            Children.Clear();
+            AddChild(pContent, AnchorDirection.Left | AnchorDirection.Top, Vector2.Zero);
+        }
+
         public override void Draw(IGraphicsSystem pSystem)
         {
             pSystem.DrawFillRect(new RectangleF(Position.X, Position.Y, Width, Height), _background);
@@ -62,23 +68,15 @@ namespace Evolusim.UI
         public override void Update(float pDeltaTime)
         {
             base.Update(pDeltaTime);
-            SelectedType = _group.GetSelectedData<Terrain.Type>();
+            //SelectedType = _group.GetSelectedData<Terrain.Type>();
 
             if(IsOpen)
             {
-                Position = new Vector2(Position.X + dx, Position.Y);
-                if(Position.X >= 0)
-                {
-                    Position = new Vector2(0, Position.Y);
-                }
+                Position = new Vector2(Math.Min(Position.X + dx, 0), Position.Y);
             }
             else
             {
-                Position = new Vector2(Position.X - dx, Position.Y);
-                if (Position.X <= -Width)
-                {
-                    Position = new Vector2(-Width, Position.Y);
-                }
+                Position = new Vector2(Math.Max(Position.X - dx, -Width), Position.Y);
             }
         }
 

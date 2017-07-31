@@ -4,18 +4,33 @@ using SmallEngine.Graphics;
 
 namespace Evolusim
 {
-    class Terrain : IDrawable
+    class Terrain
     {
         public enum Type
         {
+            //None,
+            //Mountain,
+            //Water,
+            //Plains,
+            //Forest,
+            //Desert,
+            //Ice,
+            //Snow
             None,
-            Mountain,
-            Water,
-            Plains,
-            Forest,
-            Desert,
-            Ice,
-            Snow
+            Snow,
+            Tundra,
+            Bare,
+            Scorched,
+            Taiga,
+            Shrubland,
+            TemperateDesert,
+            TemperateRain,
+            TemperateDeciduous,
+            Grassland,
+            TropicalRain,
+            TropicalSeasonal,
+            SubtropicalDesert,
+            Water
         }
 
         public const int BitmapSize = 64;
@@ -28,13 +43,28 @@ namespace Evolusim
 
         Vector2 _scale;
 
-        BitmapResource _plains;
-        BitmapResource _water;
-        BitmapResource _mountain;
-        BitmapResource _forest;
-        BitmapResource _desert;
-        BitmapResource _ice;
-        BitmapResource _snow;
+        //BitmapResource _plains;
+        //BitmapResource _water;
+        //BitmapResource _mountain;
+        //BitmapResource _forest;
+        //BitmapResource _desert;
+        //BitmapResource _ice;
+        //BitmapResource _snow;
+        Brush _water;
+        Brush _subtropicalDesert;
+        Brush _tropicalSeasonal;
+        Brush _tropicalRain;
+        Brush _grassland;
+        Brush _temperateDeciduous;
+        Brush _temperateRain;
+        Brush _tempearteDesert;
+        Brush _shrubland;
+        Brush _taiga;
+        Brush _scorched;
+        Brush _bare;
+        Brush _tundra;
+        Brush _snow;
+
         HeightMap _height;
         HeightMap _climate;
 
@@ -45,15 +75,30 @@ namespace Evolusim
             _terrain = new Type[Size, Size];
             _scale = new Vector2(64);
 
-            _plains = ResourceManager.Request<BitmapResource>("plains");
-            _water = ResourceManager.Request<BitmapResource>("water");
-            _mountain = ResourceManager.Request<BitmapResource>("mountain");
-            _forest = ResourceManager.Request<BitmapResource>("forest");
-            _desert = ResourceManager.Request<BitmapResource>("desert");
-            _snow = ResourceManager.Request<BitmapResource>("snow");
-            _ice = ResourceManager.Request<BitmapResource>("ice");
+            //_plains = ResourceManager.Request<BitmapResource>("plains");
+            //_water = ResourceManager.Request<BitmapResource>("water");
+            //_mountain = ResourceManager.Request<BitmapResource>("mountain");
+            //_forest = ResourceManager.Request<BitmapResource>("forest");
+            //_desert = ResourceManager.Request<BitmapResource>("desert");
+            //_snow = ResourceManager.Request<BitmapResource>("snow");
+            //_ice = ResourceManager.Request<BitmapResource>("ice");
 
-            _height = new HeightMap(false, Size);
+            _water = Game.Graphics.CreateBrush(System.Drawing.Color.Blue);//
+            _subtropicalDesert = Game.Graphics.CreateBrush(System.Drawing.Color.Brown);//
+            _tropicalSeasonal = Game.Graphics.CreateBrush(System.Drawing.Color.Thistle);
+            _tropicalRain = Game.Graphics.CreateBrush(System.Drawing.Color.Teal);
+            _grassland = Game.Graphics.CreateBrush(System.Drawing.Color.Green);
+            _temperateDeciduous = Game.Graphics.CreateBrush(System.Drawing.Color.DarkGreen);
+            _temperateRain = Game.Graphics.CreateBrush(System.Drawing.Color.ForestGreen);
+            _tempearteDesert = Game.Graphics.CreateBrush(System.Drawing.Color.SandyBrown);
+            _shrubland = Game.Graphics.CreateBrush(System.Drawing.Color.LightSeaGreen);
+            _taiga = Game.Graphics.CreateBrush(System.Drawing.Color.LawnGreen);
+            _scorched = Game.Graphics.CreateBrush(System.Drawing.Color.Gray);//
+            _bare = Game.Graphics.CreateBrush(System.Drawing.Color.LightYellow);
+            _tundra = Game.Graphics.CreateBrush(System.Drawing.Color.LightGreen);//
+            _snow = Game.Graphics.CreateBrush(System.Drawing.Color.White);//
+
+            _height = new HeightMap(true, Size);
             _climate = new HeightMap(true, Size);
 
             //Create terrain
@@ -100,7 +145,8 @@ namespace Evolusim
                 for(int j = y; j <= y + numTilesY + 2; j++)
                 {
                     if (j >= Size) break;
-                    pSystem.DrawBitmap(GetBitmap(i, j), 1, new Vector2(currentX, currentY), _scale * Game.ActiveCamera.Zoom);
+                    var s = _scale * Game.ActiveCamera.Zoom;
+                    pSystem.DrawFillRect(new System.Drawing.RectangleF(currentX, currentY, s.X, s.Y), GetBrush(i, j));//, 1, new Vector2(currentX, currentY), _scale * Game.ActiveCamera.Zoom);
                     currentY += tileSize;
                 }
                 currentY = startPoint.Y;
@@ -180,20 +226,34 @@ namespace Evolusim
         {
             switch (pType)
             {
-                case Terrain.Type.Desert:
-                    return System.Drawing.Color.Brown;
-                case Terrain.Type.Forest:
-                    return System.Drawing.Color.DarkGreen;
-                case Terrain.Type.Ice:
-                    return System.Drawing.Color.White;
-                case Terrain.Type.Mountain:
-                    return System.Drawing.Color.Gray;
-                case Terrain.Type.Plains:
-                    return System.Drawing.Color.Green;
+                case Type.Bare:
+                    return _bare.Color;
+                case Type.Grassland:
+                    return _grassland.Color;
+                case Type.Scorched:
+                    return _scorched.Color;
+                case Type.Shrubland:
+                    return _shrubland.Color;
+                case Type.SubtropicalDesert:
+                    return _subtropicalDesert.Color;
+                case Type.Taiga:
+                    return _taiga.Color;
+                case Type.TemperateDeciduous:
+                    return _temperateDeciduous.Color;
+                case Type.TemperateDesert:
+                    return _tempearteDesert.Color;
+                case Type.TemperateRain:
+                    return _temperateRain.Color;
+                case Type.TropicalRain:
+                    return _tropicalRain.Color;
+                case Type.TropicalSeasonal:
+                    return _tropicalSeasonal.Color;
+                case Type.Tundra:
+                    return _tundra.Color;
                 case Terrain.Type.Snow:
-                    return System.Drawing.Color.Snow;
+                    return _snow.Color;
                 case Terrain.Type.Water:
-                    return System.Drawing.Color.Blue;
+                    return _water.Color;
                 case Terrain.Type.None:
                     return System.Drawing.Color.Black;
                 default:
@@ -201,52 +261,94 @@ namespace Evolusim
             }
         }
 
-        private BitmapResource GetBitmap(int x, int y)
+        private Brush GetBrush(int pX, int pY)
         {
-            switch (_terrain[x, y])
+            switch(_terrain[pX, pY])
             {
-                case Type.Desert:
-                    return _desert;
-                case Type.Forest:
-                    return _forest;
-                case Type.Mountain:
-                    return _mountain;
-                case Type.Plains:
-                    return _plains;
-                case Type.Water:
-                    return _water;
-                case Type.Snow:
+                case Type.Bare:
+                    return _bare;
+                case Type.Grassland:
+                    return _grassland;
+                case Type.Scorched:
+                    return _scorched;
+                case Type.Shrubland:
+                    return _shrubland;
+                case Type.SubtropicalDesert:
+                    return _subtropicalDesert;
+                case Type.Taiga:
+                    return _taiga;
+                case Type.TemperateDeciduous:
+                    return _temperateDeciduous;
+                case Type.TemperateDesert:
+                    return _tempearteDesert;
+                case Type.TemperateRain:
+                    return _temperateRain;
+                case Type.TropicalRain:
+                    return _tropicalRain;
+                case Type.TropicalSeasonal:
+                    return _tropicalSeasonal;
+                case Type.Tundra:
+                    return _tundra;
+                case Terrain.Type.Snow:
                     return _snow;
-                case Type.Ice:
-                    return _ice;
+                case Terrain.Type.Water:
+                    return _water;
+                case Terrain.Type.None:
+                    return null;// System.Drawing.Color.Black;
                 default:
-                    return _plains;
+                    throw new Exception();
             }
         }
+
+        //private BitmapResource GetBitmap(int x, int y)
+        //{
+        //    switch (_terrain[x, y])
+        //    {
+        //        case Type.Desert:
+        //            return _desert;
+        //        case Type.Forest:
+        //            return _forest;
+        //        case Type.Mountain:
+        //            return _mountain;
+        //        case Type.Plains:
+        //            return _plains;
+        //        case Type.Water:
+        //            return _water;
+        //        case Type.Snow:
+        //            return _snow;
+        //        case Type.Ice:
+        //            return _ice;
+        //        default:
+        //            return _plains;
+        //    }
+        //}
         //x axis is temp; y axis is height
-        private Type[,] _terrainMap = { { Type.Water,    Type.Water,    Type.Water,  Type.Ice,    Type.Ice },
-                                        { Type.Plains,   Type.Plains,   Type.Plains, Type.Plains, Type.Plains },
-                                        { Type.Forest,   Type.Forest,   Type.Forest, Type.Forest, Type.Forest },
-                                        { Type.Desert,   Type.Desert,   Type.Desert, Type.Desert, Type.Desert },
-                                        { Type.Mountain, Type.Mountain, Type.Snow,   Type.Snow,   Type.Snow } };
+        private Type[,] _terrainMap = { { Type.Snow,          Type.Snow,               Type.Snow,               Type.Tundra,           Type.Bare,            Type.Scorched},
+                                        { Type.Taiga,         Type.Taiga,              Type.Shrubland,          Type.Shrubland,        Type.TemperateDesert, Type.TemperateDesert },
+                                        { Type.TemperateRain, Type.TemperateDeciduous, Type.TemperateDeciduous, Type.Grassland,        Type.Grassland,       Type.TemperateDesert },
+                                        { Type.TropicalRain,  Type.TropicalRain,       Type.TropicalSeasonal,   Type.TropicalSeasonal, Type.Grassland,       Type.SubtropicalDesert},
+                                        { Type.Water,         Type.Water,              Type.Water,              Type.Water,            Type.Water,           Type.Water } };
         private Type CalculateType(int x, int y)
         {
             var h = _height.Query(x, y);
             var c = _climate.Query(x, y);
 
+            //0 - 4
             int i = 0;
-            if (h <  -.4) { i = 0; }
-            else if(h < 0) { i = 1; }
-            else if(h < .3) { i = 2; }
+            if (h <  -.6) { i = 0; }
+            else if(h < -.2) { i = 1; }
+            else if(h < .2) { i = 2; }
             else if(h < .6) { i = 3; }
             else { i = 4; }
 
+            //0 - 5
             int j = 0;
-            if (c < -.4) { j = 0; }
-            else if (c < 0) { j = 1; }
-            else if (c < .3) { j = 2; }
-            else if (c < .6) { j = 3; }
-            else { j = 4; }
+            if (c < -.7) { j = 0; }
+            else if (c < -.3) { j = 1; }
+            else if (c < .0) { j = 2; }
+            else if (c < .3) { j = 3; }
+            else if (c < .7) { j = 4; }
+            else { j = 5; }
 
             return _terrainMap[i, j];
         }

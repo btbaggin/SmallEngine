@@ -12,6 +12,16 @@ namespace Evolusim
 {
     class Organism : GameObject
     {
+        public enum Status
+        {
+            None,
+            Hungry,
+            //Tired,
+            Mating
+        }
+
+        public Status OrganismStatus { get; private set; }
+
         private AnimationRenderComponent _render;
         private AudioComponent _audio;
         private MovementComponent _movement;
@@ -26,13 +36,15 @@ namespace Evolusim
         private Brush _visionBrush;
 
         private BitmapResource _heart;
+        private BitmapResource _hungry;
 
         private int _mateDuration;
         private int _currentMate;
         private int _mateTimer;
-        private bool _isMating;
 
         public int Attractive { get; private set; }
+
+        public override int Order => 10;
 
         static Organism()
         {
@@ -62,8 +74,10 @@ namespace Evolusim
             Position = new Vector2(Game.RandomInt(0, Evolusim.WorldSize), Game.RandomInt(0, Evolusim.WorldSize));
             Scale = new Vector2(64);
             _preferredTerrain = Terrain.GetTypeAt(Position);
+
             _visionBrush = Game.Graphics.CreateBrush(System.Drawing.Color.Yellow);
             _heart = ResourceManager.Request<BitmapResource>("heart");
+            _hungry = ResourceManager.Request<BitmapResource>("hungry");
         }
 
         public override void Initialize()
@@ -109,11 +123,22 @@ namespace Evolusim
         {
             _render.Draw(pSystem);
 
-            if(_isMating)
+            switch(OrganismStatus)
             {
-                var heartScale = new Vector2(Scale.X / 2, Scale.X / 2) * Game.ActiveCamera.Zoom;
-                pSystem.DrawBitmap(_heart, 1, ScreenPosition + new Vector2(heartScale.X / 4, 0),  heartScale);
+                case Status.None:
+                    break;
+
+                case Status.Hungry:
+                    var hungryScale = new Vector2(Scale.X / 2, Scale.X / 2) * Game.ActiveCamera.Zoom;
+                    pSystem.DrawBitmap(_hungry, 1, ScreenPosition + new Vector2(hungryScale.X / 4, -hungryScale.Y / 2), hungryScale);
+                    break;
+
+                case Status.Mating:
+                    var heartScale = new Vector2(Scale.X / 2, Scale.X / 2) * Game.ActiveCamera.Zoom;
+                    pSystem.DrawBitmap(_heart, 1, ScreenPosition + new Vector2(heartScale.X / 4, -heartScale.Y / 2),  heartScale);
+                    break;
             }
+
 #if DEBUG
             pSystem.DrawElipse(ScreenPosition, _vision * 64 * Game.ActiveCamera.Zoom, _visionBrush);
             var p = Game.ActiveCamera.ToCameraSpace(_movement._destination);
@@ -125,15 +150,15 @@ namespace Evolusim
         {
             _currentHunger = _hunger;
             pFood.Destroy();
-            _render.SetBitmap("organism");
             _audio.PlayImmediate();
+            OrganismStatus = Status.None;
         }
 
         public void Mate(Organism pMate)
         {
             Organism.CreateFrom(this, pMate);
             _currentMate = _mateTimer;
-            _isMating = false;
+            OrganismStatus = Status.None;
         }
 
         private IEnumerator<WaitEvent> LifeCycleTick()
@@ -158,27 +183,22 @@ namespace Evolusim
                 }
                 else if(_currentHunger <= 10)
                 {
-                    _movement.Movement = MovementComponent.MovementType.Hungry;
-                    _render.SetBitmap("organism_hungry");
+                    OrganismStatus = Status.Hungry;
                     goto yield;
                 }
 
                 //Mating
                 if(_currentMate <= 0)
                 {
-                    if(!_isMating)
-                    {
-                        _isMating = true;
-                        _mateDuration = 11;
-                    }
+                    if(OrganismStatus != Status.Mating) _mateDuration = 11;
+
                     _mateDuration -= 1;
-                    _movement.Movement = MovementComponent.MovementType.Mate;
+                    OrganismStatus = Status.Mating;
                 }
-                else if(_isMating && _mateDuration <= 0)
+                else if(OrganismStatus == Status.Mating && _mateDuration <= 0)
                 {
-                    _movement.Movement = MovementComponent.MovementType.Wander;
+                    OrganismStatus = Status.None;
                     _currentMate = _mateTimer;
-                    _isMating = false;
                 }
 
                 yield:

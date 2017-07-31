@@ -123,7 +123,8 @@ namespace SmallEngine
             Scene.Draw(Graphics);
 
             //Update game objects
-            foreach (var go in Scene.GameObjects)
+            //TODO speed!
+            foreach (var go in Scene.GameObjects.OrderBy(pGo => pGo.Order))
             {
                 go.Draw(Graphics);
             }

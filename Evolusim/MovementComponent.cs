@@ -5,22 +5,6 @@ namespace Evolusim
 {
     class MovementComponent : DependencyComponent
     {
-        public enum MovementType
-        {
-            Wander,
-            Hungry,
-            Aggressive,
-            Defensive,
-            Mate
-        }
-
-        private MovementType _movement;
-        public MovementType Movement
-        {
-            get { return _movement; }
-            set { _movement = value; _destinationSet = false; }
-        }
-
         public Vector2 Speed { get; private set; }
 
         [ImportComponent]
@@ -32,9 +16,11 @@ namespace Evolusim
         Vegetation _food;
         Organism _mate;
         bool _destinationSet;
+
+        Organism _gameObject;
+
         public MovementComponent() : base()
         {
-            Movement = MovementType.Wander;
         }
 
         public override void OnAdded(IGameObject pGameObject)
@@ -43,6 +29,7 @@ namespace Evolusim
 
             _vision = _traits.GetTrait<int>(TraitComponent.Traits.Vision);
             _speed = _traits.GetTrait<int>(TraitComponent.Traits.Speed);
+            _gameObject = (Organism)GameObject;
         }
 
         public void Move(float pDeltaTime, Terrain.Type pTerrain)
@@ -61,55 +48,46 @@ namespace Evolusim
             }
         }
 
-        private void ResolveDestination()
+        private void GetDestination(Terrain.Type pTerrain)
         {
-            switch(Movement)
+            switch (_gameObject.OrganismStatus)
             {
-                case MovementType.Wander:
+                case Organism.Status.None:
+                    //TODO only move to preferred terrain
+                    RandomDestination();
                     break;
 
-                case MovementType.Hungry:
-                    if (_food == null)
-                    {
-                        _destinationSet = false;
-                        return;
-                    }
-
-                    ((Organism)GameObject).Eat(_food);
-                    _food = null;
+                case Organism.Status.Hungry:
+                    _food = (Vegetation)SceneManager.Current.GameObjects.NearestWithinDistance(GameObject, _vision * 64, "Vegetation");
+                    if (_food != null) _destination = _food.Position;
+                    else if (!_destinationSet) RandomDestination();
                     break;
 
-                case MovementType.Mate:
-                    if (_mate == null)
-                    {
-                        _destinationSet = false;
-                        return;
-                    }
-
-                    ((Organism)GameObject).Mate(_mate);
-                    _mate = null;
+                case Organism.Status.Mating:
+                    _mate = (Organism)SceneManager.Current.GameObjects.NearestWithinDistance(GameObject, _vision * 64, "Organism");
+                    if (_mate != null) _destination = _mate.Position;
+                    else if (!_destinationSet) RandomDestination();
                     break;
             }
-            _destinationSet = false;
-            Movement = MovementType.Wander;
+            _destinationSet = true;
+            _destination = Vector2.Clamp(_destination, Vector2.Zero, new Vector2(Evolusim.WorldSize, Evolusim.WorldSize));
         }
 
         private void MoveTowardsDestination(float pDeltaTime)
         {
-            switch(Movement)
+            switch(_gameObject.OrganismStatus)
             {
-                case MovementType.Hungry:
+                case Organism.Status.Hungry:
                     if(_food == null || _food.MarkedForDestroy) GetDestination(Terrain.Type.None);
                     break;
 
-                case MovementType.Mate:
+                case Organism.Status.Mating:
                     if (_mate == null || _mate.MarkedForDestroy) GetDestination(Terrain.Type.None);
                     else _destination = _mate.Position;
                     break;
 
                 default:
                     break;
-
             }
 
             var nextPos = Vector2.MoveTowards(GameObject.Position, _destination, _speed * pDeltaTime);
@@ -117,31 +95,36 @@ namespace Evolusim
             GameObject.Position = nextPos;
         }
 
-        private void GetDestination(Terrain.Type pTerrain)
+        private void ResolveDestination()
         {
-            switch(Movement)
+            switch (_gameObject.OrganismStatus)
             {
-                case MovementType.Wander:
-                    //TODO only move to preferred terrain
-                    RandomDestination();
+                case Organism.Status.None:
                     break;
-                case MovementType.Hungry:
-                    _food = (Vegetation)SceneManager.Current.GameObjects.NearestWithinDistance(GameObject, _vision * 64, "Vegetation");
-                    if (_food != null) _destination = _food.Position;
-                    else if(!_destinationSet) RandomDestination();
+
+                case Organism.Status.Hungry:
+                    if (_food == null)
+                    {
+                        _destinationSet = false;
+                        return;
+                    }
+
+                    _gameObject.Eat(_food);
+                    _food = null;
                     break;
-                case MovementType.Defensive:
-                    break;
-                case MovementType.Aggressive:
-                    break;
-                case MovementType.Mate:
-                    _mate = (Organism)SceneManager.Current.GameObjects.NearestWithinDistance(GameObject, _vision * 64, "Organism");
-                    if (_mate != null) _destination = _mate.Position;
-                    else if(!_destinationSet) RandomDestination();
+
+                case Organism.Status.Mating:
+                    if (_mate == null)
+                    {
+                        _destinationSet = false;
+                        return;
+                    }
+
+                    _gameObject.Mate(_mate);
+                    _mate = null;
                     break;
             }
-            _destinationSet = true;
-            _destination = Vector2.Clamp(_destination, Vector2.Zero, new Vector2(Evolusim.WorldSize, Evolusim.WorldSize));
+            _destinationSet = false;
         }
 
         private void RandomDestination()

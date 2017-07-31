@@ -30,9 +30,9 @@ namespace Evolusim
         public int Y { get; private set; }
 
         public bool IsDead { get { return _lifeTime <= 0; } }
+
         private int _lifeTime;
         private float _lifetimeTimer;
-
         BitmapRenderComponent _render;
 
         static Vegetation()
@@ -77,22 +77,15 @@ namespace Evolusim
         {
             switch (Terrain.GetType((int)Position.X, (int)Position.Y))
             {
-                case Terrain.Type.Forest:
-                    return VegetationType.Berry;
-
-                case Terrain.Type.Plains:
-                    return VegetationType.Wheat;
-
-                case Terrain.Type.Mountain:
-                    return VegetationType.Thing;
-
-                case Terrain.Type.Desert:
+                case Terrain.Type.Scorched:
                     return VegetationType.Cactus;
 
                 case Terrain.Type.Water:
                     return VegetationType.Lily;
+
+                default:
+                    return VegetationType.Berry;
             }
-            return VegetationType.None;
         }
 
         private void Spread()

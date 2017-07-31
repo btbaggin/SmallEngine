@@ -36,6 +36,8 @@ namespace SmallEngine
         public bool MarkedForDestroy { get; private set; }
 
         public string Tag { get; set; }
+
+        public virtual int Order => 0;
         #endregion  
 
         private Dictionary<Type, IComponent> _components;

@@ -7,7 +7,7 @@ using SmallEngine.Graphics;
 
 namespace SmallEngine
 {
-    public class Scene : IDrawable, IUpdatable
+    public class Scene : IUpdatable
     {
         private List<IGameObject> _gameObjects;
         private List<IGameObject> _requestedGO;

@@ -9,7 +9,7 @@ namespace SmallEngine
 {
     public interface IDrawable
     {
-        //TODO int Order { get; }
+        int Order { get; }
         void Draw(IGraphicsSystem pSystem);
     }
 }
