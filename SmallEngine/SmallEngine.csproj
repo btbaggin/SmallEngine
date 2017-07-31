@@ -137,6 +137,7 @@
     <Compile Include="Audio\AudioComponent.cs" />
     <Compile Include="Physics\RigidBodyComponent.cs" />
     <Compile Include="Utils\PerlinNoise.cs" />
+    <Compile Include="Utils\RandomGenerator.cs" />
     <Compile Include="Vector2.cs" />
   </ItemGroup>
   <ItemGroup>

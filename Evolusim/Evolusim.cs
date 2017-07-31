@@ -22,13 +22,13 @@ namespace Evolusim
 
         public override void LoadContent()
         {
-            ResourceManager.Add<BitmapResource>("water", "Graphics/water.png");
-            ResourceManager.Add<BitmapResource>("plains", "Graphics/plains.png");
-            ResourceManager.Add<BitmapResource>("mountain", "Graphics/mountain.jpg");
-            ResourceManager.Add<BitmapResource>("desert", "Graphics/desert.jpg");
-            ResourceManager.Add<BitmapResource>("forest", "Graphics/forest.jpg");
-            ResourceManager.Add<BitmapResource>("snow", "Graphics/snow.jpg");
-            ResourceManager.Add<BitmapResource>("ice", "Graphics/ice.jpg");
+            //ResourceManager.Add<BitmapResource>("water", "Graphics/water.png");
+            //ResourceManager.Add<BitmapResource>("plains", "Graphics/plains.png");
+            //ResourceManager.Add<BitmapResource>("mountain", "Graphics/mountain.jpg");
+            //ResourceManager.Add<BitmapResource>("desert", "Graphics/desert.jpg");
+            //ResourceManager.Add<BitmapResource>("forest", "Graphics/forest.jpg");
+            //ResourceManager.Add<BitmapResource>("snow", "Graphics/snow.jpg");
+            //ResourceManager.Add<BitmapResource>("ice", "Graphics/ice.jpg");
 
             ResourceManager.Add<BitmapResource>("organism", "Graphics/organism.png", true);
             ResourceManager.Add<BitmapResource>("hungry", "Graphics/hungry.png", true);

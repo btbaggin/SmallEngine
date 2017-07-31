@@ -22,7 +22,7 @@ namespace Evolusim
             else
             {
                 var n = new DiamondSquareNoise(pSize);
-                _map = n.Generate(-10, 10, .15f);
+                _map = n.Generate(0, 5, .5f);
 
                 float maxHeight = 0;
                 float maxDepth = 1;

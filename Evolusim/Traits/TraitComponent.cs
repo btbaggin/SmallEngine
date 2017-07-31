@@ -24,12 +24,12 @@ namespace Evolusim
         public TraitComponent()
         {
             _traits = new Dictionary<Traits, Trait>();
-            _traits.Add(Traits.Speed, new Trait(Game.RandomInt(50, 200)));
-            _traits.Add(Traits.Hunger, new Trait(Game.RandomInt(20, 30)));
-            _traits.Add(Traits.Lifetime, new Trait(Game.RandomInt(60, 120)));
-            _traits.Add(Traits.Attractive, new Trait(Game.RandomInt(0, 10)));
-            _traits.Add(Traits.MateRate, new Trait(Game.RandomInt(0, 3)));
-            _traits.Add(Traits.Vision, new Trait(Game.RandomInt(5, 15)));
+            _traits.Add(Traits.Speed, new Trait(RandomGenerator.RandomInt(50, 200)));
+            _traits.Add(Traits.Hunger, new Trait(RandomGenerator.RandomInt(20, 30)));
+            _traits.Add(Traits.Lifetime, new Trait(RandomGenerator.RandomInt(60, 120)));
+            _traits.Add(Traits.Attractive, new Trait(RandomGenerator.RandomInt(0, 10)));
+            _traits.Add(Traits.MateRate, new Trait(RandomGenerator.RandomInt(0, 3)));
+            _traits.Add(Traits.Vision, new Trait(RandomGenerator.RandomInt(5, 15)));
         }
 
         public T GetTrait<T>(Traits pTrait)

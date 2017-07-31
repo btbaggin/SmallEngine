@@ -24,10 +24,10 @@ namespace SmallEngine
 
             float modNoise = 0f;
             _grid = new float[_size + 1, _size + 1];
-            _grid[0, 0] = Game.RandomFloat(pMin, pMax);
-            _grid[_size, 0] = Game.RandomFloat(pMin, pMax);
-            _grid[0, _size] = Game.RandomFloat(pMin, pMax);
-            _grid[_size, _size] = Game.RandomFloat(pMin, pMax);
+            _grid[0, 0] = RandomGenerator.RandomFloat(pMin, pMax);
+            _grid[_size, 0] = RandomGenerator.RandomFloat(pMin, pMax);
+            _grid[0, _size] = RandomGenerator.RandomFloat(pMin, pMax);
+            _grid[_size, _size] = RandomGenerator.RandomFloat(pMin, pMax);
 
             for (int i = _size; i > 1; i /= 2)
             {
@@ -48,6 +48,7 @@ namespace SmallEngine
                         SampleSquare(x, y, i, modNoise);
                     }
                 }
+                pNoise = modNoise;
             }
 
             return _grid;
@@ -61,7 +62,7 @@ namespace SmallEngine
             float c = GetValue(x, y + hs);
             float d = GetValue(x + hs, y + hs);
 
-            SetValue(x + (hs / 2), y + (hs / 2), (float)((a + b + c + d) / 4.0) + Game.RandomFloat(-value, value));
+            SetValue(x + (hs / 2), y + (hs / 2), (float)((a + b + c + d) / 4.0) + RandomGenerator.RandomFloat(-value, value));
         }
 
         public void SampleSquare(int x, int y, int hs, float value)
@@ -77,10 +78,10 @@ namespace SmallEngine
             float d2 = (b + cn + d + GetValue(x + hs + (hs / 2), y + (hs / 2))) / 4.0f;
             float d3 = (cn + c + d + GetValue(x + (hs / 2), y + hs + (hs / 2))) / 4.0f;
 
-            SetValue(x + (hs / 2), y, d0 + Game.RandomFloat(-value, value));
-            SetValue(x, y + (hs / 2), d1 + Game.RandomFloat(-value, value));
-            SetValue(x + hs, y + (hs / 2), d2 + Game.RandomFloat(-value, value));
-            SetValue(x + (hs / 2), y + hs, d3 + Game.RandomFloat(-value, value));
+            SetValue(x + (hs / 2), y, d0 + RandomGenerator.RandomFloat(-value, value));
+            SetValue(x, y + (hs / 2), d1 + RandomGenerator.RandomFloat(-value, value));
+            SetValue(x + hs, y + (hs / 2), d2 + RandomGenerator.RandomFloat(-value, value));
+            SetValue(x + (hs / 2), y + hs, d3 + RandomGenerator.RandomFloat(-value, value));
         }
 
         private float GetValue(int x, int y)

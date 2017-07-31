@@ -6,15 +6,17 @@ using System.Threading.Tasks;
 using SmallEngine;
 using SmallEngine.UI;
 using SmallEngine.Graphics;
+using SmallEngine.Input;
 
 namespace Evolusim
 {
-    class Minimap : UIElement, IDisposable
+    class Minimap : UIElement
     {
         Terrain _terrain;
         int _resolution;
         BitmapResource _image;
         float _ratio;
+        float _inverseRatio;
         Brush _cameraOutline;
 
         public Minimap(Terrain pTerrain, int pSize, int pResolution)
@@ -27,6 +29,7 @@ namespace Evolusim
             _terrain = pTerrain;
             _resolution = pResolution;
             _ratio = (float)Width / Evolusim.WorldSize;
+            _inverseRatio = Evolusim.WorldSize / (float)Width;
             _cameraOutline = Game.Graphics.CreateBrush(System.Drawing.Color.Black);
             SetLayout();
         }
@@ -40,6 +43,16 @@ namespace Evolusim
             var w = Game.ActiveCamera.Width * _ratio;
             var h = Game.ActiveCamera.Height * _ratio;
             pSystem.DrawRect(new System.Drawing.RectangleF(Position.X + x.X, Position.Y + x.Y, w, h), _cameraOutline, 1);
+        }
+
+        public override void Update(float pDeltaTime)
+        {
+            base.Update(pDeltaTime);
+            if(IsMouseOver && InputManager.KeyDown(Mouse.Left))
+            {
+                var p = InputManager.MousePosition - Position;
+                Game.ActiveCamera.Position = p * _inverseRatio;
+            }
         }
 
         public void Dispose()

@@ -71,7 +71,7 @@ namespace Evolusim
 
         public Organism()
         {
-            Position = new Vector2(Game.RandomInt(0, Evolusim.WorldSize), Game.RandomInt(0, Evolusim.WorldSize));
+            Position = new Vector2(RandomGenerator.RandomInt(0, Evolusim.WorldSize), RandomGenerator.RandomInt(0, Evolusim.WorldSize));
             Scale = new Vector2(64);
             _preferredTerrain = Terrain.GetTypeAt(Position);
 

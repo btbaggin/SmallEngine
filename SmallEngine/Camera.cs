@@ -27,7 +27,7 @@ namespace SmallEngine
         public Vector2 Position
         {
             get { return _position; }
-            private set { _position = value; }
+            set { _position = value; }
         }
 
         public int ZoomSpeed { get; set; }

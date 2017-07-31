@@ -67,7 +67,7 @@ namespace Evolusim
 
             pSystem.DrawFillRect(new System.Drawing.RectangleF(0, 0, Game.Form.Width, Game.Form.Height), _backgroundBrush);
 
-            pSystem.DrawText("Evolusim", new System.Drawing.RectangleF(0, 50, Game.Form.Width, 30), _titleFont);
+            //pSystem.DrawText("Evolusim", new System.Drawing.RectangleF(0, 50, Game.Form.Width, 30), _titleFont);
 
             float y = 120;
             for(int i = 0; i < mItems.Count; i++)

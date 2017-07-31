@@ -53,7 +53,7 @@ namespace Evolusim
         {
             base.Initialize();
             Type = GetVegetationType();
-            _lifeTime = Game.RandomInt(20, 40);
+            _lifeTime = RandomGenerator.RandomInt(20, 40);
             Scale = new Vector2(64);
 
             _render = GetComponent<BitmapRenderComponent>();
@@ -90,8 +90,8 @@ namespace Evolusim
 
         private void Spread()
         {
-            var dx = Game.RandomInt(X - SpreadSize, X + SpreadSize);
-            var dy = Game.RandomInt(Y - SpreadSize, Y + SpreadSize);
+            var dx = RandomGenerator.RandomInt(X - SpreadSize, X + SpreadSize);
+            var dy = RandomGenerator.RandomInt(Y - SpreadSize, Y + SpreadSize);
             dx = (int)MathF.Clamp(dx, 0, Terrain.Size);
             dy = (int)MathF.Clamp(dy, 0, Terrain.Size);
 

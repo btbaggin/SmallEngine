@@ -129,8 +129,8 @@ namespace Evolusim
 
         private void RandomDestination()
         {
-            var u = Game.RandomFloat();
-            var v = Game.RandomFloat();
+            var u = RandomGenerator.RandomFloat();
+            var v = RandomGenerator.RandomFloat();
             var w = (_vision * 64) * MathF.Sqrt(u);
             var t = 2 * MathF.PI * v;
             var x = w * MathF.Cos(t);

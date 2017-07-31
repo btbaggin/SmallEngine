@@ -36,9 +36,9 @@ namespace SmallEngine
 
             for (int i = 0; i < GradientSizeTable; i++)
             {
-                float z = 1f - 2f * Game.RandomFloat();
+                float z = 1f - 2f * RandomGenerator.RandomFloat();
                 float r = MathF.Sqrt(1f - z * z);
-                float theta = 2 * MathF.PI * Game.RandomFloat();
+                float theta = 2 * MathF.PI * RandomGenerator.RandomFloat();
                 _gradients[i * 3] = r * MathF.Cos(theta);
                 _gradients[i * 3 + 1] = r * MathF.Sin(theta);
                 _gradients[i * 3 + 2] = z;

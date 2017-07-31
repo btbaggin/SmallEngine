@@ -64,6 +64,7 @@ namespace Evolusim
         Brush _bare;
         Brush _tundra;
         Brush _snow;
+        Brush _none;
 
         HeightMap _height;
         HeightMap _climate;
@@ -97,6 +98,7 @@ namespace Evolusim
             _bare = Game.Graphics.CreateBrush(System.Drawing.Color.LightYellow);
             _tundra = Game.Graphics.CreateBrush(System.Drawing.Color.LightGreen);//
             _snow = Game.Graphics.CreateBrush(System.Drawing.Color.White);//
+            _none = Game.Graphics.CreateBrush(System.Drawing.Color.Black);
 
             _height = new HeightMap(true, Size);
             _climate = new HeightMap(true, Size);
@@ -115,7 +117,7 @@ namespace Evolusim
             {
                 for (int y = 0; y < Terrain.Size; y++)
                 {
-                    if (Game.RandomFloat() < .01f)
+                    if (RandomGenerator.RandomFloat() < .01f)
                     {
                         Vegetation.Create(x, y);
                     }
@@ -206,10 +208,8 @@ namespace Evolusim
             {
                 for (int y = 0; y < pResolution; y++)
                 {
-                    Terrain.Type t = GetType(x * step, y * step);
-
                     var i = (int)(pResolution * 4 * y + x * 4);
-                    var color = ColorFromType(t);
+                    var color = GetBrush(x * step, y * step).Color;
                     memory[i] = color.R;
                     memory[i + 1] = color.G;
                     memory[i + 2] = color.B;
@@ -220,45 +220,6 @@ namespace Evolusim
             if (pResource != null) pResource.Dispose();
             pResource = ((DirectXGraphicSystem)Game.Graphics).FromByte(memory, pResolution, pResolution);
             _updateBitmap = false;
-        }
-
-        private System.Drawing.Color ColorFromType(Terrain.Type pType)
-        {
-            switch (pType)
-            {
-                case Type.Bare:
-                    return _bare.Color;
-                case Type.Grassland:
-                    return _grassland.Color;
-                case Type.Scorched:
-                    return _scorched.Color;
-                case Type.Shrubland:
-                    return _shrubland.Color;
-                case Type.SubtropicalDesert:
-                    return _subtropicalDesert.Color;
-                case Type.Taiga:
-                    return _taiga.Color;
-                case Type.TemperateDeciduous:
-                    return _temperateDeciduous.Color;
-                case Type.TemperateDesert:
-                    return _tempearteDesert.Color;
-                case Type.TemperateRain:
-                    return _temperateRain.Color;
-                case Type.TropicalRain:
-                    return _tropicalRain.Color;
-                case Type.TropicalSeasonal:
-                    return _tropicalSeasonal.Color;
-                case Type.Tundra:
-                    return _tundra.Color;
-                case Terrain.Type.Snow:
-                    return _snow.Color;
-                case Terrain.Type.Water:
-                    return _water.Color;
-                case Terrain.Type.None:
-                    return System.Drawing.Color.Black;
-                default:
-                    throw new Exception();
-            }
         }
 
         private Brush GetBrush(int pX, int pY)
@@ -289,39 +250,18 @@ namespace Evolusim
                     return _tropicalSeasonal;
                 case Type.Tundra:
                     return _tundra;
-                case Terrain.Type.Snow:
+                case Type.Snow:
                     return _snow;
-                case Terrain.Type.Water:
+                case Type.Water:
                     return _water;
-                case Terrain.Type.None:
-                    return null;// System.Drawing.Color.Black;
+                case Type.None:
+                    return _none;
                 default:
                     throw new Exception();
             }
         }
 
-        //private BitmapResource GetBitmap(int x, int y)
-        //{
-        //    switch (_terrain[x, y])
-        //    {
-        //        case Type.Desert:
-        //            return _desert;
-        //        case Type.Forest:
-        //            return _forest;
-        //        case Type.Mountain:
-        //            return _mountain;
-        //        case Type.Plains:
-        //            return _plains;
-        //        case Type.Water:
-        //            return _water;
-        //        case Type.Snow:
-        //            return _snow;
-        //        case Type.Ice:
-        //            return _ice;
-        //        default:
-        //            return _plains;
-        //    }
-        //}
+
         //x axis is temp; y axis is height
         private Type[,] _terrainMap = { { Type.Snow,          Type.Snow,               Type.Snow,               Type.Tundra,           Type.Bare,            Type.Scorched},
                                         { Type.Taiga,         Type.Taiga,              Type.Shrubland,          Type.Shrubland,        Type.TemperateDesert, Type.TemperateDesert },
