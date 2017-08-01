@@ -4,11 +4,13 @@ using SmallEngine.Input;
 using Evolusim.UI;
 using SmallEngine.UI;
 
+using Evolusim.Terrain;
+
 namespace Evolusim
 {
     class GameScene : Scene
     {
-        Terrain _terrain;
+        TerrainMap _terrain;
         Minimap _minimap;
         Toolbar _toolbar;
 
@@ -16,9 +18,11 @@ namespace Evolusim
         {
             base.Begin();
 
-            _terrain = new Terrain();
+            _terrain = new TerrainMap();
             _minimap = new Minimap(_terrain, 200, 256);
             _toolbar = new Toolbar();
+            Vegetation.Populate();
+
             UIManager.Register(_toolbar);
             UIManager.Register(_minimap);
             InputManager.Listen(Keys.T);
@@ -54,7 +58,7 @@ namespace Evolusim
 
             if (InputManager.KeyDown(Mouse.Left) && !InputManager.HasFocus())
             {
-                Terrain.SetTypeAt(_toolbar.SelectedType, Evolusim.ActiveCamera.ToWorldSpace(InputManager.MousePosition));
+                TerrainMap.SetTerrainTypeAt(_toolbar.SelectedType, Evolusim.ActiveCamera.ToWorldSpace(InputManager.MousePosition));
             }
 
             if(InputManager.KeyPressed(Keys.T))

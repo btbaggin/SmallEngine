@@ -1,6 +1,8 @@
 ﻿using System.Linq;
 using SmallEngine;
 
+using Evolusim.Terrain;
+
 namespace Evolusim
 {
     class MovementComponent : DependencyComponent
@@ -34,7 +36,7 @@ namespace Evolusim
             _gameObject = (Organism)GameObject;
         }
 
-        public void Move(float pDeltaTime, Terrain.Type pTerrain)
+        public void Move(float pDeltaTime, TerrainType pTerrain)
         {
             if (!_destinationSet) GetDestination(pTerrain);
 
@@ -55,7 +57,7 @@ namespace Evolusim
             _stopped = true;
         }
 
-        private void GetDestination(Terrain.Type pTerrain)
+        private void GetDestination(TerrainType pTerrain)
         {
             switch (_gameObject.OrganismStatus)
             {
@@ -87,11 +89,11 @@ namespace Evolusim
             switch(_gameObject.OrganismStatus)
             {
                 case Organism.Status.Hungry:
-                    if(_food == null || _food.IsDead) GetDestination(Terrain.Type.None);
+                    if(_food == null || _food.IsDead) GetDestination(TerrainType.None);
                     break;
 
                 case Organism.Status.Mating:
-                    if (_mate == null || _mate.MarkedForDestroy) GetDestination(Terrain.Type.None);
+                    if (_mate == null || _mate.MarkedForDestroy) GetDestination(TerrainType.None);
                     else _destination = _mate.Position;
                     break;
 

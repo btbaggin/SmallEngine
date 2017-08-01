@@ -8,18 +8,18 @@ using SmallEngine.UI;
 using SmallEngine.Graphics;
 using SmallEngine.Input;
 
-namespace Evolusim
+namespace Evolusim.Terrain
 {
     class Minimap : UIElement
     {
-        Terrain _terrain;
+        TerrainMap _terrain;
         int _resolution;
         BitmapResource _image;
         float _ratio;
         float _inverseRatio;
         Brush _cameraOutline;
 
-        public Minimap(Terrain pTerrain, int pSize, int pResolution)
+        public Minimap(TerrainMap pTerrain, int pSize, int pResolution)
         {
             Anchor = AnchorDirection.Top | AnchorDirection.Right;
             AnchorPoint = Vector2.Zero;

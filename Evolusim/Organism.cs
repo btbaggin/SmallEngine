@@ -8,6 +8,8 @@ using SmallEngine.Audio;
 using SmallEngine.Graphics;
 using SmallEngine.Input;
 
+using Evolusim.Terrain;
+
 namespace Evolusim
 {
     class Organism : GameObject
@@ -27,7 +29,7 @@ namespace Evolusim
         private MovementComponent _movement;
         private TraitComponent _traits;
 
-        private Terrain.Type _preferredTerrain;
+        private TerrainType _preferredTerrain;
         private int _currentHunger;
         private int _hunger;
 
@@ -73,7 +75,7 @@ namespace Evolusim
         {
             Position = new Vector2(RandomGenerator.RandomInt(0, Evolusim.WorldSize), RandomGenerator.RandomInt(0, Evolusim.WorldSize));
             Scale = new Vector2(64);
-            _preferredTerrain = Terrain.GetTypeAt(Position);
+            _preferredTerrain = TerrainMap.GetTerrainTypeAt(Position);
 
             _visionBrush = Game.Graphics.CreateBrush(System.Drawing.Color.Yellow);
             _heart = ResourceManager.Request<BitmapResource>("heart");

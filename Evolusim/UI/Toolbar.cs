@@ -8,6 +8,8 @@ using SmallEngine;
 using SmallEngine.Graphics;
 using SmallEngine.UI;
 
+using Evolusim.Terrain;
+
 namespace Evolusim.UI
 {
     class Toolbar : UIElement, IMessageReceiver, IDisposable
@@ -19,7 +21,7 @@ namespace Evolusim.UI
         SmallEngine.Graphics.Brush _background;
         ToggleButtonGroup _group;
 
-        public Terrain.Type SelectedType { get; private set; }
+        public TerrainType SelectedType { get; private set; }
 
         public Toolbar() : base()
         {
@@ -39,7 +41,7 @@ namespace Evolusim.UI
             SetLayout();
 
             MessageBus.Register(this);
-            SelectedType = Terrain.Type.None;
+            SelectedType = TerrainType.None;
         }
 
         public void Toggle()

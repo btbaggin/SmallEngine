@@ -8,6 +8,8 @@ using SmallEngine.Audio;
 using SmallEngine.Input;
 using SmallEngine.Graphics;
 
+using Evolusim.Terrain;
+
 namespace Evolusim
 {
     class Evolusim : Game
@@ -18,30 +20,20 @@ namespace Evolusim
          * Only allow changing height / climate
          */
 
-        public static int WorldSize { get { return 64 * Terrain.Size; } }
+        public static int WorldSize { get { return 64 * TerrainMap.Size; } }
 
         public override void LoadContent()
         {
-            //ResourceManager.Add<BitmapResource>("water", "Graphics/water.png");
-            //ResourceManager.Add<BitmapResource>("plains", "Graphics/plains.png");
-            //ResourceManager.Add<BitmapResource>("mountain", "Graphics/mountain.jpg");
-            //ResourceManager.Add<BitmapResource>("desert", "Graphics/desert.jpg");
-            //ResourceManager.Add<BitmapResource>("forest", "Graphics/forest.jpg");
-            //ResourceManager.Add<BitmapResource>("snow", "Graphics/snow.jpg");
-            //ResourceManager.Add<BitmapResource>("ice", "Graphics/ice.jpg");
-
             ResourceManager.Add<BitmapResource>("organism", "Graphics/organism.png", true);
             ResourceManager.Add<BitmapResource>("hungry", "Graphics/hungry.png", true);
             ResourceManager.Add<BitmapResource>("heart", "Graphics/heart.png", true);
 
-            ResourceManager.Add<BitmapResource>("cactus", "Graphics/cactus.png", true);
-
-            ResourceManager.Add<BitmapResource>("plant1", "Graphics/plant1.png", true);
-            ResourceManager.Add<BitmapResource>("plant2", "Graphics/plant2.png", true);
-            ResourceManager.Add<BitmapResource>("plant3", "Graphics/plant3.png", true);
-            ResourceManager.AddGroup("plants", "plant1", "plant2", "plant3");
-
-            ResourceManager.Add<BitmapResource>("lily", "Graphics/lily.png", true);
+            ResourceManager.Add<BitmapResource>("v_water", "Graphics/v_water.png", true);
+            ResourceManager.Add<BitmapResource>("v_grassland", "Graphics/v_grassland.png", true);
+            ResourceManager.Add<BitmapResource>("v_shrubland", "Graphics/v_shrubland.png", true);
+            ResourceManager.Add<BitmapResource>("v_temperatedeciduous", "Graphics/v_temperatedeciduous", true);
+            ResourceManager.Add<BitmapResource>("v_temperatedesert", "Graphics/v_temperatedesert", true);
+            ResourceManager.Add<BitmapResource>("v_subtropicaldesert", "Graphics/v_temperatedesert", true);
 
             ResourceManager.Add<BitmapResource>("plant_dead", "Graphics/plant_dead.png", true);
 

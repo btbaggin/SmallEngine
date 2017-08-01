@@ -18,7 +18,6 @@ namespace SmallEngine
         /*TODO
          * MessageBus dropping messages if too busy
          * Generic render component?
-         * Way to check if mouseclick is handled
          */
 
         public enum RenderSystem

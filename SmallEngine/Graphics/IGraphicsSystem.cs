@@ -21,6 +21,6 @@ namespace SmallEngine.Graphics
 
         Font CreateFont(string pFamily, float pSize, Color pColor);
         Brush CreateBrush(Color pColor);
-        //TODO effects?
+        //TODO effects? https://english.r2d2rigo.es/2014/08/19/applying-direct2d-built-in-effects-to-bitmaps-with-sharpdx/
     }
 }

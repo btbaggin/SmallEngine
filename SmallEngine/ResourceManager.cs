@@ -147,6 +147,11 @@ namespace SmallEngine
             return r;
         }
 
+        public static bool ResourceLoaded(string pAlias)
+        {
+            return _resources.ContainsKey(pAlias);
+        }
+
         /// <summary>
         /// Request a resource from the manager
         /// </summary>

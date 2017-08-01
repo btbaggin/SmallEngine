@@ -6,24 +6,24 @@ using System.Threading.Tasks;
 using SmallEngine;
 using SmallEngine.Graphics;
 
-namespace Evolusim
+namespace Evolusim.Terrain
 {
     class Vegetation : GameObject
     {
-        public enum VegetationType
-        {
-            None,
-            Berry,
-            Wheat,
-            Cactus,
-            Thing,
-            Lily,
-            Dead
-        }
+        //public enum VegetationType
+        //{
+        //    None,
+        //    Berry,
+        //    Wheat,
+        //    Cactus,
+        //    Thing,
+        //    Lily,
+        //    Dead
+        //}
 
         private const int SpreadSize = 2;
 
-        public VegetationType Type { get; private set; }
+        //public VegetationType Type { get; private set; }
 
         public int X { get; private set; }
 
@@ -44,58 +44,89 @@ namespace Evolusim
         {
             var v = SceneManager.Current.CreateGameObject<Vegetation>("vegetation");
             v.X = pX; v.Y = pY;
-            v.Position = Terrain.GetPosition(new Vector2(pX, pY));
+            v.Position = TerrainMap.GetPosition(new Vector2(pX, pY));
             v.Tag = "Vegetation";
             return v;
+        }
+
+        public static void Populate()
+        {
+            for (int x = 0; x < TerrainMap.Size; x++)
+            {
+                for (int y = 0; y < TerrainMap.Size; y++)
+                {
+                    if (RandomGenerator.RandomFloat() < GetPercent(TerrainMap.GetTerrainType(x, y)))
+                    {
+                        Create(x, y);
+                    }
+                }
+            }
+        }
+
+        private static float GetPercent(TerrainType pType)
+        {
+            switch (pType)
+            {
+                case TerrainType.Water:
+                    return .05f;
+
+                case TerrainType.Grassland:
+                case TerrainType.Shrubland:
+                case TerrainType.TemperateDeciduous:
+                    return .01f;
+
+                case TerrainType.Desert:
+                    return .003f;
+
+                default:
+                    return -1f; //Will not create
+            }
         }
 
         public override void Initialize()
         {
             base.Initialize();
-            Type = GetVegetationType();
             _lifeTime = RandomGenerator.RandomInt(20, 40);
             Scale = new Vector2(64);
-
             _render = GetComponent<BitmapRenderComponent>();
-            switch(Type)
+
+            switch (TerrainMap.GetTerrainType((int)Position.X, (int)Position.Y))
             {
-                case VegetationType.Cactus:
-                    _render.SetBitmap("cactus");
+                case TerrainType.Water:
+                    _render.SetBitmap("v_water");
+                    //Type = VegetationType.Lily;
                     break;
 
-                case VegetationType.Lily:
-                    _render.SetBitmap("lily");
+                case TerrainType.Grassland:
+                    _render.SetBitmap("v_grassland");
+                    break;
+
+                case TerrainType.Shrubland:
+                    _render.SetBitmap("v_shrubland");
+                    break;
+
+                case TerrainType.TemperateDeciduous:
+                    _render.SetBitmap("v_temperatedeciduous");
+                    break;
+
+                case TerrainType.Desert:
+                    _render.SetBitmap("v_desert");
                     break;
 
                 default:
-                    _render.SetBitmapFromGroup("plants");
-                    break;
+                    throw new Exception("Unsupported terrain type");
             }
         }
 
-        private VegetationType GetVegetationType()
-        {
-            switch (Terrain.GetType((int)Position.X, (int)Position.Y))
-            {
-                case Terrain.Type.Scorched:
-                    return VegetationType.Cactus;
-
-                case Terrain.Type.Water:
-                    return VegetationType.Lily;
-
-                default:
-                    return VegetationType.Berry;
-            }
-        }
 
         private void Spread()
         {
             var dx = RandomGenerator.RandomInt(X - SpreadSize, X + SpreadSize);
             var dy = RandomGenerator.RandomInt(Y - SpreadSize, Y + SpreadSize);
-            dx = (int)MathF.Clamp(dx, 0, Terrain.Size);
-            dy = (int)MathF.Clamp(dy, 0, Terrain.Size);
+            dx = (int)MathF.Clamp(dx, 0, TerrainMap.Size);
+            dy = (int)MathF.Clamp(dy, 0, TerrainMap.Size);
 
-            if (dx < Terrain.Size && dy < Terrain.Size) Vegetation.Create(dx, dy);
+            if (dx < TerrainMap.Size && dy < TerrainMap.Size) Vegetation.Create(dx, dy);
         }
 
         public override void Update(float pDeltaTime)
