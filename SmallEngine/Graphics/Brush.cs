@@ -17,7 +17,7 @@ namespace SmallEngine.Graphics
         public Color Color { get; private set; }
         private Brush(Color pColor, RenderTarget pTarget)
         {
-            ColorBrush = new SolidColorBrush(pTarget, new SharpDX.Color4(pColor.R, pColor.G, pColor.B, pColor.A));
+            ColorBrush = new SolidColorBrush(pTarget, new SharpDX.Color4(pColor.R / 255f, pColor.G / 255f, pColor.B / 255f, pColor.A / 255f));
             ColorBrush.Opacity = pColor.A / 255f;
             Color = pColor;
         }
