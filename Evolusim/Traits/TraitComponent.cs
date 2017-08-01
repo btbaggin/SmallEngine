@@ -32,9 +32,14 @@ namespace Evolusim
             _traits.Add(Traits.Vision, new Trait(RandomGenerator.RandomInt(5, 15)));
         }
 
-        public T GetTrait<T>(Traits pTrait)
+        public T GetTraitValue<T>(Traits pTrait)
         {
             return _traits[pTrait].GetValue<T>();
+        }
+        
+        public Trait GetTrait(Traits pTrait)
+        {
+            return _traits[pTrait];
         }
     }
 }

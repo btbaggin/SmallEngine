@@ -62,7 +62,7 @@
     <Compile Include="Terrain\Vegetation.cs" />
     <Compile Include="Traits\Trait.cs" />
     <Compile Include="Traits\TraitComponent.cs" />
-    <Compile Include="UI\Toolbar.cs" />
+    <Compile Include="UI\InspectionBar.cs" />
     <Compile Include="UI\ToggleButton.cs" />
     <Compile Include="UI\ToggleButtonGroup.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">

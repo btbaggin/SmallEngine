@@ -12,7 +12,7 @@ namespace Evolusim
     {
         TerrainMap _terrain;
         Minimap _minimap;
-        Toolbar _toolbar;
+        InspectionBar _toolbar;
 
         protected override void Begin()
         {
@@ -20,12 +20,12 @@ namespace Evolusim
 
             _terrain = new TerrainMap();
             _minimap = new Minimap(_terrain, 200, 256);
-            _toolbar = new Toolbar();
+            _toolbar = new InspectionBar();
             Vegetation.Populate();
 
             UIManager.Register(_toolbar);
             UIManager.Register(_minimap);
-            InputManager.Listen(Keys.T);
+
             InputManager.Listen(Keys.Escape);
             InputManager.Listen(Keys.Up);
             InputManager.Listen(Keys.Down);
@@ -56,16 +56,10 @@ namespace Evolusim
                 SceneManager.BeginScene(new MenuScene(true), SceneLoadMode.Additive);
             }
 
-            if (InputManager.KeyDown(Mouse.Left) && !InputManager.HasFocus())
-            {
-                TerrainMap.SetTerrainTypeAt(_toolbar.SelectedType, Evolusim.ActiveCamera.ToWorldSpace(InputManager.MousePosition));
-            }
-
-            if(InputManager.KeyPressed(Keys.T))
-            {
-                MessageBus.SendMessage(new GameMessage("ToolbarToggle", null));
-                //_toolbar.Toggle();
-            }
+            //if (InputManager.KeyDown(Mouse.Left) && !InputManager.HasFocus())
+            //{
+            //    TerrainMap.SetTerrainTypeAt(_toolbar.SelectedType, Evolusim.ActiveCamera.ToWorldSpace(InputManager.MousePosition));
+            //}
         }
 
         protected override void End()
@@ -77,7 +71,6 @@ namespace Evolusim
             _minimap.Dispose();
             _toolbar.Dispose();
 
-            InputManager.StopListening(Keys.T);
             InputManager.StopListening(Keys.Escape);
             InputManager.StopListening(Keys.Up);
             InputManager.StopListening(Keys.Down);

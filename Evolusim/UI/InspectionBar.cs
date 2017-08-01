@@ -12,18 +12,16 @@ using Evolusim.Terrain;
 
 namespace Evolusim.UI
 {
-    class Toolbar : UIElement, IMessageReceiver, IDisposable
+    class InspectionBar : UIElement, IMessageReceiver, IDisposable
     { 
         private const float dx = 10;
 
         public bool IsOpen { get; private set; }
 
         SmallEngine.Graphics.Brush _background;
-        ToggleButtonGroup _group;
+        private Organism _organism;
 
-        public TerrainType SelectedType { get; private set; }
-
-        public Toolbar() : base()
+        public InspectionBar() : base()
         {
             _background = Game.Graphics.CreateBrush(Color.FromArgb(150, 0, 0, 0));
             WidthPercent = .2f;
@@ -32,16 +30,7 @@ namespace Evolusim.UI
             Orientation = ElementOrientation.Vertical;
             Order = 10;
 
-            //_group = new ToggleButtonGroup(new ToggleButton("plains", "Plains", Terrain.Type.Bare) { Orientation = ElementOrientation.Vertical, Margin = new Vector2(2, 0) },
-            //    new ToggleButton("water", "Water", Terrain.Type.Water) { Orientation = ElementOrientation.Vertical, Margin = new Vector2(2, 0) },
-            //    new ToggleButton("desert", "Desert", Terrain.Type.SubtropicalDesert) { Orientation = ElementOrientation.Vertical, Margin = new Vector2(2, 0) },
-            //    new ToggleButton("forest", "Forest", Terrain.Type.TropicalRain) { Orientation = ElementOrientation.Vertical, Margin = new Vector2(2, 0) },
-            //    new ToggleButton("mountain", "Mountains", Terrain.Type.Scorched) { Orientation = ElementOrientation.Vertical, Margin = new Vector2(2, 0) });
-            //AddChild(_group, AnchorDirection.Left | AnchorDirection.Top, Vector2.Zero);
-            SetLayout();
-
             MessageBus.Register(this);
-            SelectedType = TerrainType.None;
         }
 
         public void Toggle()
@@ -55,10 +44,16 @@ namespace Evolusim.UI
             Position = new Vector2(-Width, Position.Y);
         }
 
-        public void SetContent(UIElement pContent)
+        private void UpdateContent()
         {
             Children.Clear();
-            AddChild(pContent, AnchorDirection.Left | AnchorDirection.Top, Vector2.Zero);
+            foreach (TraitComponent.Traits e in Enum.GetValues(typeof(TraitComponent.Traits)))
+            {
+                var t = _organism.GetTrait(e);
+                LabelElement l = new LabelElement(e.ToString() + ": " + t.GetValue<object>().ToString() , "Arial", 14, Color.White);
+                AddChild(l, AnchorDirection.Left | AnchorDirection.Top, Vector2.Zero);
+            }
+            SetLayout();
         }
 
         public override void Draw(IGraphicsSystem pSystem)
@@ -70,7 +65,6 @@ namespace Evolusim.UI
         public override void Update(float pDeltaTime)
         {
             base.Update(pDeltaTime);
-            //SelectedType = _group.GetSelectedData<Terrain.Type>();
 
             if(IsOpen)
             {
@@ -86,12 +80,10 @@ namespace Evolusim.UI
         {
             switch(pM.MessageType)
             {
-                case "ToolbarToggle":
-                    IsOpen = !IsOpen;
-                    break;
-
                 case "ToolbarOpen":
                     IsOpen = true;
+                    _organism = pM.GetValue<Organism>();
+                    UpdateContent();
                     break;
             }
         }

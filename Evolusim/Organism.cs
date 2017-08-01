@@ -94,13 +94,13 @@ namespace Evolusim
             _movement = GetComponent<MovementComponent>();
 
             _traits = GetComponent<TraitComponent>();
-            _hunger = _traits.GetTrait<int>(TraitComponent.Traits.Hunger);
+            _hunger = _traits.GetTraitValue<int>(TraitComponent.Traits.Hunger);
 
-            _lifeTime = _traits.GetTrait<int>(TraitComponent.Traits.Lifetime);
-            _vision = _traits.GetTrait<int>(TraitComponent.Traits.Vision);
+            _lifeTime = _traits.GetTraitValue<int>(TraitComponent.Traits.Lifetime);
+            _vision = _traits.GetTraitValue<int>(TraitComponent.Traits.Vision);
 
-            Attractive = _traits.GetTrait<int>(TraitComponent.Traits.Attractive);
-            var mateRate = _traits.GetTrait<int>(TraitComponent.Traits.MateRate);
+            Attractive = _traits.GetTraitValue<int>(TraitComponent.Traits.Attractive);
+            var mateRate = _traits.GetTraitValue<int>(TraitComponent.Traits.MateRate);
             if (mateRate == 0) _mateTimer = _lifeTime;
             else _mateTimer = _lifeTime / mateRate;
 
@@ -116,7 +116,7 @@ namespace Evolusim
 
             if(InputManager.KeyPressed(Mouse.Left) && InputManager.IsFocused(this))
             {
-                MessageBus.SendMessage(new GameMessage("ToolbarOpen", null));
+                MessageBus.SendMessage(new GameMessage("ToolbarOpen", this));
             }
 
         }
@@ -163,6 +163,11 @@ namespace Evolusim
             Organism.CreateFrom(this, pMate);
             _currentMate = _mateTimer;
             OrganismStatus = Status.None;
+        }
+
+        public Traits.Trait GetTrait(TraitComponent.Traits pTrait)
+        {
+            return _traits.GetTrait(pTrait);
         }
 
         private IEnumerator<WaitEvent> LifeCycleTick()

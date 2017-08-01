@@ -31,8 +31,8 @@ namespace Evolusim
         {
             base.OnAdded(pGameObject);
 
-            _vision = _traits.GetTrait<int>(TraitComponent.Traits.Vision);
-            _speed = _traits.GetTrait<int>(TraitComponent.Traits.Speed);
+            _vision = _traits.GetTraitValue<int>(TraitComponent.Traits.Vision);
+            _speed = _traits.GetTraitValue<int>(TraitComponent.Traits.Speed);
             _gameObject = (Organism)GameObject;
         }
 
