@@ -48,7 +48,7 @@ namespace Evolusim
         public override void Update(float pDeltaTime)
         {
             base.Update(pDeltaTime);
-            if(IsMouseOver && InputManager.KeyDown(Mouse.Left))
+            if(InputManager.KeyDown(Mouse.Left) && InputManager.IsFocused(this))
             {
                 var p = InputManager.MousePosition - Position;
                 Game.ActiveCamera.Position = p * _inverseRatio;

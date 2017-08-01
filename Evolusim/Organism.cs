@@ -112,7 +112,7 @@ namespace Evolusim
             _movement.Move(pDeltaTime, _preferredTerrain);
             _render.Update(pDeltaTime);
 
-            if(InputManager.KeyPressed(Mouse.Left) && IsMouseOver())
+            if(InputManager.KeyPressed(Mouse.Left) && InputManager.IsFocused(this))
             {
                 MessageBus.SendMessage(new GameMessage("ToolbarOpen", null));
             }
@@ -148,6 +148,7 @@ namespace Evolusim
 
         public void Eat(Vegetation pFood)
         {
+            _movement.Stop(1f);
             _currentHunger = _hunger;
             pFood.Destroy();
             _audio.PlayImmediate();
@@ -156,6 +157,7 @@ namespace Evolusim
 
         public void Mate(Organism pMate)
         {
+            _movement.Stop(1f);
             Organism.CreateFrom(this, pMate);
             _currentMate = _mateTimer;
             OrganismStatus = Status.None;

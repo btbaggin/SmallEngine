@@ -16,6 +16,8 @@ namespace Evolusim
         Vegetation _food;
         Organism _mate;
         bool _destinationSet;
+        bool _stopped;
+        float _stopDuration;
 
         Organism _gameObject;
 
@@ -34,18 +36,23 @@ namespace Evolusim
 
         public void Move(float pDeltaTime, Terrain.Type pTerrain)
         {
-            if (!_destinationSet)
+            if (!_destinationSet) GetDestination(pTerrain);
+
+            if(_stopped)
             {
-                GetDestination(pTerrain);
+                _stopped = (_stopDuration -= pDeltaTime) > 0;
             }
 
             //TODO use pathing
             MoveTowardsDestination(pDeltaTime);
 
-            if(GameObject.Position ==  _destination)
-            {
-                ResolveDestination();
-            }
+            if(GameObject.Position ==  _destination) ResolveDestination();
+        }
+
+        public void Stop(float pDuration)
+        {
+            _stopDuration = pDuration;
+            _stopped = true;
         }
 
         private void GetDestination(Terrain.Type pTerrain)
@@ -75,10 +82,12 @@ namespace Evolusim
 
         private void MoveTowardsDestination(float pDeltaTime)
         {
+            if (_stopped) return;
+
             switch(_gameObject.OrganismStatus)
             {
                 case Organism.Status.Hungry:
-                    if(_food == null || _food.MarkedForDestroy) GetDestination(Terrain.Type.None);
+                    if(_food == null || _food.IsDead) GetDestination(Terrain.Type.None);
                     break;
 
                 case Organism.Status.Mating:

@@ -122,6 +122,7 @@ namespace SmallEngine.Input
             ScreenToClient(_handle, ref p);
             _mousePos = new Vector2(p.X, p.Y);
             CheckDrag();
+            CheckMouseFocus();
         }
 
         private void GetStatus(ref InputInfo pKey, out bool pPressed, out bool pHeld)
@@ -142,6 +143,55 @@ namespace SmallEngine.Input
                     pKey.LastPressed = time;
                 }
                 pKey.IsPressed = keyPressed;
+            }
+        }
+
+        private static Vector2 _dragStart;
+        private static Mode _mode = Mode.Normal;
+        private enum Mode
+        {
+            PossibleDrag,
+            Drag,
+            Normal
+        }
+
+        private static void CheckDrag()
+        {
+            if (_mode == Mode.Normal && KeyPressed(Mouse.Left))
+            {
+                _mode = Mode.PossibleDrag;
+                _dragStart = _mousePos;
+            }
+
+            if (_mode == Mode.PossibleDrag && KeyDown(Mouse.Left))
+            {
+                var _dragDistance = _mousePos - _dragStart;
+                if (Math.Abs(_dragDistance.X) > System.Windows.SystemParameters.MinimumHorizontalDragDistance ||
+                   Math.Abs(_dragDistance.Y) > System.Windows.SystemParameters.MinimumVerticalDragDistance)
+                {
+                    _mode = Mode.Drag;
+                }
+            }
+            else if (KeyUp(Mouse.Left))
+            {
+                _mode = Mode.Normal;
+            }
+        }
+
+        private static IFocusElement _focus;
+        private static void CheckMouseFocus()
+        {
+            _focus = null;
+            foreach(var ui in UI.UIManager.Elements.OrderBy(pUi => pUi.Order))
+            {
+                _focus = ui.GetFocusedElement(MousePosition);
+                if (_focus != null) return;
+            }
+
+            foreach(var go in SceneManager.Current.GameObjects.OrderBy(pGo => pGo.Order))
+            {
+                _focus = go.GetFocusedElement(MousePosition);
+                if (_focus != null) return;
             }
         }
 
@@ -196,36 +246,14 @@ namespace SmallEngine.Input
             return _mode == Mode.Drag;
         }
 
-        private static Vector2 _dragStart;
-        private static Mode _mode = Mode.Normal;
-        private enum Mode
+        public static bool IsFocused(IFocusElement pElement)
         {
-            PossibleDrag,
-            Drag,
-            Normal
+            return pElement == _focus;
         }
 
-        private static void CheckDrag()
+        public static bool HasFocus()
         {
-            if (_mode == Mode.Normal && KeyPressed(Mouse.Left))
-            {
-                _mode = Mode.PossibleDrag;
-                _dragStart = _mousePos;
-            }
-
-            if (_mode == Mode.PossibleDrag && KeyDown(Mouse.Left))
-            {
-                var _dragDistance = _mousePos - _dragStart;
-                if (Math.Abs(_dragDistance.X) > System.Windows.SystemParameters.MinimumHorizontalDragDistance ||
-                   Math.Abs(_dragDistance.Y) > System.Windows.SystemParameters.MinimumVerticalDragDistance)
-                {
-                    _mode = Mode.Drag;
-                }
-            }
-            else if (KeyUp(Mouse.Left))
-            {
-                _mode = Mode.Normal;
-            }
+            return _focus != null;
         }
 
         public static void Listen(Keys pKey)

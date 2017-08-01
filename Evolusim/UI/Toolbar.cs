@@ -30,11 +30,11 @@ namespace Evolusim.UI
             Orientation = ElementOrientation.Vertical;
             Order = 10;
 
-            //_group = new ToggleButtonGroup(new ToggleButton("plains", "Plains", Terrain.Type.Plains) { Orientation = ElementOrientation.Vertical, Margin = new Vector2(2, 0) },
+            //_group = new ToggleButtonGroup(new ToggleButton("plains", "Plains", Terrain.Type.Bare) { Orientation = ElementOrientation.Vertical, Margin = new Vector2(2, 0) },
             //    new ToggleButton("water", "Water", Terrain.Type.Water) { Orientation = ElementOrientation.Vertical, Margin = new Vector2(2, 0) },
-            //    new ToggleButton("desert", "Desert", Terrain.Type.Desert) { Orientation = ElementOrientation.Vertical, Margin = new Vector2(2, 0) },
-            //    new ToggleButton("forest", "Forest", Terrain.Type.Forest) { Orientation = ElementOrientation.Vertical, Margin = new Vector2(2, 0) },
-            //    new ToggleButton("mountain", "Mountains", Terrain.Type.Mountain) { Orientation = ElementOrientation.Vertical, Margin = new Vector2(2, 0) });
+            //    new ToggleButton("desert", "Desert", Terrain.Type.SubtropicalDesert) { Orientation = ElementOrientation.Vertical, Margin = new Vector2(2, 0) },
+            //    new ToggleButton("forest", "Forest", Terrain.Type.TropicalRain) { Orientation = ElementOrientation.Vertical, Margin = new Vector2(2, 0) },
+            //    new ToggleButton("mountain", "Mountains", Terrain.Type.Scorched) { Orientation = ElementOrientation.Vertical, Margin = new Vector2(2, 0) });
             //AddChild(_group, AnchorDirection.Left | AnchorDirection.Top, Vector2.Zero);
             SetLayout();
 

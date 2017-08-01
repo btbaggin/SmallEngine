@@ -30,7 +30,8 @@ namespace Evolusim
             TropicalRain,
             TropicalSeasonal,
             SubtropicalDesert,
-            Water
+            Water,
+            Ice
         }
 
         public const int BitmapSize = 64;
@@ -64,6 +65,7 @@ namespace Evolusim
         Brush _bare;
         Brush _tundra;
         Brush _snow;
+        Brush _ice;
         Brush _none;
 
         HeightMap _height;
@@ -98,6 +100,7 @@ namespace Evolusim
             _bare = Game.Graphics.CreateBrush(System.Drawing.Color.LightYellow);
             _tundra = Game.Graphics.CreateBrush(System.Drawing.Color.LightGreen);//
             _snow = Game.Graphics.CreateBrush(System.Drawing.Color.White);//
+            _ice = Game.Graphics.CreateBrush(System.Drawing.Color.White);
             _none = Game.Graphics.CreateBrush(System.Drawing.Color.Black);
 
             _height = new HeightMap(true, Size);
@@ -254,6 +257,8 @@ namespace Evolusim
                     return _snow;
                 case Type.Water:
                     return _water;
+                case Type.Ice:
+                    return _ice;
                 case Type.None:
                     return _none;
                 default:
@@ -267,7 +272,7 @@ namespace Evolusim
                                         { Type.Taiga,         Type.Taiga,              Type.Shrubland,          Type.Shrubland,        Type.TemperateDesert, Type.TemperateDesert },
                                         { Type.TemperateRain, Type.TemperateDeciduous, Type.TemperateDeciduous, Type.Grassland,        Type.Grassland,       Type.TemperateDesert },
                                         { Type.TropicalRain,  Type.TropicalRain,       Type.TropicalSeasonal,   Type.TropicalSeasonal, Type.Grassland,       Type.SubtropicalDesert},
-                                        { Type.Water,         Type.Water,              Type.Water,              Type.Water,            Type.Water,           Type.Water } };
+                                        { Type.Water,         Type.Water,              Type.Water,              Type.Water,            Type.Water,           Type.Ice } };
         private Type CalculateType(int x, int y)
         {
             var h = _height.Query(x, y);

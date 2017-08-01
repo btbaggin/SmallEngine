@@ -5,10 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
 using SmallEngine.Graphics;
+using SmallEngine.Input;
 
 namespace SmallEngine.UI
 {
-    public abstract class UIElement : IDrawable, IUpdatable
+    public abstract class UIElement : IDrawable, IUpdatable, IFocusElement
     {
         #region Properties
         private Vector2 _position;
@@ -82,15 +83,6 @@ namespace SmallEngine.UI
         {
             get { return new RectangleF(Position.X, Position.Y, Width, Height); }
         }
-
-        public bool IsMouseOver
-        {
-            get
-            {
-                var p = Input.InputManager.MousePosition;
-                return Bounds.Contains(new System.Drawing.PointF(p.X, p.Y));
-            }
-        }
         #endregion
 
         public UIElement()
@@ -134,6 +126,21 @@ namespace SmallEngine.UI
             pElement.AnchorPoint = pAnchorPoint;
             pElement.Parent = this;
             Children.Add(pElement);
+        }
+
+        public IFocusElement GetFocusedElement(Vector2 pPoint)
+        {
+            IFocusElement focus = null;
+            if(Bounds.Contains(new PointF(pPoint.X, pPoint.Y)))
+            {
+                foreach(var c in Children)
+                {
+                    focus = c.GetFocusedElement(pPoint);
+                    if (focus != null) return focus;
+                }
+                focus = this;
+            }
+            return focus;
         }
 
         public virtual void Measure(SizeF pSize, float pLeft, float pTop)

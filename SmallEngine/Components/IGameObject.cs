@@ -4,10 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SmallEngine.Input;
 
 namespace SmallEngine
 {
-    public interface IGameObject : IUpdatable, IDrawable, IMessageReceiver, IDisposable
+    public interface IGameObject : IUpdatable, IDrawable, IMessageReceiver, IFocusElement, IDisposable
     {
         #region Properties
         string Name { get; }
@@ -35,7 +36,6 @@ namespace SmallEngine
         void AddComponent(IComponent pComponent);
         void RemoveComponent(Type pComponent);
 
-        bool IsMouseOver();
         void SetGame(Game pGame);
         void Initialize();
         void Destroy();

@@ -10,27 +10,27 @@ namespace SmallEngine.UI
 {
     public class UIManager
     {
-        private static List<UIElement> _elements;
+        internal static List<UIElement> Elements { get; private set; }
 
         static UIManager()
         {
-            _elements = new List<UI.UIElement>();
+            Elements = new List<UI.UIElement>();
         }
 
         public static void Register(UIElement pElement)
         {
-            _elements.Add(pElement);
+            Elements.Add(pElement);
         }
 
         public static void Unregister(UIElement pElement)
         {
-            _elements.Remove(pElement);
+            Elements.Remove(pElement);
         }
 
         internal void Draw(IGraphicsSystem pSystem)
         {
             //TODO speed
-            foreach (var e in _elements.OrderBy((pE) => pE.Order))
+            foreach (var e in Elements.OrderBy((pE) => pE.Order))
             {
                 if (e.Visible)
                 {
@@ -41,7 +41,7 @@ namespace SmallEngine.UI
 
         internal void Update(float pDeltaTime)
         {
-            foreach (var e in _elements)
+            foreach (var e in Elements)
             {
                 if (e.Visible && e.Enabled)
                 {
@@ -52,7 +52,7 @@ namespace SmallEngine.UI
 
         internal void Resize()
         {
-            foreach(var e in _elements)
+            foreach(var e in Elements)
             {
                 e.Measure(new SizeF(Game.Form.Width, Game.Form.Height), 0, 0);
             }

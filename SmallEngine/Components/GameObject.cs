@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SmallEngine.Graphics;
+using SmallEngine.Input;
 
 namespace SmallEngine
 {
@@ -98,13 +99,19 @@ namespace SmallEngine
             _components.Remove(pComponent);
         }
 
-        public bool IsMouseOver()
+        public IFocusElement GetFocusedElement(Vector2 pPoint)
         {
-            var mp = Input.InputManager.MousePosition;
             var s = Scale * Game.ActiveCamera.Zoom;
             var sp = ScreenPosition;
-            return mp.X >= sp.X && mp.X <= sp.X + s.X &&
-                   mp.Y >= sp.Y && mp.Y <= sp.Y + s.Y;
+            if (pPoint.X >= sp.X && 
+                pPoint.X <= sp.X + s.X &&
+                pPoint.Y >= sp.Y &&
+                pPoint.Y <= sp.Y + s.Y)
+            {
+                return this;
+            }
+
+            return null;
         }
 
         public void SetGame(Game pGame)

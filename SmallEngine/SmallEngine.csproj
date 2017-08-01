@@ -107,6 +107,7 @@
     <Compile Include="Components\IComponent.cs" />
     <Compile Include="Graphics\RenderComponent.cs" />
     <Compile Include="IMessageReciever.cs" />
+    <Compile Include="Input\IFocusElement.cs" />
     <Compile Include="Input\InputManager.cs" />
     <Compile Include="Input\InputInfo.cs" />
     <Compile Include="Input\InputState.cs" />
