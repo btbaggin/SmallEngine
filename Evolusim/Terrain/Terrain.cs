@@ -6,8 +6,6 @@ namespace Evolusim.Terrain
 {
     class TerrainMap
     {
-
-
         public const int BitmapSize = 64;
         public static int Size { get { return 513; } }
         static TerrainType[,] _terrain;
@@ -51,7 +49,7 @@ namespace Evolusim.Terrain
             _grassland = Game.Graphics.CreateBrush(System.Drawing.Color.Green);
             _temperateDeciduous = Game.Graphics.CreateBrush(System.Drawing.Color.DarkGreen);
             _temperateRain = Game.Graphics.CreateBrush(System.Drawing.Color.ForestGreen);
-            _shrubland = Game.Graphics.CreateBrush(System.Drawing.Color.LightSeaGreen);
+            _shrubland = Game.Graphics.CreateBrush(System.Drawing.Color.DarkOliveGreen);
             _taiga = Game.Graphics.CreateBrush(System.Drawing.Color.LawnGreen);
             _scorched = Game.Graphics.CreateBrush(System.Drawing.Color.Gray);//
             _bare = Game.Graphics.CreateBrush(System.Drawing.Color.LightYellow);

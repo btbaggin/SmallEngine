@@ -31,9 +31,8 @@ namespace Evolusim
             ResourceManager.Add<BitmapResource>("v_water", "Graphics/v_water.png", true);
             ResourceManager.Add<BitmapResource>("v_grassland", "Graphics/v_grassland.png", true);
             ResourceManager.Add<BitmapResource>("v_shrubland", "Graphics/v_shrubland.png", true);
-            ResourceManager.Add<BitmapResource>("v_temperatedeciduous", "Graphics/v_temperatedeciduous", true);
-            ResourceManager.Add<BitmapResource>("v_temperatedesert", "Graphics/v_temperatedesert", true);
-            ResourceManager.Add<BitmapResource>("v_subtropicaldesert", "Graphics/v_temperatedesert", true);
+            ResourceManager.Add<BitmapResource>("v_temperatedeciduous", "Graphics/v_temperatedeciduous.png", true);
+            ResourceManager.Add<BitmapResource>("v_desert", "Graphics/v_desert.png", true);
 
             ResourceManager.Add<BitmapResource>("plant_dead", "Graphics/plant_dead.png", true);
 

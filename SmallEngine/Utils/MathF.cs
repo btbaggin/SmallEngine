@@ -57,6 +57,11 @@ namespace SmallEngine
         {
             return (float)(pAngle * (Math.PI / 180));
         }
+
+        public static float Round(float a, int pPlaces)
+        {
+            return (float)Math.Round(a, pPlaces);
+        }
     }
 
 }

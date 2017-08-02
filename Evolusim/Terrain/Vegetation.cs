@@ -43,7 +43,7 @@ namespace Evolusim.Terrain
         public static Vegetation Create(int pX, int pY)
         {
             var v = SceneManager.Current.CreateGameObject<Vegetation>("vegetation");
-            v.X = pX; v.Y = pY;
+            v.SetXY(pX, pY);
             v.Position = TerrainMap.GetPosition(new Vector2(pX, pY));
             v.Tag = "Vegetation";
             return v;
@@ -89,8 +89,11 @@ namespace Evolusim.Terrain
             _lifeTime = RandomGenerator.RandomInt(20, 40);
             Scale = new Vector2(64);
             _render = GetComponent<BitmapRenderComponent>();
+        }
 
-            switch (TerrainMap.GetTerrainType((int)Position.X, (int)Position.Y))
+        private void SetXY(int pX, int pY)
+        {
+            switch (TerrainMap.GetTerrainType(pX, pY))
             {
                 case TerrainType.Water:
                     _render.SetBitmap("v_water");
@@ -117,7 +120,6 @@ namespace Evolusim.Terrain
                     throw new Exception("Unsupported terrain type");
             }
         }
-
 
         private void Spread()
         {
