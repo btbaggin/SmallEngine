@@ -77,28 +77,26 @@ namespace Evolusim.Terrain
         {
             int x = (int)(Evolusim.ActiveCamera.Position.X / BitmapSize);
             int y = (int)(Evolusim.ActiveCamera.Position.Y / BitmapSize);
-            float numTilesX = Evolusim.ActiveCamera.Width / BitmapSize;
-            float numTilesY = Evolusim.ActiveCamera.Height / BitmapSize;
+            float numTilesX = Game.Form.Width / (BitmapSize * Game.ActiveCamera.Zoom);
+            float numTilesY = Game.Form.Height / (BitmapSize * Game.ActiveCamera.Zoom);
 
             //Width and height should be the same
-            var tileSize = (Game.Form.Width / numTilesX);
             var startPoint = Evolusim.ActiveCamera.ToCameraSpace(new Vector2(x * BitmapSize, y * BitmapSize));
 
-            Vector2 scale = new Vector2(tileSize);
+            Vector2 scale = new Vector2(BitmapSize) * Game.ActiveCamera.Zoom;//new Vector2(tileSize);
             var currentX = startPoint.X;
             var currentY = startPoint.Y;
-            for(int i = x; i <= x + numTilesX + 2; i++)
+            for(int i = x; i <= x + numTilesX; i++)
             {
                 if (i >= Size) break;
-                for(int j = y; j <= y + numTilesY + 2; j++)
+                for(int j = y; j <= y + numTilesY; j++)
                 {
                     if (j >= Size) break;
-                    var s = _scale * Game.ActiveCamera.Zoom;
-                    pSystem.DrawFillRect(new System.Drawing.RectangleF(currentX, currentY, s.X, s.Y), GetBrush(i, j));
-                    currentY += tileSize;
+                    pSystem.DrawFillRect(new System.Drawing.RectangleF(currentX, currentY, scale.X + 1, scale.Y + 1), GetBrush(i, j));
+                    currentY += scale.Y;
                 }
                 currentY = startPoint.Y;
-                currentX += tileSize;
+                currentX += scale.X;
             }
         }
 

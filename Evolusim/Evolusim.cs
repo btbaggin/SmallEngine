@@ -53,7 +53,7 @@ namespace Evolusim
             InputManager.Listen(Keys.Up);
             InputManager.Listen(Keys.Down);
 
-            ActiveCamera = new Camera(889, 4444, 500, 2500)
+            ActiveCamera = new Camera(.1f, 2f)
             {
                 Bounds = new System.Drawing.RectangleF(0, 0, WorldSize, WorldSize)
             };
