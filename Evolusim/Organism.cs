@@ -94,13 +94,13 @@ namespace Evolusim
             _movement = GetComponent<MovementComponent>();
 
             _traits = GetComponent<TraitComponent>();
-            _hunger = _traits.GetTraitValue<int>(TraitComponent.Traits.Hunger);
+            _hunger = (int)_traits.GetTrait(TraitComponent.Traits.Hunger).Value;
 
-            _lifeTime = _traits.GetTraitValue<int>(TraitComponent.Traits.Lifetime);
-            _vision = _traits.GetTraitValue<int>(TraitComponent.Traits.Vision);
+            _lifeTime = (int)_traits.GetTrait(TraitComponent.Traits.Lifetime).Value;
+            _vision = (int)_traits.GetTrait(TraitComponent.Traits.Vision).Value;
 
-            Attractive = _traits.GetTraitValue<int>(TraitComponent.Traits.Attractive);
-            var mateRate = _traits.GetTraitValue<int>(TraitComponent.Traits.MateRate);
+            Attractive = (int)_traits.GetTrait(TraitComponent.Traits.Attractive).Value;
+            var mateRate = (int)_traits.GetTrait(TraitComponent.Traits.MateRate).Value;
             if (mateRate == 0) _mateTimer = _lifeTime;
             else _mateTimer = _lifeTime / mateRate;
 

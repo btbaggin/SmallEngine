@@ -8,15 +8,17 @@ namespace Evolusim.Traits
 {
     class Trait
     {
-        private object _value;
-        public Trait(object pValue)
-        {
-            _value = pValue;
-        }
+        public float Min { get; private set; }
 
-        public T GetValue<T>()
+        public float Max { get; private set; }
+
+        public float Value { get; private set; }
+
+        public Trait(float pMin, float pMax)
         {
-            return (T)_value;
+            Min = pMin;
+            Max = pMax;
+            Value = SmallEngine.RandomGenerator.RandomFloat(Min, Max);
         }
     }
 }

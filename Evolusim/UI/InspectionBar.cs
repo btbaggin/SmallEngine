@@ -50,8 +50,7 @@ namespace Evolusim.UI
             foreach (TraitComponent.Traits e in Enum.GetValues(typeof(TraitComponent.Traits)))
             {
                 var t = _organism.GetTrait(e);
-                LabelElement l = new LabelElement(e.ToString() + ": " + t.GetValue<object>().ToString(), "Arial", 14, Color.White) { WidthPercent = 1f, Height = 25 };
-                AddChild(l, AnchorDirection.Left | AnchorDirection.Top, Vector2.Zero);
+                AddChild(new AttributeElement(e.ToString(), t.Value, t.Min, t.Max), AnchorDirection.Left | AnchorDirection.Top, Vector2.Zero);
             }
             SetLayout();
         }
