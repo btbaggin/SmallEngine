@@ -25,9 +25,9 @@ namespace SmallEngine
 
         public float Rotation { get; set; }
 
-        public RectangleF Bounds
+        public Rectangle Bounds
         {
-            get { return new RectangleF(Position.X, Position.Y, Scale.X, Scale.Y); }
+            get { return new Rectangle(Position, Scale); }
         }
 
         public bool Persistant { get; set; }

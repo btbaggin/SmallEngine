@@ -1,14 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Drawing;
 using SmallEngine;
 using SmallEngine.Graphics;
 using SmallEngine.UI;
-
-using Evolusim.Terrain;
 
 namespace Evolusim.UI
 {
@@ -18,12 +11,12 @@ namespace Evolusim.UI
 
         public bool IsOpen { get; private set; }
 
-        SmallEngine.Graphics.Brush _background;
+        Brush _background;
         private Organism _organism;
 
         public InspectionBar() : base()
         {
-            _background = Game.Graphics.CreateBrush(Color.FromArgb(150, 0, 0, 0));
+            _background = Game.Graphics.CreateBrush(System.Drawing.Color.FromArgb(150, 0, 0, 0));
             WidthPercent = .2f;
             HeightPercent = 1f;
             Position = new Vector2(-Width, 0);
@@ -57,7 +50,7 @@ namespace Evolusim.UI
 
         public override void Draw(IGraphicsSystem pSystem)
         {
-            pSystem.DrawFillRect(new RectangleF(Position.X, Position.Y, Width, Height), _background);
+            pSystem.DrawFillRect(new Rectangle(Position, Width, Height), _background);
             base.Draw(pSystem);
         }
 

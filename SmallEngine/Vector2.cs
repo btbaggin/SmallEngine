@@ -444,110 +444,73 @@ namespace SmallEngine
             return new Vector2(pPoint.X, pPoint.Y);
         }
 
-        public static explicit operator SharpDX.Mathematics.Interop.RawVector2(Vector2 pVector)
+        public static implicit operator SharpDX.Mathematics.Interop.RawVector2(Vector2 pVector)
         {
             return new SharpDX.Mathematics.Interop.RawVector2(pVector.X, pVector.Y);
         }
 
         public static Vector2 operator +(Vector2 pV1, Vector2 pV2)
         {
-            if (pV1 == null) throw new ArgumentNullException("pV1");
-            if (pV2 == null) throw new ArgumentNullException("pV2");
-
             return new Vector2(pV1.X + pV2.X, pV1.Y + pV2.Y);
         }
 
         public static Vector2 operator +(Vector2 pV1, float pScalar)
         {
-            if (pV1 == null) throw new ArgumentNullException("pV1");
-
             return new Vector2(pV1.X + pScalar, pV1.Y + pScalar);
         }
 
         public static Vector2 operator +(float pScalar, Vector2 pV1)
         {
-            if (pV1 == null) throw new ArgumentNullException("pV1");
-
             return new Vector2(pV1.X + pScalar, pV1.Y + pScalar);
         }
 
         public static Vector2 operator -(Vector2 pV1, Vector2 pV2)
         {
-            if (pV1 == null) throw new ArgumentNullException("pV1");
-            if (pV2 == null) throw new ArgumentNullException("pV2");
-
             return new Vector2(pV1.X - pV2.X, pV1.Y - pV2.Y);
         }
 
         public static Vector2 operator -(Vector2 pV1, float pScalar)
         {
-            if (pV1 == null) throw new ArgumentNullException("pV1");
-
             return new Vector2(pV1.X - pScalar, pV1.Y - pScalar);
         }
 
         public static Vector2 operator -(float pScalar, Vector2 pV1)
         {
-            if (pV1 == null) throw new ArgumentNullException("pV1");
-
             return new Vector2(pV1.X - pScalar, pV1.Y - pScalar);
         }
 
         public static Vector2 operator *(Vector2 pV1, float pScalar)
         {
-            if (pV1 == null) throw new ArgumentNullException("pV1");
-
             return new Vector2(pV1.X * pScalar, pV1.Y * pScalar);
         }
 
         public static Vector2 operator *(float pScalar, Vector2 pV1)
         {
-            if (pV1 == null) throw new ArgumentNullException("pV1");
-
             return new Vector2(pV1.X * pScalar, pV1.Y * pScalar);
         }
 
         public static Vector2 operator *(Vector2 pV1, Vector2 pV2)
         {
-            if (pV1 == null) throw new ArgumentNullException("pV1");
-            if (pV2 == null) throw new ArgumentNullException("pV2");
-
             return new Vector2(pV1.X * pV2.X, pV1.Y * pV2.Y);
         }
 
         public static Vector2 operator /(Vector2 pV1, float pScalar)
         {
-            if (pV1 == null) throw new ArgumentNullException("pV1");
-
             return new Vector2(pV1.X / pScalar, pV1.Y / pScalar);
         }
 
         public static Vector2 operator /(float pScalar, Vector2 pV1)
         {
-            if (pV1 == null) throw new ArgumentNullException("pV1");
-
             return new Vector2(pV1.X / pScalar, pV1.Y / pScalar);
         }
 
         public static Vector2 operator /(Vector2 pV1, Vector2 pV2)
         {
-            if (pV1 == null) throw new ArgumentNullException("pV1");
-            if (pV2 == null) throw new ArgumentNullException("pV2");
-
             return new Vector2(pV1.X / pV2.X, pV1.Y / pV2.Y);
         }
 
         public static bool operator ==(Vector2 pV1, Vector2 pV2)
         {
-            if (object.Equals(pV1, null) && !object.Equals(pV2, null) || !object.Equals(pV1, null) && object.Equals(pV2, null))
-            {
-                return false;
-            }
-            else if (object.Equals(pV1, null) && object.Equals(pV2, null))
-            {
-                return true;
-            }
-
             return pV1.X == pV2.X && pV1.Y == pV2.Y;
         }
 

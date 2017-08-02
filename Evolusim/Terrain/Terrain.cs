@@ -86,13 +86,13 @@ namespace Evolusim.Terrain
             Vector2 scale = new Vector2(BitmapSize) * Game.ActiveCamera.Zoom;//new Vector2(tileSize);
             var currentX = startPoint.X;
             var currentY = startPoint.Y;
-            for(int i = x; i <= x + numTilesX; i++)
+            for(int i = x; i <= x + numTilesX + 2; i++)
             {
                 if (i >= Size) break;
-                for(int j = y; j <= y + numTilesY; j++)
+                for(int j = y; j <= y + numTilesY + 2; j++)
                 {
                     if (j >= Size) break;
-                    pSystem.DrawFillRect(new System.Drawing.RectangleF(currentX, currentY, scale.X + 1, scale.Y + 1), GetBrush(i, j));
+                    pSystem.DrawFillRect(new Rectangle(currentX, currentY, scale.X + 1, scale.Y + 1), GetBrush(i, j));
                     currentY += scale.Y;
                 }
                 currentY = startPoint.Y;

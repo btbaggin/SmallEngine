@@ -21,7 +21,7 @@ namespace SmallEngine
 
         float Rotation { get; set; }
 
-        RectangleF Bounds { get; }
+        Rectangle Bounds { get; }
 
         bool Persistant { get; set; }
 

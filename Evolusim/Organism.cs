@@ -144,7 +144,7 @@ namespace Evolusim
 #if DEBUG
             pSystem.DrawElipse(ScreenPosition, _vision * 64 * Game.ActiveCamera.Zoom, _visionBrush);
             var p = Game.ActiveCamera.ToCameraSpace(_movement._destination);
-            pSystem.DrawFillRect(new System.Drawing.RectangleF(p.X, p.Y, 5, 5), _visionBrush);
+            pSystem.DrawFillRect(new Rectangle(p, 5, 5), _visionBrush);
 #endif
         }
 

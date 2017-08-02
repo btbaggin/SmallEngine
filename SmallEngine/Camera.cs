@@ -1,23 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Drawing;
-using SmallEngine;
-using SmallEngine.Input;
+﻿using SmallEngine.Input;
 
 namespace SmallEngine
 {
     public class Camera
     {
         #region Properties
-        public RectangleF Viewport
+        public Rectangle Viewport
         {
-            get { return new RectangleF(_position.X, _position.Y, Width, Height); }
+            get { return new Rectangle(_position, Width, Height); }
         }
 
-        public RectangleF Bounds { get; set; }
+        public Rectangle Bounds { get; set; }
 
         public float Width { get; private set; }
 
@@ -44,29 +37,22 @@ namespace SmallEngine
         }
         #endregion
 
-        //private float _minWidth, _minHeight;
-        //private float _maxWidth, _maxHeight;
-
         private float _minZoom, _maxZoom;
 
         private IGameObject _followObject;
 
-        public Camera(float pMinZoom, float pMaxZoom)//float pMinWidth, float pMaxWidth, float pMinHeight, float pMaxHeight)//Eh...
+        public Camera(float pMinZoom, float pMaxZoom)
         {
             Position = Vector2.Zero;
-            //_minWidth = pMinWidth;
-            //_maxWidth = pMaxWidth;
-            //_minHeight = pMinHeight;
-            //_maxHeight = pMaxHeight;
 
             _minZoom = pMinZoom;
             _maxZoom = pMaxZoom;
-            Width = Game.Form.Width;//pMaxWidth;
-            Height = Game.Form.Height;//pMaxHeight;
+            Width = Game.Form.Width;
+            Height = Game.Form.Height;
             AllowZoom = true;
             Zoom = 1;
-            ZoomSpeed = .05f;
-            MoveSpeed = 10;
+            ZoomSpeed = .025f;
+            MoveSpeed = 5;
         }
 
         public void Update(float pDeltaTime)
@@ -86,9 +72,6 @@ namespace SmallEngine
                 Height = Game.Form.Height / Zoom;
             }
 
-            //Width = MathF.Clamp(Width, _minWidth, _maxWidth);
-            //Height = MathF.Clamp(Height, _minHeight, _maxHeight);
-
             if (_position.X < Bounds.Left) _position.X = Bounds.Left;
             if (_position.Y < Bounds.Top) _position.Y = Bounds.Top;
             if (_position.X + Width > Bounds.Right) _position.X = Bounds.Right - Width;
@@ -97,26 +80,31 @@ namespace SmallEngine
 
         public void MoveLeft()
         {
-            _position.X -= Width * GameTime.DeltaTime * MoveSpeed;
+            var z = Zoom / (_maxZoom - _minZoom);
+            _position.X -= z * GameTime.DeltaTime * MoveSpeed;
         }
 
         public void MoveRight()
         {
-            _position.X += Width * GameTime.DeltaTime * MoveSpeed;
+            var z = Zoom / (_maxZoom - _minZoom);
+            _position.X += z * GameTime.DeltaTime * MoveSpeed;
         }
 
         public void MoveUp()
         {
-            _position.Y -= Height * GameTime.DeltaTime * MoveSpeed;
+            var z = Zoom / (_maxZoom - _minZoom);
+            _position.Y -= z * GameTime.DeltaTime * MoveSpeed;
         }
 
         public void MoveDown()
         {
-            _position.Y += Height * GameTime.DeltaTime * MoveSpeed;
+            var z = Zoom / (_maxZoom - _minZoom);
+            _position.Y += z * GameTime.DeltaTime * MoveSpeed;
         }
 
         public Vector2 ToWorldSpace(Vector2 pCameraSpace)
         {
+            //TODO am i still right?
             var dx = Width / Game.Form.Width;
             var dy = Height / Game.Form.Height;
             return new Vector2(pCameraSpace.X * dx, pCameraSpace.Y * dy) + _position;

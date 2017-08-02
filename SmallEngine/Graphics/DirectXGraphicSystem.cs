@@ -137,9 +137,9 @@ namespace SmallEngine.Graphics
         #endregion
 
         #region Overridden functions
-        public void DrawText(string pText, System.Drawing.RectangleF pRect, Font pFont)
+        public void DrawText(string pText, Rectangle pRect, Font pFont)
         {
-            RenderTarget2D.DrawText(pText, pFont.Format, new RawRectangleF(pRect.X, pRect.Y, pRect.Right, pRect.Bottom), pFont.Brush);
+            RenderTarget2D.DrawText(pText, pFont.Format, pRect, pFont.Brush);
         }
 
         public BitmapResource FromByte(byte[] pData, int pWidth, int pHeight)
@@ -201,16 +201,15 @@ namespace SmallEngine.Graphics
             RenderTarget2D.DrawBitmap(pBitmap.DirectXBitmap, new RawRectangleF(x, y, x + pScale.X, y + pScale.Y), pOpacity, BitmapInterpolationMode.NearestNeighbor);
         }
 
-        public void DrawBitmap(BitmapResource pBitmap, float pOpacity, Vector2 pPosition, Vector2 pScale, System.Drawing.RectangleF pSourceRect)
+        public void DrawBitmap(BitmapResource pBitmap, float pOpacity, Vector2 pPosition, Vector2 pScale, Rectangle pSourceRect)
         {
             var x = pPosition.X;
             var y = pPosition.Y;
-            var source = new RawRectangleF(pSourceRect.Left, pSourceRect.Top, pSourceRect.Right, pSourceRect.Bottom);
             RenderTarget2D.DrawBitmap(pBitmap.DirectXBitmap,
                                       new RawRectangleF(x, y, x + pScale.X, y + pScale.Y),
                                       pOpacity,
                                       BitmapInterpolationMode.NearestNeighbor,
-                                      source);
+                                      pSourceRect);
         }
 
         public void DrawPoint(Vector2 pPoint, Brush pBrush)
@@ -220,22 +219,22 @@ namespace SmallEngine.Graphics
 
         public void DrawLine(Vector2 pPoint1, Vector2 pPoint2, Brush pBrush)
         {
-            RenderTarget2D.DrawLine((RawVector2)pPoint1, (RawVector2)pPoint2, pBrush.ColorBrush);
+            RenderTarget2D.DrawLine(pPoint1, pPoint2, pBrush.ColorBrush);
         }
 
-        public void DrawFillRect(System.Drawing.RectangleF pRect, Brush pBrush)
+        public void DrawFillRect(Rectangle pRect, Brush pBrush)
         {
-            RenderTarget2D.FillRectangle(new RawRectangleF(pRect.Left, pRect.Top, pRect.Right, pRect.Bottom), pBrush.ColorBrush);
+            RenderTarget2D.FillRectangle(pRect, pBrush.ColorBrush);
         }
 
-        public void DrawRect(System.Drawing.RectangleF pRect, Brush pBrush,float pStroke)
+        public void DrawRect(Rectangle pRect, Brush pBrush,float pStroke)
         {
-            RenderTarget2D.DrawRectangle(new RawRectangleF(pRect.Left, pRect.Top, pRect.Right, pRect.Bottom), pBrush.ColorBrush, pStroke);
+            RenderTarget2D.DrawRectangle(pRect, pBrush.ColorBrush, pStroke);
         }
 
         public void DrawElipse(Vector2 pPoint, float pRadius, Brush pBrush)
         {
-            RenderTarget2D.DrawEllipse(new Ellipse((RawVector2)pPoint, pRadius, pRadius), pBrush.ColorBrush);
+            RenderTarget2D.DrawEllipse(new Ellipse(pPoint, pRadius, pRadius), pBrush.ColorBrush);
         }
 
         public void SetTransform(float pRotation, Vector2 pCenter)

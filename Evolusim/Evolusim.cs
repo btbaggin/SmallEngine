@@ -55,7 +55,7 @@ namespace Evolusim
 
             ActiveCamera = new Camera(.1f, 2f)
             {
-                Bounds = new System.Drawing.RectangleF(0, 0, WorldSize, WorldSize)
+                Bounds = new Rectangle(0, 0, WorldSize, WorldSize)
             };
         }
 

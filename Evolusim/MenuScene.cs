@@ -65,7 +65,7 @@ namespace Evolusim
         {
             base.Draw(pSystem);
 
-            pSystem.DrawFillRect(new System.Drawing.RectangleF(0, 0, Game.Form.Width, Game.Form.Height), _backgroundBrush);
+            pSystem.DrawFillRect(new Rectangle(0, 0, Game.Form.Width, Game.Form.Height), _backgroundBrush);
 
             //pSystem.DrawText("Evolusim", new System.Drawing.RectangleF(0, 50, Game.Form.Width, 30), _titleFont);
 
@@ -74,11 +74,11 @@ namespace Evolusim
             {
                 if(mCurrentIndex == i)
                 {
-                    pSystem.DrawText(mItems[i], new System.Drawing.RectangleF(0, y, Game.Form.Width, 20), _highlightFont);
+                    pSystem.DrawText(mItems[i], new Rectangle(0, y, Game.Form.Width, 20), _highlightFont);
                 }
                 else
                 {
-                    pSystem.DrawText(mItems[i], new System.Drawing.RectangleF(0, y, Game.Form.Width, 20), _font);
+                    pSystem.DrawText(mItems[i], new Rectangle(0, y, Game.Form.Width, 20), _font);
                 }
                 y += 40;
             }

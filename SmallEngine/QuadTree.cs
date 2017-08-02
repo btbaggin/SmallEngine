@@ -15,7 +15,7 @@ namespace SmallEngine
         private const int MAX_OBJECTS = 10;
         private readonly int _level;
         private readonly List<T> _entities;
-        private RectangleF _bounds;
+        private Rectangle _bounds;
 
         private readonly QuadTree<T>[] _nodes = new QuadTree<T>[4];
 
@@ -52,9 +52,9 @@ namespace SmallEngine
         #endregion
 
         #region "Constructor"
-        public QuadTree(RectangleF pBounds) : this(0, pBounds) { }
+        public QuadTree(Rectangle pBounds) : this(0, pBounds) { }
 
-        private QuadTree(int pLevel, RectangleF pBounds)
+        private QuadTree(int pLevel, Rectangle pBounds)
         {
             _level = pLevel;
             _entities = new List<T>();
@@ -177,7 +177,7 @@ namespace SmallEngine
         public IEnumerable<T> Retrieve(Vector2 pPoint)
         {
             var l = new List<T>();
-            return Retrieve(ref l, new RectangleF(pPoint.X, pPoint.Y, 1, 1));
+            return Retrieve(ref l, new Rectangle(pPoint, 1, 1));
         }
 
         /// <summary>
@@ -191,7 +191,7 @@ namespace SmallEngine
             return Retrieve(ref l, pEntitiy.Bounds);
         }
 
-        public void Resize(RectangleF pBounds)
+        public void Resize(Rectangle pBounds)
         {
             Clear();
             _bounds = pBounds;
@@ -209,7 +209,7 @@ namespace SmallEngine
         #endregion
 
         #region "Private Functions"
-        private List<T> Retrieve(ref List<T> pReturnObjects, RectangleF pRect)
+        private List<T> Retrieve(ref List<T> pReturnObjects, Rectangle pRect)
         {
             int index = GetIndex(pRect);
             if (index != -1 && _nodes[0] != null)
@@ -227,10 +227,10 @@ namespace SmallEngine
             var subWidth = _bounds.Width / 2;
             var subHeight = _bounds.Height / 2;
 
-            _nodes[0] = new QuadTree<T>(_level + 1, new RectangleF(_bounds.X, _bounds.Y, subWidth, subHeight));
-            _nodes[1] = new QuadTree<T>(_level + 1, new RectangleF(_bounds.X + subWidth, _bounds.Y, subWidth, subHeight));
-            _nodes[2] = new QuadTree<T>(_level + 1, new RectangleF(_bounds.X, _bounds.Y + subHeight, subWidth, subHeight));
-            _nodes[3] = new QuadTree<T>(_level + 1, new RectangleF(_bounds.X + subWidth, _bounds.Y + subHeight, subWidth, subHeight));
+            _nodes[0] = new QuadTree<T>(_level + 1, new Rectangle(_bounds.X, _bounds.Y, subWidth, subHeight));
+            _nodes[1] = new QuadTree<T>(_level + 1, new Rectangle(_bounds.X + subWidth, _bounds.Y, subWidth, subHeight));
+            _nodes[2] = new QuadTree<T>(_level + 1, new Rectangle(_bounds.X, _bounds.Y + subHeight, subWidth, subHeight));
+            _nodes[3] = new QuadTree<T>(_level + 1, new Rectangle(_bounds.X + subWidth, _bounds.Y + subHeight, subWidth, subHeight));
         }
 
         private int GetIndex(T pEntity)
@@ -238,7 +238,7 @@ namespace SmallEngine
             return GetIndex(pEntity.Bounds);
         }
 
-        private int GetIndex(RectangleF pRect)
+        private int GetIndex(Rectangle pRect)
         {
             var i = -1;
             double verticalMidpoint = _bounds.X + (_bounds.Width / 2);

@@ -114,6 +114,7 @@
     <Compile Include="Input\Keys.cs" />
     <Compile Include="Input\Mouse.cs" />
     <Compile Include="MessageBus.cs" />
+    <Compile Include="Rectangle.cs" />
     <Compile Include="UI\AnchorDirection.cs" />
     <Compile Include="UI\ElementOrientation.cs" />
     <Compile Include="UI\ImageElement.cs" />

@@ -24,7 +24,7 @@ namespace SmallEngine.Physics
 
         public Material ColliderMaterial { get; set; }
 
-        public RectangleF Bounds
+        public Rectangle Bounds
         {
             get { return GameObject.Bounds; }
         }

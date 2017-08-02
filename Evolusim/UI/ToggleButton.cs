@@ -36,7 +36,7 @@ namespace Evolusim.UI
             base.Draw(pSystem);
             if(IsSelected)
             {
-                pSystem.DrawRect(new System.Drawing.RectangleF(Position.X, Position.Y, Width, Height), _highlightBrush, 3);
+                pSystem.DrawRect(new Rectangle(Position, Width, Height), _highlightBrush, 3);
             }
         }
     }

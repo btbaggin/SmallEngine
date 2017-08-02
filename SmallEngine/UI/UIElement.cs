@@ -79,9 +79,9 @@ namespace SmallEngine.UI
 
         public ElementOrientation Orientation { get; set; }
 
-        public RectangleF Bounds
+        public Rectangle Bounds
         {
-            get { return new RectangleF(Position.X, Position.Y, Width, Height); }
+            get { return new Rectangle(Position, Width, Height); }
         }
         #endregion
 
@@ -131,7 +131,7 @@ namespace SmallEngine.UI
         public IFocusElement GetFocusedElement(Vector2 pPoint)
         {
             IFocusElement focus = null;
-            if(Bounds.Contains(new PointF(pPoint.X, pPoint.Y)))
+            if(Bounds.Contains(pPoint))
             {
                 foreach(var c in Children)
                 {

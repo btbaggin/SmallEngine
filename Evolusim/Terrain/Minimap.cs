@@ -42,7 +42,7 @@ namespace Evolusim.Terrain
             var x = Game.ActiveCamera.Position * _ratio;
             var w = Game.ActiveCamera.Width * _ratio;
             var h = Game.ActiveCamera.Height * _ratio;
-            pSystem.DrawRect(new System.Drawing.RectangleF(Position.X + x.X, Position.Y + x.Y, w, h), _cameraOutline, 1);
+            pSystem.DrawRect(new Rectangle(Position.X + x.X, Position.Y + x.Y, w, h), _cameraOutline, 1);
         }
 
         public override void Update(float pDeltaTime)

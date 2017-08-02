@@ -35,8 +35,8 @@ namespace Evolusim.UI
         {
             base.Draw(pSystem);
             var w = Width * ((_value - _min) / (_max - _min));
-            pSystem.DrawFillRect(new System.Drawing.RectangleF(Position.X, Position.Y + 20, Width, 10), _background);
-            pSystem.DrawFillRect(new System.Drawing.RectangleF(Position.X + 1, Position.Y + 21, w, 8), _foreground);
+            pSystem.DrawFillRect(new Rectangle(Position.X, Position.Y + 20, Width, 10), _background);
+            pSystem.DrawFillRect(new Rectangle(Position.X + 1, Position.Y + 21, w, 8), _foreground);
         }
     }
 }

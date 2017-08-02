@@ -22,7 +22,7 @@ namespace SmallEngine.UI
         public override void Draw(IGraphicsSystem pSystem)
         {
             base.Draw(pSystem);
-            pSystem.DrawText(_text, new System.Drawing.RectangleF(Position.X, Position.Y, Width, Height), _font);
+            pSystem.DrawText(_text, new Rectangle(Position, Width, Height), _font);
         }
     }
 }

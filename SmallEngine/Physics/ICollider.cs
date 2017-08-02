@@ -16,7 +16,7 @@ namespace SmallEngine.Physics
     public interface ICollider
     {
         Shape ColliderShape { get; }
-        RectangleF Bounds { get; set; }
+        Rectangle Bounds { get; set; }
 
         bool IsColliding(ICollider pCollider);
         void Resolve(ICollider pCollider);

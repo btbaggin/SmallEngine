@@ -44,7 +44,7 @@ namespace Evolusim
                 Opacity, 
                 GameObject.ScreenPosition, 
                 GameObject.Scale * Game.ActiveCamera.Zoom, 
-                new System.Drawing.RectangleF(_currentFrame * _frameSize.X, AnimationNum * _frameSize.Y, _frameSize.X, _frameSize.Y));
+                new Rectangle(_currentFrame * _frameSize.X, AnimationNum * _frameSize.Y, _frameSize.X, _frameSize.Y));
         }
 
         public void Update(float pDeltaTime)
