@@ -62,21 +62,25 @@ namespace Evolusim
             if(InputManager.KeyDown(Keys.Left))
             {
                 ActiveCamera.MoveLeft();
+                ActiveCamera.StopFollow();
             }
 
             if(InputManager.KeyDown(Keys.Right))
             {
                 ActiveCamera.MoveRight();
+                ActiveCamera.StopFollow();
             }
 
-            if(InputManager.KeyDown(Keys.Up))
+            if (InputManager.KeyDown(Keys.Up))
             {
                 ActiveCamera.MoveUp();
+                ActiveCamera.StopFollow();
             }
 
-            if(InputManager.KeyDown(Keys.Down))
+            if (InputManager.KeyDown(Keys.Down))
             {
                 ActiveCamera.MoveDown();
+                ActiveCamera.StopFollow();
             }
 
             base.Update(pDeltaTime);

@@ -59,7 +59,12 @@ namespace Evolusim
             if (InputManager.KeyPressed(Mouse.Left) && !InputManager.HasFocus())
             {
                 Game.ActiveCamera.StopFollow();
+                Organism.SelectedOrganism = null;
             //    TerrainMap.SetTerrainTypeAt(_toolbar.SelectedType, Evolusim.ActiveCamera.ToWorldSpace(InputManager.MousePosition));
+            }
+            else if(InputManager.KeyPressed(Mouse.Right) && !InputManager.HasFocus())
+            {
+
             }
         }
 

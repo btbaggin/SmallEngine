@@ -20,6 +20,7 @@ namespace Evolusim
         bool _destinationSet;
         bool _stopped;
         float _stopDuration;
+        bool _override;
 
         Organism _gameObject;
 
@@ -51,6 +52,15 @@ namespace Evolusim
             if(GameObject.Position ==  _destination) ResolveDestination();
         }
 
+        public void MoveTo(Vector2 pPosition)
+        {
+            _override = true;
+            _destination = pPosition;
+            _destinationSet = true;
+            _mate = null;
+            _food = null;
+        }
+
         public void Stop(float pDuration)
         {
             _stopDuration = pDuration;
@@ -59,46 +69,52 @@ namespace Evolusim
 
         private void GetDestination(TerrainType pTerrain)
         {
-            switch (_gameObject.OrganismStatus)
+            if(!_override)
             {
-                case Organism.Status.None:
-                    //TODO only move to preferred terrain
-                    RandomDestination();
-                    break;
+                switch (_gameObject.OrganismStatus)
+                {
+                    case Organism.Status.None:
+                        //TODO only move to preferred terrain
+                        RandomDestination();
+                        break;
 
-                case Organism.Status.Hungry:
-                    _food = (Vegetation)SceneManager.Current.GameObjects.NearestWithinDistance(GameObject, _vision * 64, "Vegetation");
-                    if (_food != null) _destination = _food.Position;
-                    else if (!_destinationSet) RandomDestination();
-                    break;
+                    case Organism.Status.Hungry:
+                        _food = (Vegetation)SceneManager.Current.GameObjects.NearestWithinDistance(GameObject, _vision * 64, "Vegetation");
+                        if (_food != null) _destination = _food.Position;
+                        else if (!_destinationSet) RandomDestination();
+                        break;
 
-                case Organism.Status.Mating:
-                    _mate = (Organism)SceneManager.Current.GameObjects.NearestWithinDistance(GameObject, _vision * 64, "Organism");
-                    if (_mate != null) _destination = _mate.Position;
-                    else if (!_destinationSet) RandomDestination();
-                    break;
+                    case Organism.Status.Mating:
+                        _mate = (Organism)SceneManager.Current.GameObjects.NearestWithinDistance(GameObject, _vision * 64, "Organism");
+                        if (_mate != null) _destination = _mate.Position;
+                        else if (!_destinationSet) RandomDestination();
+                        break;
+                }
+                _destinationSet = true;
+                _destination = Vector2.Clamp(_destination, Vector2.Zero, new Vector2(Evolusim.WorldSize, Evolusim.WorldSize));
             }
-            _destinationSet = true;
-            _destination = Vector2.Clamp(_destination, Vector2.Zero, new Vector2(Evolusim.WorldSize, Evolusim.WorldSize));
         }
 
         private void MoveTowardsDestination(float pDeltaTime)
         {
             if (_stopped) return;
 
-            switch(_gameObject.OrganismStatus)
+            if(!_override)
             {
-                case Organism.Status.Hungry:
-                    if(_food == null || _food.IsDead) GetDestination(TerrainType.None);
-                    break;
+                switch (_gameObject.OrganismStatus)
+                {
+                    case Organism.Status.Hungry:
+                        if (_food == null || _food.IsDead) GetDestination(TerrainType.None);
+                        break;
 
-                case Organism.Status.Mating:
-                    if (_mate == null || _mate.MarkedForDestroy) GetDestination(TerrainType.None);
-                    else _destination = _mate.Position;
-                    break;
+                    case Organism.Status.Mating:
+                        if (_mate == null || _mate.MarkedForDestroy) GetDestination(TerrainType.None);
+                        else _destination = _mate.Position;
+                        break;
 
-                default:
-                    break;
+                    default:
+                        break;
+                }
             }
 
             var nextPos = Vector2.MoveTowards(GameObject.Position, _destination, _speed * pDeltaTime);
@@ -108,34 +124,39 @@ namespace Evolusim
 
         private void ResolveDestination()
         {
-            switch (_gameObject.OrganismStatus)
+            if(!_override)
             {
-                case Organism.Status.None:
-                    break;
+                switch (_gameObject.OrganismStatus)
+                {
+                    case Organism.Status.None:
+                        break;
 
-                case Organism.Status.Hungry:
-                    if (_food == null)
-                    {
-                        _destinationSet = false;
-                        return;
-                    }
+                    case Organism.Status.Hungry:
+                        if (_food == null)
+                        {
+                            _destinationSet = false;
+                            return;
+                        }
 
-                    _gameObject.Eat(_food);
-                    _food = null;
-                    break;
+                        _gameObject.Eat(_food);
+                        _food = null;
+                        break;
 
-                case Organism.Status.Mating:
-                    if (_mate == null)
-                    {
-                        _destinationSet = false;
-                        return;
-                    }
+                    case Organism.Status.Mating:
+                        if (_mate == null)
+                        {
+                            _destinationSet = false;
+                            return;
+                        }
 
-                    _gameObject.Mate(_mate);
-                    _mate = null;
-                    break;
+                        _gameObject.Mate(_mate);
+                        _mate = null;
+                        break;
+                }
             }
+
             _destinationSet = false;
+            _override = false;
         }
 
         private void RandomDestination()

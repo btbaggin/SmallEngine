@@ -46,6 +46,8 @@ namespace Evolusim
 
         public int Attractive { get; private set; }
 
+        public static Organism SelectedOrganism { get; set; }
+
         public override int Order => 10;
 
         static Organism()
@@ -117,6 +119,7 @@ namespace Evolusim
             if(InputManager.KeyPressed(Mouse.Left) && InputManager.IsFocused(this))
             {
                 MessageBus.SendMessage(new GameMessage("ToolbarOpen", this));
+                SelectedOrganism = this;
             }
 
         }
@@ -163,6 +166,11 @@ namespace Evolusim
             Organism.CreateFrom(this, pMate);
             _currentMate = _mateTimer;
             OrganismStatus = Status.None;
+        }
+
+        public void MoveTo(Vector2 pPosition)
+        {
+
         }
 
         public Traits.Trait GetTrait(TraitComponent.Traits pTrait)
