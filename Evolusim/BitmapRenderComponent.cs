@@ -10,7 +10,7 @@ namespace Evolusim
 {
     class BitmapRenderComponent : RenderComponent
     {
-        private BitmapResource _bitmap;
+        public BitmapResource Bitmap { get; private set; }
         
         public BitmapRenderComponent()
         {
@@ -18,22 +18,22 @@ namespace Evolusim
 
         public void SetBitmap(string pAlias)
         {
-            _bitmap = ResourceManager.Request<BitmapResource>(pAlias);
+            Bitmap = ResourceManager.Request<BitmapResource>(pAlias);
         }
 
         public void SetBitmapFromGroup(string pGroup)
         {
-            _bitmap = ResourceManager.RequestFromGroup<BitmapResource>(pGroup);
+            Bitmap = ResourceManager.RequestFromGroup<BitmapResource>(pGroup);
         }
 
         protected override void DoDraw(IGraphicsSystem pSystem)
         {
-            pSystem.DrawBitmap(_bitmap, 1, GameObject.ScreenPosition, GameObject.Scale * Game.ActiveCamera.Zoom);
+            pSystem.DrawBitmap(Bitmap, 1, GameObject.ScreenPosition, GameObject.Scale * Game.ActiveCamera.Zoom);
         }
 
         public override void Dispose()
         {
-            ResourceManager.Dispose<BitmapResource>(_bitmap.Alias);
+            ResourceManager.Dispose<BitmapResource>(Bitmap.Alias);
         }
     }
 }

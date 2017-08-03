@@ -34,8 +34,6 @@ namespace Evolusim
             ResourceManager.Add<BitmapResource>("v_temperatedeciduous", "Graphics/v_temperatedeciduous.png", true);
             ResourceManager.Add<BitmapResource>("v_desert", "Graphics/v_desert.png", true);
 
-            ResourceManager.Add<BitmapResource>("plant_dead", "Graphics/plant_dead.png", true);
-
             ResourceManager.Add<AudioResource>("menu", "Audio/misc_menu.wav");
             ResourceManager.Add<AudioResource>("nom", "Audio/nom.wav");
         }

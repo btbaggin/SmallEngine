@@ -10,20 +10,7 @@ namespace Evolusim.Terrain
 {
     class Vegetation : GameObject
     {
-        //public enum VegetationType
-        //{
-        //    None,
-        //    Berry,
-        //    Wheat,
-        //    Cactus,
-        //    Thing,
-        //    Lily,
-        //    Dead
-        //}
-
         private const int SpreadSize = 2;
-
-        //public VegetationType Type { get; private set; }
 
         public int X { get; private set; }
 
@@ -97,7 +84,6 @@ namespace Evolusim.Terrain
             {
                 case TerrainType.Water:
                     _render.SetBitmap("v_water");
-                    //Type = VegetationType.Lily;
                     break;
 
                 case TerrainType.Grassland:
@@ -128,7 +114,7 @@ namespace Evolusim.Terrain
             dx = (int)MathF.Clamp(dx, 0, TerrainMap.Size);
             dy = (int)MathF.Clamp(dy, 0, TerrainMap.Size);
 
-            if (dx < TerrainMap.Size && dy < TerrainMap.Size) Vegetation.Create(dx, dy);
+            if (dx < TerrainMap.Size && dy < TerrainMap.Size) Vegetation.Create(dx, dy); //TODO this breaks
         }
 
         public override void Update(float pDeltaTime)
@@ -144,10 +130,6 @@ namespace Evolusim.Terrain
             {
                 Spread();
             }
-            else if(_lifeTime == 0)
-            {
-                _render.SetBitmap("plant_dead");
-            }
             else if(_lifeTime <= -1)
             {
                 Destroy();
@@ -156,7 +138,14 @@ namespace Evolusim.Terrain
 
         public override void Draw(IGraphicsSystem pSystem)
         {
-            _render.Draw(pSystem);
+            if(IsDead)
+            {
+                ((DirectXGraphicSystem)Game.Graphics).SetEffect(_render.Bitmap, ScreenPosition);
+            }
+            else
+            {
+                _render.Draw(pSystem);
+            }
         }
 
         public override void Dispose()

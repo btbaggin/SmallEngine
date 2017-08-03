@@ -52,7 +52,7 @@ namespace SmallEngine
             AllowZoom = true;
             Zoom = 1;
             ZoomSpeed = .025f;
-            MoveSpeed = 5;
+            MoveSpeed = 1000;
         }
 
         public void Update(float pDeltaTime)
@@ -80,25 +80,25 @@ namespace SmallEngine
 
         public void MoveLeft()
         {
-            var z = Zoom / (_maxZoom - _minZoom);
+            var z = (_maxZoom - _minZoom) / Zoom;
             _position.X -= z * GameTime.DeltaTime * MoveSpeed;
         }
 
         public void MoveRight()
         {
-            var z = Zoom / (_maxZoom - _minZoom);
+            var z = (_maxZoom - _minZoom) / Zoom;
             _position.X += z * GameTime.DeltaTime * MoveSpeed;
         }
 
         public void MoveUp()
         {
-            var z = Zoom / (_maxZoom - _minZoom);
+            var z = (_maxZoom - _minZoom) / Zoom;
             _position.Y -= z * GameTime.DeltaTime * MoveSpeed;
         }
 
         public void MoveDown()
         {
-            var z = Zoom / (_maxZoom - _minZoom);
+            var z = (_maxZoom - _minZoom) / Zoom;
             _position.Y += z * GameTime.DeltaTime * MoveSpeed;
         }
 

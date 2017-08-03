@@ -56,7 +56,7 @@ namespace Evolusim
                 SceneManager.BeginScene(new MenuScene(true), SceneLoadMode.Additive);
             }
 
-            if (InputManager.KeyDown(Mouse.Left) && !InputManager.HasFocus())
+            if (InputManager.KeyPressed(Mouse.Left) && !InputManager.HasFocus())
             {
                 Game.ActiveCamera.StopFollow();
             //    TerrainMap.SetTerrainTypeAt(_toolbar.SelectedType, Evolusim.ActiveCamera.ToWorldSpace(InputManager.MousePosition));
