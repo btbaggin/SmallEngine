@@ -38,6 +38,7 @@ namespace SmallEngine
         #endregion
 
         private float _minZoom, _maxZoom;
+        private float _inverseZoom;
 
         private IGameObject _followObject;
 
@@ -51,7 +52,7 @@ namespace SmallEngine
             Height = Game.Form.Height;
             AllowZoom = true;
             Zoom = 1;
-            ZoomSpeed = .025f;
+            ZoomSpeed = .05f;
             MoveSpeed = 1000;
         }
 
@@ -67,6 +68,7 @@ namespace SmallEngine
                 var mw = InputManager.MouseWheelDelta;
                 Zoom += mw * ZoomSpeed * pDeltaTime;
                 Zoom = MathF.Clamp(Zoom, _minZoom, _maxZoom);
+                _inverseZoom = (_maxZoom - _minZoom) / Zoom;
 
                 Width = Game.Form.Width / Zoom;
                 Height = Game.Form.Height / Zoom;
@@ -80,26 +82,22 @@ namespace SmallEngine
 
         public void MoveLeft()
         {
-            var z = (_maxZoom - _minZoom) / Zoom;
-            _position.X -= z * GameTime.DeltaTime * MoveSpeed;
+            _position.X -= _inverseZoom * GameTime.DeltaTime * MoveSpeed;
         }
 
         public void MoveRight()
         {
-            var z = (_maxZoom - _minZoom) / Zoom;
-            _position.X += z * GameTime.DeltaTime * MoveSpeed;
+            _position.X += _inverseZoom * GameTime.DeltaTime * MoveSpeed;
         }
 
         public void MoveUp()
         {
-            var z = (_maxZoom - _minZoom) / Zoom;
-            _position.Y -= z * GameTime.DeltaTime * MoveSpeed;
+            _position.Y -= _inverseZoom * GameTime.DeltaTime * MoveSpeed;
         }
 
         public void MoveDown()
         {
-            var z = (_maxZoom - _minZoom) / Zoom;
-            _position.Y += z * GameTime.DeltaTime * MoveSpeed;
+            _position.Y += _inverseZoom * GameTime.DeltaTime * MoveSpeed;
         }
 
         public Vector2 ToWorldSpace(Vector2 pCameraSpace)

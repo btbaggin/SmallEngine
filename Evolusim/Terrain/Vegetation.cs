@@ -10,8 +10,6 @@ namespace Evolusim.Terrain
 {
     class Vegetation : GameObject
     {
-        private const int SpreadSize = 2;
-
         public int X { get; private set; }
 
         public int Y { get; private set; }
@@ -21,6 +19,8 @@ namespace Evolusim.Terrain
         private int _lifeTime;
         private float _lifetimeTimer;
         BitmapRenderComponent _render;
+        TerrainType _terrainType;
+        private int _speadCount;
 
         static Vegetation()
         {
@@ -55,15 +55,17 @@ namespace Evolusim.Terrain
             switch (pType)
             {
                 case TerrainType.Water:
-                    return .05f;
+                    return .01f;
+
+                case TerrainType.Shrubland:
+                    return .02f;
 
                 case TerrainType.Grassland:
-                case TerrainType.Shrubland:
                 case TerrainType.TemperateDeciduous:
                     return .01f;
 
                 case TerrainType.Desert:
-                    return .003f;
+                    return .001f;
 
                 default:
                     return -1f; //Will not create
@@ -73,32 +75,42 @@ namespace Evolusim.Terrain
         public override void Initialize()
         {
             base.Initialize();
-            _lifeTime = RandomGenerator.RandomInt(20, 40);
             Scale = new Vector2(64);
             _render = GetComponent<BitmapRenderComponent>();
         }
 
         private void SetXY(int pX, int pY)
         {
-            switch (TerrainMap.GetTerrainType(pX, pY))
+            _terrainType = TerrainMap.GetTerrainType(pX, pY);
+            switch (_terrainType)
             {
                 case TerrainType.Water:
                     _render.SetBitmap("v_water");
+                    _lifeTime = RandomGenerator.RandomInt(20, 40);
+                    _speadCount = RandomGenerator.RandomInt(1, 2);
                     break;
 
                 case TerrainType.Grassland:
+                    _lifeTime = RandomGenerator.RandomInt(20, 40);
+                    _speadCount = 1;
                     _render.SetBitmap("v_grassland");
                     break;
 
                 case TerrainType.Shrubland:
+                    _lifeTime = RandomGenerator.RandomInt(10, 20);
+                    _speadCount = RandomGenerator.RandomInt(0, 3);
                     _render.SetBitmap("v_shrubland");
                     break;
 
                 case TerrainType.TemperateDeciduous:
+                    _lifeTime = RandomGenerator.RandomInt(40, 60);
+                    _speadCount = RandomGenerator.RandomInt(1, 2);
                     _render.SetBitmap("v_temperatedeciduous");
                     break;
 
                 case TerrainType.Desert:
+                    _lifeTime = RandomGenerator.RandomInt(60, 80);
+                    _speadCount = 1;
                     _render.SetBitmap("v_desert");
                     break;
 
@@ -109,12 +121,15 @@ namespace Evolusim.Terrain
 
         private void Spread()
         {
-            var dx = RandomGenerator.RandomInt(X - SpreadSize, X + SpreadSize);
-            var dy = RandomGenerator.RandomInt(Y - SpreadSize, Y + SpreadSize);
+            var dx = RandomGenerator.RandomInt(X - 1, X + 1);
+            var dy = RandomGenerator.RandomInt(Y - 1, Y + 1);
             dx = (int)MathF.Clamp(dx, 0, TerrainMap.Size);
             dy = (int)MathF.Clamp(dy, 0, TerrainMap.Size);
 
-            if (dx < TerrainMap.Size && dy < TerrainMap.Size) Vegetation.Create(dx, dy); //TODO this breaks
+            if (TerrainMap.GetTerrainType(dx, dy) == _terrainType)
+            {
+                Create(dx, dy);
+            }
         }
 
         public override void Update(float pDeltaTime)
@@ -130,6 +145,14 @@ namespace Evolusim.Terrain
             {
                 Spread();
             }
+            else if(_lifeTime == 0)
+            {
+                using (var e = new Effect())
+                {
+                    e.AddSaturation(.2f);
+                    _render.SetBitmap(e.ApplyTo(_render.Bitmap));
+                }
+            }
             else if(_lifeTime <= -1)
             {
                 Destroy();
@@ -138,14 +161,7 @@ namespace Evolusim.Terrain
 
         public override void Draw(IGraphicsSystem pSystem)
         {
-            if(IsDead)
-            {
-                ((DirectXGraphicSystem)Game.Graphics).SetEffect(_render.Bitmap, ScreenPosition);
-            }
-            else
-            {
-                _render.Draw(pSystem);
-            }
+            _render.Draw(pSystem);
         }
 
         public override void Dispose()

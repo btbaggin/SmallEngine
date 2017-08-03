@@ -28,13 +28,14 @@ namespace SmallEngine.Graphics
         private SharpDX.DXGI.Factory2 _dxgiFactory2;
 
         public SharpDX.Direct2D1.Device _2dDevice;
-        public SharpDX.Direct2D1.DeviceContext _2dContext;
 
         #region Properties
         public SharpDX.Direct3D11.Device1 Device
         {
             get { return _device; }
         }
+
+        public SharpDX.Direct2D1.DeviceContext Context { get; private set; }
 
         public SharpDX.Direct2D1.Factory Factory2D { get; private set; }
 
@@ -75,13 +76,13 @@ namespace SmallEngine.Graphics
 
                 _swapChain = new SharpDX.DXGI.SwapChain1(_dxgiFactory2, _device, pWindow.Handle, ref desc, null);
                 _2dDevice = new SharpDX.Direct2D1.Device(_dxgiDevice2);
-                _2dContext = new SharpDX.Direct2D1.DeviceContext(_2dDevice, DeviceContextOptions.None);
+                Context = new SharpDX.Direct2D1.DeviceContext(_2dDevice, DeviceContextOptions.None);
                 Factory2D = new SharpDX.Direct2D1.Factory(FactoryType.SingleThreaded);
                 var dpi = Factory2D.DesktopDpi;
                 var prop = new BitmapProperties1(new PixelFormat(Format.B8G8R8A8_UNorm, SharpDX.Direct2D1.AlphaMode.Premultiplied), dpi.Height, dpi.Width, BitmapOptions.CannotDraw | BitmapOptions.Target);
                 _backBuffer = _swapChain.GetBackBuffer<Surface>(0);
-                _renderTarget = new Bitmap1(_2dContext, _backBuffer, prop);
-                _2dContext.Target = _renderTarget;
+                _renderTarget = new Bitmap1(Context, _backBuffer, prop);
+                Context.Target = _renderTarget;
 
                 // Ignore all windows events
                 using (Factory factory = _swapChain.GetParent<Factory>())
@@ -106,15 +107,15 @@ namespace SmallEngine.Graphics
             {
                 _backBuffer.Dispose();
                 _renderTarget.Dispose();
-                _2dContext.Dispose();
+                Context.Dispose();
                 _swapChain.ResizeBuffers(0, 0, 0, Format.Unknown, SwapChainFlags.AllowModeSwitch);
 
-                _2dContext = new SharpDX.Direct2D1.DeviceContext(_2dDevice, DeviceContextOptions.None);
+                Context = new SharpDX.Direct2D1.DeviceContext(_2dDevice, DeviceContextOptions.None);
                 var dpi = Factory2D.DesktopDpi;
                 var prop = new BitmapProperties1(new PixelFormat(Format.B8G8R8A8_UNorm, SharpDX.Direct2D1.AlphaMode.Premultiplied), dpi.Height, dpi.Width, BitmapOptions.CannotDraw | BitmapOptions.Target);
                 _backBuffer = _swapChain.GetBackBuffer<Surface>(0);
-                _renderTarget = new Bitmap1(_2dContext, _backBuffer, prop);
-                _2dContext.Target = _renderTarget;
+                _renderTarget = new Bitmap1(Context, _backBuffer, prop);
+                Context.Target = _renderTarget;
             }
             catch (System.Exception e)
             {
@@ -128,7 +129,7 @@ namespace SmallEngine.Graphics
             _swapChain.Dispose();
             _backBuffer.Dispose();
             _renderTarget.Dispose();
-            _2dContext.Dispose();
+            Context.Dispose();
             Factory2D.Dispose();
             FactoryDWrite.Dispose();
         }
@@ -137,12 +138,12 @@ namespace SmallEngine.Graphics
         #region Overridden functions
         public void DrawText(string pText, Rectangle pRect, Font pFont)
         {
-            _2dContext.DrawText(pText, pFont.Format, pRect, pFont.Brush);
+            Context.DrawText(pText, pFont.Format, pRect, pFont.Brush);
         }
 
         public BitmapResource FromByte(byte[] pData, int pWidth, int pHeight)
         {
-            Bitmap b = new Bitmap(_2dContext, new Size2(pWidth, pHeight), new BitmapProperties(_2dContext.PixelFormat));
+            Bitmap b = new Bitmap(Context, new Size2(pWidth, pHeight), new BitmapProperties(Context.PixelFormat));
             b.CopyFromMemory(pData, pWidth * 4);
             var br = new BitmapResource() { DirectXBitmap = b };
             return br;
@@ -187,7 +188,7 @@ namespace SmallEngine.Graphics
                     bitmap.UnlockBits(bitmapData);
                     tempStream.Position = 0;
 
-                    return new Bitmap(_2dContext, size, tempStream, stride, bitmapProperties);
+                    return new Bitmap(Context, size, tempStream, stride, bitmapProperties);
                 }
             }
         }
@@ -196,73 +197,69 @@ namespace SmallEngine.Graphics
         {
             var x = pPosition.X;
             var y = pPosition.Y;
-            _2dContext.DrawBitmap(pBitmap.DirectXBitmap, new RawRectangleF(x, y, x + pScale.X, y + pScale.Y), pOpacity, BitmapInterpolationMode.NearestNeighbor);
-            //RenderTarget2D.DrawBitmap(pBitmap.DirectXBitmap, new RawRectangleF(x, y, x + pScale.X, y + pScale.Y), pOpacity, BitmapInterpolationMode.NearestNeighbor);
+            Context.DrawBitmap(pBitmap.DirectXBitmap, new RawRectangleF(x, y, x + pScale.X, y + pScale.Y), pOpacity, BitmapInterpolationMode.NearestNeighbor);
         }
 
         public void DrawBitmap(BitmapResource pBitmap, float pOpacity, Vector2 pPosition, Vector2 pScale, Rectangle pSourceRect)
         {
             var x = pPosition.X;
             var y = pPosition.Y;
-            _2dContext.DrawBitmap(pBitmap.DirectXBitmap,
+            Context.DrawBitmap(pBitmap.DirectXBitmap,
                                       new RawRectangleF(x, y, x + pScale.X, y + pScale.Y),
                                       pOpacity,
                                       BitmapInterpolationMode.NearestNeighbor,
                                       pSourceRect);
         }
 
+        public void DrawImage(Effect pEffect)
+        {
+            Context.DrawImage(pEffect.DirectXEffect);
+        }
+
         public void DrawPoint(Vector2 pPoint, Brush pBrush)
         {
-            _2dContext.FillRectangle(new RawRectangleF(pPoint.X - 1, pPoint.Y - 1, pPoint.X + 1, pPoint.Y + 1), pBrush.ColorBrush);
+            Context.FillRectangle(new RawRectangleF(pPoint.X - 1, pPoint.Y - 1, pPoint.X + 1, pPoint.Y + 1), pBrush.ColorBrush);
         }
 
         public void DrawLine(Vector2 pPoint1, Vector2 pPoint2, Brush pBrush)
         {
-            _2dContext.DrawLine(pPoint1, pPoint2, pBrush.ColorBrush);
+            Context.DrawLine(pPoint1, pPoint2, pBrush.ColorBrush);
         }
 
         public void DrawFillRect(Rectangle pRect, Brush pBrush)
         {
-            _2dContext.FillRectangle(pRect, pBrush.ColorBrush);
+            Context.FillRectangle(pRect, pBrush.ColorBrush);
         }
 
         public void DrawRect(Rectangle pRect, Brush pBrush, float pStroke)
         {
-            _2dContext.DrawRectangle(pRect, pBrush.ColorBrush, pStroke);
+            Context.DrawRectangle(pRect, pBrush.ColorBrush, pStroke);
         }
 
         public void DrawElipse(Vector2 pPoint, float pRadius, Brush pBrush)
         {
-            _2dContext.DrawEllipse(new Ellipse(pPoint, pRadius, pRadius), pBrush.ColorBrush);
+            Context.DrawEllipse(new Ellipse(pPoint, pRadius, pRadius), pBrush.ColorBrush);
         }
 
         public void SetTransform(float pRotation, Vector2 pCenter)
         {
-            _2dContext.Transform = Matrix3x2.Rotation(pRotation, new SharpDX.Vector2(pCenter.X, pCenter.Y));
-        }
-
-        public void SetEffect(BitmapResource pBitmap, Vector2 pPoint)
-        {
-            var s = new SharpDX.Direct2D1.Effects.Saturation(_2dContext);
-            s.Value = .2f;
-            s.SetInput(0, pBitmap.DirectXBitmap, true);
-            _2dContext.DrawImage(s, pPoint);
+            Context.Transform = Matrix3x2.Rotation(pRotation, new SharpDX.Vector2(pCenter.X, pCenter.Y));
         }
 
         public void ResetTransform()
         {
-            _2dContext.Transform = Matrix3x2.Identity;
+            Context.Transform = Matrix3x2.Identity;
         }
 
         public void BeginDraw()
         {
-            _2dContext.BeginDraw();
-            _2dContext.Clear(Color4.Black);
+            Context.BeginDraw();
+            Context.Clear(Color4.Black);
         }
 
         public void EndDraw()
         {
-            _2dContext.EndDraw();
+            Context.EndDraw();
             _swapChain.Present(_form.Vsync ? 1 : 0, PresentFlags.None);
         }
 
@@ -273,12 +270,12 @@ namespace SmallEngine.Graphics
 
         public Font CreateFont(string pFamily, float pSize, System.Drawing.Color pColor)
         {
-            return Font.Create(FactoryDWrite, _2dContext, pFamily, pSize, pColor);
+            return Font.Create(FactoryDWrite, Context, pFamily, pSize, pColor);
         }
 
         public Brush CreateBrush(System.Drawing.Color pColor)
         {
-            return Brush.Create(pColor, _2dContext);
+            return Brush.Create(pColor, Context);
         }
         #endregion
     }

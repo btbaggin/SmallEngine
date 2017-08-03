@@ -8,9 +8,13 @@ namespace SmallEngine.Graphics
         bool Initialize(GameForm pForm, bool pFullScreen);
         void BeginDraw();
         void EndDraw();
+
         void DrawText(string pText, Rectangle pRect, Font pFont);
+
         void DrawBitmap(BitmapResource pBitmap, float pOpacity, Vector2 pPosition, Vector2 pScale);
         void DrawBitmap(BitmapResource pBitmap, float pOpacity, Vector2 pPosition, Vector2 pScale, Rectangle pSourceRect);
+        void DrawImage(Effect pEffect);
+
         void DrawLine(Vector2 pPoint1, Vector2 pPoint2, Brush pBrush);
         void DrawFillRect(Rectangle pRect, Brush pBrush);
         void DrawRect(Rectangle pRect, Brush pBrush, float pStroke);
@@ -21,7 +25,6 @@ namespace SmallEngine.Graphics
 
         Font CreateFont(string pFamily, float pSize, Color pColor);
         Brush CreateBrush(Color pColor);
-        //TODO effects? https://english.r2d2rigo.es/2014/08/19/applying-direct2d-built-in-effects-to-bitmaps-with-sharpdx/
 
     }
 }

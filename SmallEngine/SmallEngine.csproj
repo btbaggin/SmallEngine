@@ -102,6 +102,7 @@
     <Compile Include="Graphics\BitmapResource.cs" />
     <Compile Include="Graphics\Brush.cs" />
     <Compile Include="Graphics\DirectXGraphicSystem.cs" />
+    <Compile Include="Graphics\Effect.cs" />
     <Compile Include="Graphics\Font.cs" />
     <Compile Include="Graphics\IGraphicsSystem.cs" />
     <Compile Include="Components\IComponent.cs" />

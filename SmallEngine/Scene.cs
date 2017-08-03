@@ -69,6 +69,7 @@ namespace SmallEngine
             Begin();
         }
 
+        //TODO use pooling
         #region CreateGameObject
         public IGameObject CreateGameObject(params IComponent[] pComponents)
         {

@@ -18,10 +18,15 @@ namespace SmallEngine.Graphics
 
     public class Font : IDisposable
     {
-        public SharpDX.Direct2D1.SolidColorBrush Brush { get; private set; }
+        #region Properties
+        internal SharpDX.Direct2D1.SolidColorBrush Brush { get; private set; }
+
         public TextFormat Format { get; private set; }
+
         public string Family { get { return Format.FontFamilyName; } }
+
         public float Size { get { return Format.FontSize; } }
+
         public Alignment Alignment
         {
             get
@@ -66,9 +71,11 @@ namespace SmallEngine.Graphics
                 }
             }
         }
+        #endregion
 
         private Factory _factory;
 
+        #region Constructor
         private Font(Factory pFactory, SharpDX.Direct2D1.SolidColorBrush pBrush, string pFamily, float pSize)
         {
             _factory = pFactory;
@@ -79,6 +86,15 @@ namespace SmallEngine.Graphics
         internal static Font Create(Factory pFactory, SharpDX.Direct2D1.RenderTarget pTarget, string pFamily, float pSize, Color pColor)
         {
             return new Font(pFactory, new SharpDX.Direct2D1.SolidColorBrush(pTarget, new SharpDX.Mathematics.Interop.RawColor4(pColor.R, pColor.G, pColor.B, pColor.A)), pFamily, pSize);
+        }
+        #endregion  
+
+        public SizeF MeasureString(string pText, float pWidth)
+        {
+            using (TextLayout l = new TextLayout(_factory, pText, Format, pWidth, Format.FontSize))
+            {
+                return new SizeF(l.Metrics.Width, l.Metrics.Height);
+            }
         }
 
         public void Dispose()

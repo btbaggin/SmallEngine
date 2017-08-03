@@ -72,15 +72,19 @@ namespace Evolusim
             float y = 120;
             for(int i = 0; i < mItems.Count; i++)
             {
+                System.Drawing.SizeF fontSize = _highlightFont.MeasureString(mItems[i], Game.Form.Width);
+                var x = (Game.Form.Width / 2) - (fontSize.Width / 2);
+                var currentY = y - (fontSize.Height / 2);
+
                 if(mCurrentIndex == i)
                 {
-                    pSystem.DrawText(mItems[i], new Rectangle(0, y, Game.Form.Width, 20), _highlightFont);
+                    pSystem.DrawText(mItems[i], new Rectangle(x, currentY, fontSize.Width, fontSize.Height), _highlightFont);
                 }
                 else
                 {
-                    pSystem.DrawText(mItems[i], new Rectangle(0, y, Game.Form.Width, 20), _font);
+                    pSystem.DrawText(mItems[i], new Rectangle(x, currentY, fontSize.Width, fontSize.Height), _font);
                 }
-                y += 40;
+                y += fontSize.Height + 5;
             }
         }
 

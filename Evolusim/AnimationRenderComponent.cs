@@ -47,6 +47,11 @@ namespace Evolusim
                 new Rectangle(_currentFrame * _frameSize.X, AnimationNum * _frameSize.Y, _frameSize.X, _frameSize.Y));
         }
 
+        protected override void DoDraw(IGraphicsSystem pSystem, Effect pEffect)
+        {
+            throw new NotImplementedException();
+        }
+
         public void Update(float pDeltaTime)
         {
             _evaluator.Invoke();
