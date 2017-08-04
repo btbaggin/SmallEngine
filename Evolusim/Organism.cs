@@ -121,26 +121,24 @@ namespace Evolusim
                 MessageBus.SendMessage(new GameMessage("ToolbarOpen", this));
                 SelectedOrganism = this;
             }
-
         }
 
         public override void Draw(IGraphicsSystem pSystem)
         {
             _render.Draw(pSystem);
 
+            var scale = new Vector2(Scale.X / 2, Scale.X / 2) * Game.ActiveCamera.Zoom;
             switch(OrganismStatus)
             {
                 case Status.None:
                     break;
 
                 case Status.Hungry:
-                    var hungryScale = new Vector2(Scale.X / 2, Scale.X / 2) * Game.ActiveCamera.Zoom;
-                    pSystem.DrawBitmap(_hungry, 1, ScreenPosition + new Vector2(hungryScale.X / 4, -hungryScale.Y / 2), hungryScale);
+                    pSystem.DrawBitmap(_hungry, 1, ScreenPosition + new Vector2(scale.X / 4, -scale.Y / 2), scale);
                     break;
 
                 case Status.Mating:
-                    var heartScale = new Vector2(Scale.X / 2, Scale.X / 2) * Game.ActiveCamera.Zoom;
-                    pSystem.DrawBitmap(_heart, 1, ScreenPosition + new Vector2(heartScale.X / 4, -heartScale.Y / 2),  heartScale);
+                    pSystem.DrawBitmap(_heart, 1, ScreenPosition + new Vector2(scale.X / 4, -scale.Y / 2),  scale);
                     break;
             }
 

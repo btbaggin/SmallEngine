@@ -13,7 +13,7 @@ namespace SmallEngine.Graphics
 
         void DrawBitmap(BitmapResource pBitmap, float pOpacity, Vector2 pPosition, Vector2 pScale);
         void DrawBitmap(BitmapResource pBitmap, float pOpacity, Vector2 pPosition, Vector2 pScale, Rectangle pSourceRect);
-        void DrawImage(Effect pEffect);
+        void DrawImage(Effect pEffect, Vector2 pPosition);
 
         void DrawLine(Vector2 pPoint1, Vector2 pPoint2, Brush pBrush);
         void DrawFillRect(Rectangle pRect, Brush pBrush);
