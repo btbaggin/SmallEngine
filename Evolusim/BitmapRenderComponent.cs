@@ -43,6 +43,11 @@ namespace Evolusim
 
         public override void Dispose()
         {
+            if (Bitmap.Alias == null)
+            {
+                Bitmap.Dispose();
+                return;
+            }
             ResourceManager.Dispose<BitmapResource>(Bitmap.Alias);
         }
     }

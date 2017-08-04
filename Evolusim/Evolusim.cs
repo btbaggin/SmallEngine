@@ -51,8 +51,9 @@ namespace Evolusim
             InputManager.Listen(Keys.Up);
             InputManager.Listen(Keys.Down);
 
-            ActiveCamera = new Camera(.1f, 2f)
+            ActiveCamera = new Camera(.1f, 1f)
             {
+                Zoom = .5f,
                 Bounds = new Rectangle(0, 0, WorldSize, WorldSize)
             };
         }

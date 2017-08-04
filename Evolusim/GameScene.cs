@@ -33,6 +33,7 @@ namespace Evolusim
             InputManager.Listen(Keys.Right);
 
             InputManager.Listen(Mouse.Left);
+            InputManager.Listen(Mouse.Right);
 
             for(int i = 0; i < 100; i++)
             {
@@ -64,7 +65,7 @@ namespace Evolusim
             }
             else if(InputManager.KeyPressed(Mouse.Right) && !InputManager.HasFocus())
             {
-
+                if (Organism.SelectedOrganism != null) Organism.SelectedOrganism.MoveTo(Game.ActiveCamera.ToWorldSpace(InputManager.MousePosition));
             }
         }
 
@@ -84,6 +85,7 @@ namespace Evolusim
             InputManager.StopListening(Keys.Right);
 
             InputManager.StopListening(Mouse.Left);
+            InputManager.StopListening(Mouse.Right);
         }
     }
 }

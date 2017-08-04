@@ -83,7 +83,7 @@ namespace Evolusim.Terrain
             //Width and height should be the same
             var startPoint = Evolusim.ActiveCamera.ToCameraSpace(new Vector2(x * BitmapSize, y * BitmapSize));
 
-            Vector2 scale = new Vector2(BitmapSize) * Game.ActiveCamera.Zoom;//new Vector2(tileSize);
+            Vector2 scale = new Vector2(BitmapSize) * Game.ActiveCamera.Zoom;
             var currentX = startPoint.X;
             var currentY = startPoint.Y;
             for(int i = x; i <= x + numTilesX + 2; i++)
@@ -154,9 +154,9 @@ namespace Evolusim.Terrain
                 {
                     var i = (int)(pResolution * 4 * y + x * 4);
                     var color = GetBrush(x * step, y * step).Color;
-                    memory[i] = color.R;
+                    memory[i] = color.B;
                     memory[i + 1] = color.G;
-                    memory[i + 2] = color.B;
+                    memory[i + 2] = color.R;
                     memory[i + 3] = color.A;
                 }
             }

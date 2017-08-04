@@ -31,7 +31,6 @@ namespace Evolusim.Terrain
         {
             var v = SceneManager.Current.CreateGameObject<Vegetation>("vegetation");
             v.SetXY(pX, pY);
-            v.Position = TerrainMap.GetPosition(new Vector2(pX, pY));
             v.Tag = "Vegetation";
             return v;
         }
@@ -81,7 +80,10 @@ namespace Evolusim.Terrain
 
         private void SetXY(int pX, int pY)
         {
+            X = pX;
+            Y = pY;
             _terrainType = TerrainMap.GetTerrainType(pX, pY);
+            Position = TerrainMap.GetPosition(new Vector2(pX, pY));
             switch (_terrainType)
             {
                 case TerrainType.Water:
@@ -121,14 +123,17 @@ namespace Evolusim.Terrain
 
         private void Spread()
         {
-            var dx = RandomGenerator.RandomInt(X - 1, X + 1);
-            var dy = RandomGenerator.RandomInt(Y - 1, Y + 1);
-            dx = (int)MathF.Clamp(dx, 0, TerrainMap.Size);
-            dy = (int)MathF.Clamp(dy, 0, TerrainMap.Size);
-
-            if (TerrainMap.GetTerrainType(dx, dy) == _terrainType)
+            for(int i = 0; i < _speadCount; i++)
             {
-                Create(dx, dy);
+                var dx = RandomGenerator.RandomInt(X - 1, X + 1);
+                var dy = RandomGenerator.RandomInt(Y - 1, Y + 1);
+                dx = (int)MathF.Clamp(dx, 0, TerrainMap.Size);
+                dy = (int)MathF.Clamp(dy, 0, TerrainMap.Size);
+
+                if (TerrainMap.GetTerrainType(dx, dy) == _terrainType)
+                {
+                    Create(dx, dy);
+                }
             }
         }
 
@@ -150,6 +155,7 @@ namespace Evolusim.Terrain
                 using (var e = new Effect())
                 {
                     e.AddSaturation(.2f);
+                    e.Apply();
                     _render.SetBitmap(e.ApplyTo(_render.Bitmap));
                 }
             }

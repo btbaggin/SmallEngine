@@ -143,7 +143,7 @@ namespace SmallEngine.Graphics
 
         public BitmapResource FromByte(byte[] pData, int pWidth, int pHeight)
         {
-            Bitmap b = new Bitmap(Context, new Size2(pWidth, pHeight), new BitmapProperties(Context.PixelFormat));
+            Bitmap b = new Bitmap(Context, new Size2(pWidth, pHeight), new BitmapProperties(new PixelFormat(Format.B8G8R8A8_UNorm, SharpDX.Direct2D1.AlphaMode.Premultiplied)));
             b.CopyFromMemory(pData, pWidth * 4);
             var br = new BitmapResource() { DirectXBitmap = b };
             return br;

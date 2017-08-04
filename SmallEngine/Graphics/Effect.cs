@@ -50,10 +50,12 @@ namespace SmallEngine.Graphics
         public void Apply()
         {
             _compositeEffect = new Composite(_context);
-            for(int i = 0; i < _effects.Count; i++)
-            {
-                _compositeEffect.SetInputEffect(i + 1, _effects[i], true);
-            }
+            //_compositeEffect.InputCount = 2;
+            //for(int i = 1; i < _effects.Count; i++)
+            //{
+            //    _effects[i - 1].SetInputEffect(0, _effects[i], true);
+            //}
+            //_compositeEffect.SetInputEffect(0, _effects[_effects.Count - 1], true);
         }
 
         public void Draw(BitmapResource pBitmap)
@@ -71,17 +73,22 @@ namespace SmallEngine.Graphics
                 new SharpDX.Size2((int)pBitmap.DirectXBitmap.Size.Width, (int)pBitmap.DirectXBitmap.Size.Height),
                 new BitmapProperties1()
                 {
-                    PixelFormat = _context.PixelFormat,
+                    PixelFormat = new PixelFormat(SharpDX.DXGI.Format.B8G8R8A8_UNorm, AlphaMode.Premultiplied),
                     BitmapOptions = BitmapOptions.Target
                 });
 
             _context.BeginDraw();
             _context.Target = b;
-            _compositeEffect.SetInput(0, b, true);
-            _context.DrawImage(pBitmap.DirectXBitmap);
+            //foreach (var e in _effects)
+            //{
+            //    e.SetInput(0, pBitmap.DirectXBitmap, true);
+            //}
+            _effects[0].SetInput(0, pBitmap.DirectXBitmap, true);
+            // _compositeEffect.SetInput(1, pBitmap.DirectXBitmap, true);
+            //TODO why isnt this working
+            _context.DrawImage(_effects[0]);
             _context.EndDraw();
 
-            pBitmap.DirectXBitmap.Dispose();
             var retval = new BitmapResource() { DirectXBitmap = b };
             _context.Target = t;
             return retval;

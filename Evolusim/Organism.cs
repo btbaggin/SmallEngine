@@ -170,7 +170,7 @@ namespace Evolusim
 
         public void MoveTo(Vector2 pPosition)
         {
-
+            _movement.MoveTo(pPosition);
         }
 
         public Traits.Trait GetTrait(TraitComponent.Traits pTrait)
