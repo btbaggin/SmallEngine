@@ -18,7 +18,7 @@ namespace Evolusim
         {
             None,
             Hungry,
-            //Tired,
+            Sleeping,
             Mating
         }
 
@@ -37,6 +37,10 @@ namespace Evolusim
         private int _vision;
         private Brush _visionBrush;
 
+        private int _stamina;
+        private int _currentStamina;
+
+        private BitmapResource _sleep;
         private BitmapResource _heart;
         private BitmapResource _hungry;
 
@@ -82,6 +86,7 @@ namespace Evolusim
             _visionBrush = Game.Graphics.CreateBrush(System.Drawing.Color.Yellow);
             _heart = ResourceManager.Request<BitmapResource>("heart");
             _hungry = ResourceManager.Request<BitmapResource>("hungry");
+            _sleep = ResourceManager.Request<BitmapResource>("sleep");
         }
 
         public override void Initialize()
@@ -100,6 +105,7 @@ namespace Evolusim
 
             _lifeTime = (int)_traits.GetTrait(TraitComponent.Traits.Lifetime).Value;
             _vision = (int)_traits.GetTrait(TraitComponent.Traits.Vision).Value;
+            _stamina = (int)_traits.GetTrait(TraitComponent.Traits.Stamina).Value;
 
             Attractive = (int)_traits.GetTrait(TraitComponent.Traits.Attractive).Value;
             var mateRate = (int)_traits.GetTrait(TraitComponent.Traits.MateRate).Value;
@@ -108,6 +114,7 @@ namespace Evolusim
 
             _currentMate = _mateTimer;
             _currentHunger = _hunger;
+            _currentStamina = _stamina;
             Coroutine.Start(LifeCycleTick);
         }
 
@@ -128,17 +135,22 @@ namespace Evolusim
             _render.Draw(pSystem);
 
             var scale = new Vector2(Scale.X / 2, Scale.X / 2) * Game.ActiveCamera.Zoom;
+            var pos = ScreenPosition + new Vector2(scale.X / 2, -scale.Y / 2);
             switch(OrganismStatus)
             {
                 case Status.None:
                     break;
 
                 case Status.Hungry:
-                    pSystem.DrawBitmap(_hungry, 1, ScreenPosition + new Vector2(scale.X / 4, -scale.Y / 2), scale);
+                    pSystem.DrawBitmap(_hungry, 1, pos, scale);
                     break;
 
                 case Status.Mating:
-                    pSystem.DrawBitmap(_heart, 1, ScreenPosition + new Vector2(scale.X / 4, -scale.Y / 2),  scale);
+                    pSystem.DrawBitmap(_heart, 1, pos,  scale);
+                    break;
+
+                case Status.Sleeping:
+                    pSystem.DrawBitmap(_sleep, 1, pos, scale);
                     break;
             }
 
@@ -187,8 +199,15 @@ namespace Evolusim
                     break;
                 }
 
+                if (OrganismStatus == Status.Sleeping)
+                {
+                    _currentStamina += 1;
+                    if(_currentStamina <= _stamina) goto yield;
+                }
+
                 _currentMate -= 1;
                 _currentHunger -= 1;
+                _currentStamina -= 1;
 
                 //Hunger
                 if(_currentHunger <= 0)
@@ -199,6 +218,12 @@ namespace Evolusim
                 else if(_currentHunger <= 10)
                 {
                     OrganismStatus = Status.Hungry;
+                    goto yield;
+                }
+
+                if(_currentStamina <= 0)
+                {
+                    OrganismStatus = Status.Sleeping;
                     goto yield;
                 }
 

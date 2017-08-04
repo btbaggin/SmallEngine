@@ -17,7 +17,8 @@ namespace Evolusim
             Lifetime,
             Attractive,
             MateRate,
-            Vision
+            Vision,
+            Stamina
         }
 
         private Dictionary<Traits, Trait> _traits;
@@ -30,6 +31,7 @@ namespace Evolusim
             _traits.Add(Traits.Attractive, new Trait(0, 10));
             _traits.Add(Traits.MateRate, new Trait(0, 3));
             _traits.Add(Traits.Vision, new Trait(5, 15));
+            _traits.Add(Traits.Stamina, new Trait(30, 45));
         }
 
         public Trait GetTrait(Traits pTrait)

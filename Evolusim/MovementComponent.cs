@@ -112,6 +112,9 @@ namespace Evolusim
                         else _destination = _mate.Position;
                         break;
 
+                    case Organism.Status.Sleeping:
+                        return;
+
                     default:
                         break;
                 }
