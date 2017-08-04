@@ -211,9 +211,9 @@ namespace SmallEngine.Graphics
                                       pSourceRect);
         }
 
-        public void DrawImage(Effect pEffect, Vector2 pPosition)
+        public void DrawImage(BitmapResource pBitmap, Effect pEffect, Vector2 pPosition)
         {
-            Context.DrawImage(pEffect.DirectXEffect, pPosition);
+            pEffect.Draw(pBitmap, pPosition);
         }
 
         public void DrawPoint(Vector2 pPoint, Brush pBrush)

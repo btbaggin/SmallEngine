@@ -71,7 +71,7 @@ namespace Evolusim
         {
             if(!_override)
             {
-                switch (_gameObject.OrganismStatus)
+                switch (_gameObject.GetMovementType())
                 {
                     case Organism.Status.None:
                         //TODO only move to preferred terrain
@@ -101,7 +101,7 @@ namespace Evolusim
 
             if(!_override)
             {
-                switch (_gameObject.OrganismStatus)
+                switch (_gameObject.GetMovementType())
                 {
                     case Organism.Status.Hungry:
                         if (_food == null || _food.IsDead) GetDestination(TerrainType.None);
@@ -129,7 +129,7 @@ namespace Evolusim
         {
             if(!_override)
             {
-                switch (_gameObject.OrganismStatus)
+                switch (_gameObject.GetMovementType())
                 {
                     case Organism.Status.None:
                         break;

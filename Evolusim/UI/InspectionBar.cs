@@ -75,10 +75,18 @@ namespace Evolusim.UI
                 case "ToolbarOpen":
                     IsOpen = true;
                     _organism = pM.GetValue<Organism>();
+                    Organism.SelectedOrganism = _organism;
                     Game.ActiveCamera.Zoom = 1;
                     Game.ActiveCamera.Follow(_organism);
 
                     UpdateContent();
+                    break;
+
+                case "ToolbarClose":
+                    IsOpen = false;
+                    _organism = null;
+                    Organism.SelectedOrganism = null;
+                    Game.ActiveCamera.StopFollow();
                     break;
             }
         }

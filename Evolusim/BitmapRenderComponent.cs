@@ -38,7 +38,7 @@ namespace Evolusim
 
         protected override void DoDraw(IGraphicsSystem pSystem, Effect pEffect)
         {
-            pSystem.DrawImage(pEffect, GameObject.ScreenPosition);
+            pSystem.DrawImage(Bitmap, pEffect, GameObject.ScreenPosition);
         }
 
         public override void Dispose()

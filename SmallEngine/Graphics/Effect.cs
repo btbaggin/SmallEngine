@@ -11,11 +11,10 @@ namespace SmallEngine.Graphics
     public class Effect : IDisposable
     {
         //https://english.r2d2rigo.es/2014/08/19/applying-direct2d-built-in-effects-to-bitmaps-with-sharpdx/
-        Composite _compositeEffect;
+        //https://msdn.microsoft.com/en-us/library/windows/desktop/hh973241(v=vs.85).aspx
         List<SharpDX.Direct2D1.Effect> _effects;
         DeviceContext _context;
-
-        internal SharpDX.Direct2D1.Effect DirectXEffect { get { return _compositeEffect; } }
+        Composite _composite;
 
         public Effect()
         {
@@ -47,27 +46,28 @@ namespace SmallEngine.Graphics
             _effects.Add(new GaussianBlur(_context) { StandardDeviation = pAmount });
         }
 
-        public void Apply()
+        public void Finalize()
         {
-            _compositeEffect = new Composite(_context);
-            //_compositeEffect.InputCount = 2;
-            //for(int i = 1; i < _effects.Count; i++)
-            //{
-            //    _effects[i - 1].SetInputEffect(0, _effects[i], true);
-            //}
-            //_compositeEffect.SetInputEffect(0, _effects[_effects.Count - 1], true);
+            _composite = new Composite(_context);
+            _composite.InputCount = 2;
         }
 
-        public void Draw(BitmapResource pBitmap)
+        public void Draw(BitmapResource pBitmap, Vector2 pPosition)
         {
-            System.Diagnostics.Debug.Assert(_compositeEffect != null);
-            _compositeEffect.SetInput(0, pBitmap.DirectXBitmap, true);
+            _effects[0].SetInput(0, pBitmap.DirectXBitmap, true);
+            for (int i = 1; i < _effects.Count; i++)
+            {
+                _effects[i].SetInput(0, _effects[i - 1].Output, true);
+            }
+
+            _composite.SetInput(0, pBitmap.DirectXBitmap, true);
+            _composite.SetInput(1, _effects[_effects.Count - 1].Output, true);
+
+            _context.DrawImage(_composite.Output, pPosition);
         }
 
         public BitmapResource ApplyTo(BitmapResource pBitmap)
         {
-            System.Diagnostics.Debug.Assert(_compositeEffect != null);
-
             var t = _context.Target;
             var b = new Bitmap1(_context,
                 new SharpDX.Size2((int)pBitmap.DirectXBitmap.Size.Width, (int)pBitmap.DirectXBitmap.Size.Height),
@@ -77,20 +77,21 @@ namespace SmallEngine.Graphics
                     BitmapOptions = BitmapOptions.Target
                 });
 
-            _context.BeginDraw();
-            _context.Target = b;
-            //foreach (var e in _effects)
-            //{
-            //    e.SetInput(0, pBitmap.DirectXBitmap, true);
-            //}
             _effects[0].SetInput(0, pBitmap.DirectXBitmap, true);
-            // _compositeEffect.SetInput(1, pBitmap.DirectXBitmap, true);
-            //TODO why isnt this working
-            _context.DrawImage(_effects[0]);
+            for (int i = 1; i < _effects.Count; i++)
+            {
+                _effects[i].SetInput(0, _effects[i - 1].Output, true);
+            }
+
+            _composite.SetInput(0, pBitmap.DirectXBitmap, true);
+            _composite.SetInput(1, _effects[_effects.Count - 1].Output, true);
+
+            _context.Target = b;
+            _context.BeginDraw();
+            _context.DrawImage(_composite.Output);
             _context.EndDraw();
 
             var retval = new BitmapResource() { DirectXBitmap = b };
-            _context.Target = t;
             return retval;
         }
 
@@ -100,7 +101,7 @@ namespace SmallEngine.Graphics
             {
                 e.Dispose();
             }
-            _compositeEffect.Dispose();
+            _composite.Dispose();
         }
     }
 }

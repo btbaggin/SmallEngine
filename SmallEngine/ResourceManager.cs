@@ -60,7 +60,20 @@ namespace SmallEngine
             _resources.Add(pAlias, r);
             //Begin sync load
             r.Create();
-            return (T)r;
+            return r;
+        }
+
+        public static T Add<T>(string pAlias, T pResource, bool pKeepReference) where T : Resource, new()
+        {
+            if(_resources.ContainsKey(pAlias))
+            {
+                return Request<T>(pAlias);
+            }
+
+            pResource.Alias = pAlias;
+            pResource.KeepReference = pKeepReference;
+            _resources.Add(pAlias, pResource);
+            return pResource;
         }
 
         /// <summary>

@@ -208,10 +208,10 @@ namespace Evolusim.Terrain
 
         //x axis is temp; y axis is height
         private TerrainType[,] _terrainMap = { { TerrainType.Snow,          TerrainType.Snow,               TerrainType.Snow,               TerrainType.Tundra,           TerrainType.Bare,      TerrainType.Scorched },
-                                        { TerrainType.Taiga,         TerrainType.Taiga,              TerrainType.Shrubland,          TerrainType.Shrubland,        TerrainType.Desert,    TerrainType.Desert },
-                                        { TerrainType.TemperateRain, TerrainType.TemperateDeciduous, TerrainType.TemperateDeciduous, TerrainType.Grassland,        TerrainType.Grassland, TerrainType.Desert },
-                                        { TerrainType.TropicalRain,  TerrainType.TropicalRain,       TerrainType.TropicalSeasonal,   TerrainType.TropicalSeasonal, TerrainType.Grassland, TerrainType.Desert },
-                                        { TerrainType.Water,         TerrainType.Water,              TerrainType.Water,              TerrainType.Water,            TerrainType.Water,     TerrainType.Ice } };
+                                               { TerrainType.Taiga,         TerrainType.Taiga,              TerrainType.Shrubland,          TerrainType.Shrubland,        TerrainType.Desert,    TerrainType.Desert },
+                                               { TerrainType.TemperateRain, TerrainType.TemperateDeciduous, TerrainType.TemperateDeciduous, TerrainType.Grassland,        TerrainType.Grassland, TerrainType.Desert },
+                                               { TerrainType.TropicalRain,  TerrainType.TropicalRain,       TerrainType.TropicalSeasonal,   TerrainType.TropicalSeasonal, TerrainType.Grassland, TerrainType.Desert },
+                                               { TerrainType.Water,         TerrainType.Water,              TerrainType.Water,              TerrainType.Water,            TerrainType.Water,     TerrainType.Ice } };
         private TerrainType CalculateTerrainType(int x, int y)
         {
             var h = _height.Query(x, y);

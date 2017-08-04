@@ -25,6 +25,19 @@ namespace Evolusim.Terrain
         static Vegetation()
         {
             SceneManager.Define("vegetation", typeof(BitmapRenderComponent));
+
+            //Add dead bitmaps
+            using (Effect e = new Effect())
+            {
+                e.AddSaturation(.2f);
+                e.Finalize();
+
+                foreach (var s in new string[] { "v_water", "v_desert", "v_grassland", "v_shrubland", "v_temperatedeciduous"})
+                {
+                    var b = e.ApplyTo(ResourceManager.Request<BitmapResource>(s));
+                    ResourceManager.Add<BitmapResource>(s + "_dead", b, true);
+                }
+            }
         }
 
         public static Vegetation Create(int pX, int pY)
@@ -152,12 +165,7 @@ namespace Evolusim.Terrain
             }
             else if(_lifeTime == 0)
             {
-                using (var e = new Effect())
-                {
-                    e.AddSaturation(.2f);
-                    e.Apply();
-                    _render.SetBitmap(e.ApplyTo(_render.Bitmap));
-                }
+                _render.SetBitmap(_render.Bitmap.Alias + "_dead");
             }
             else if(_lifeTime <= -1)
             {

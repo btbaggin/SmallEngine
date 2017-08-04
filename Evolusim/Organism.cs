@@ -14,6 +14,7 @@ namespace Evolusim
 {
     class Organism : GameObject
     {
+        [Flags]
         public enum Status
         {
             None,
@@ -30,23 +31,26 @@ namespace Evolusim
         private TraitComponent _traits;
 
         private TerrainType _preferredTerrain;
-        private int _currentHunger;
+
         private int _hunger;
+        private int _currentHunger;
+        private float _hungerPercent;
+
+        private int _stamina;
+        private int _currentStamina;
+        private float _staminaPercent;
+
+        private int _mate;
+        private int _currentMate;
+        private float _matePercent;
 
         private int _lifeTime;
         private int _vision;
         private Brush _visionBrush;
 
-        private int _stamina;
-        private int _currentStamina;
-
         private BitmapResource _sleep;
         private BitmapResource _heart;
         private BitmapResource _hungry;
-
-        private int _mateDuration;
-        private int _currentMate;
-        private int _mateTimer;
 
         public int Attractive { get; private set; }
 
@@ -54,6 +58,7 @@ namespace Evolusim
 
         public override int Order => 10;
 
+        #region Constructors
         static Organism()
         {
             SceneManager.Define("organism", typeof(AnimationRenderComponent),
@@ -88,6 +93,7 @@ namespace Evolusim
             _hungry = ResourceManager.Request<BitmapResource>("hungry");
             _sleep = ResourceManager.Request<BitmapResource>("sleep");
         }
+        #endregion
 
         public override void Initialize()
         {
@@ -109,10 +115,10 @@ namespace Evolusim
 
             Attractive = (int)_traits.GetTrait(TraitComponent.Traits.Attractive).Value;
             var mateRate = (int)_traits.GetTrait(TraitComponent.Traits.MateRate).Value;
-            if (mateRate == 0) _mateTimer = _lifeTime;
-            else _mateTimer = _lifeTime / mateRate;
+            if (mateRate == 0) _mate = _lifeTime;
+            else _mate = _lifeTime / mateRate;
 
-            _currentMate = _mateTimer;
+            _currentMate = _mate;
             _currentHunger = _hunger;
             _currentStamina = _stamina;
             Coroutine.Start(LifeCycleTick);
@@ -126,7 +132,6 @@ namespace Evolusim
             if(InputManager.KeyPressed(Mouse.Left) && InputManager.IsFocused(this))
             {
                 MessageBus.SendMessage(new GameMessage("ToolbarOpen", this));
-                SelectedOrganism = this;
             }
         }
 
@@ -136,22 +141,17 @@ namespace Evolusim
 
             var scale = new Vector2(Scale.X / 2, Scale.X / 2) * Game.ActiveCamera.Zoom;
             var pos = ScreenPosition + new Vector2(scale.X / 2, -scale.Y / 2);
-            switch(OrganismStatus)
+            if(OrganismStatus.HasFlag(Status.Sleeping))
             {
-                case Status.None:
-                    break;
-
-                case Status.Hungry:
-                    pSystem.DrawBitmap(_hungry, 1, pos, scale);
-                    break;
-
-                case Status.Mating:
-                    pSystem.DrawBitmap(_heart, 1, pos,  scale);
-                    break;
-
-                case Status.Sleeping:
-                    pSystem.DrawBitmap(_sleep, 1, pos, scale);
-                    break;
+                pSystem.DrawBitmap(_sleep, 1, pos, scale);
+            }
+            else if(OrganismStatus.HasFlag(Status.Hungry))
+            {
+                pSystem.DrawBitmap(_sleep, 1, pos, scale);
+            }
+            else if(OrganismStatus.HasFlag(Status.Mating))
+            {
+                pSystem.DrawBitmap(_sleep, 1, pos, scale);
             }
 
 #if DEBUG
@@ -174,18 +174,36 @@ namespace Evolusim
         {
             _movement.Stop(1f);
             Organism.CreateFrom(this, pMate);
-            _currentMate = _mateTimer;
+            _currentMate = _mate;
             OrganismStatus = Status.None;
+        }
+
+        public void TrySleep()
+        {
+            //TODO maybe look around for stuff
+            if(OrganismStatus.HasFlag(Status.Hungry) && _hungerPercent > .4f)
+            {
+                OrganismStatus |= Status.Sleeping;
+            }
         }
 
         public void MoveTo(Vector2 pPosition)
         {
+            if (OrganismStatus.HasFlag(Status.Sleeping)) return;
             _movement.MoveTo(pPosition);
         }
 
         public Traits.Trait GetTrait(TraitComponent.Traits pTrait)
         {
             return _traits.GetTrait(pTrait);
+        }
+
+        public Status GetMovementType()
+        {
+            if (OrganismStatus.HasFlag(Status.Sleeping)) return Status.Sleeping;
+            if (OrganismStatus.HasFlag(Status.Hungry)) return Status.Hungry;
+            if (OrganismStatus.HasFlag(Status.Mating)) return Status.Mating;
+            return Status.None;
         }
 
         private IEnumerator<WaitEvent> LifeCycleTick()
@@ -199,46 +217,67 @@ namespace Evolusim
                     break;
                 }
 
-                if (OrganismStatus == Status.Sleeping)
+                //If we are sleeping, just regen stamina, nothing else
+                if (OrganismStatus.HasFlag(Status.Sleeping))
                 {
-                    _currentStamina += 1;
-                    if(_currentStamina <= _stamina) goto yield;
+                    _staminaPercent += .1f;
+                    if (_staminaPercent >= 1f)
+                    {
+                        _currentStamina = _stamina + 1; //Add one because we are going to subtract 1
+                        OrganismStatus &= ~Status.Sleeping;
+                    }
+                    else
+                    {
+                        goto yield;
+                    }
                 }
 
                 _currentMate -= 1;
                 _currentHunger -= 1;
                 _currentStamina -= 1;
 
-                //Hunger
-                if(_currentHunger <= 0)
+                _hungerPercent = _currentHunger / _hunger;
+                _staminaPercent = _currentStamina / _stamina;
+                _matePercent = _currentStamina / _mate;
+
+                //Hard sleep check
+                if (_staminaPercent <= 0)
                 {
+                    //Go to sleep no matter what if we have no stamina
+                    OrganismStatus |= Status.Sleeping;
+                    goto yield;
+                }
+
+                //*** Hunger
+                if (_hungerPercent <= 0)
+                { 
                     Destroy();
                     break;
                 }
-                else if(_currentHunger <= 10)
+                else if(_hungerPercent <= .25f)
                 {
+                    //Start seeking food no matter what
                     OrganismStatus = Status.Hungry;
                     goto yield;
                 }
-
-                if(_currentStamina <= 0)
+                else if(_hungerPercent <= .75)
                 {
-                    OrganismStatus = Status.Sleeping;
+                    //Start seeking food...
+                    OrganismStatus |= Status.Hungry;
                     goto yield;
                 }
 
-                //Mating
-                if(_currentMate <= 0)
+                //*** Stamina
+                if(_currentStamina <= .3)
                 {
-                    if(OrganismStatus != Status.Mating) _mateDuration = 11;
-
-                    _mateDuration -= 1;
-                    OrganismStatus = Status.Mating;
+                    TrySleep();
+                    goto yield;
                 }
-                else if(OrganismStatus == Status.Mating && _mateDuration <= 0)
+
+                //*** Mating
+                if(_currentMate <= .4f)
                 {
-                    OrganismStatus = Status.None;
-                    _currentMate = _mateTimer;
+                    OrganismStatus |= Status.Mating;
                 }
 
                 yield:
