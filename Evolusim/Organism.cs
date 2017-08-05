@@ -185,13 +185,11 @@ namespace Evolusim
                 {
                     //Start seeking food no matter what
                     OrganismStatus = Status.Hungry;
-                    return;
                 }
-                else if (_hungerPercent <= .75)
+                else if (_hungerPercent <= .5)
                 {
                     //Start seeking food...
                     OrganismStatus |= Status.Hungry;
-                    return;
                 }
 
                 //*** Stamina

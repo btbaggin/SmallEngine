@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using SmallEngine;
+using SmallEngine.Input;
 using SmallEngine.Graphics;
 
 namespace Evolusim.Terrain
@@ -119,7 +116,7 @@ namespace Evolusim.Terrain
                     _lifeTime = RandomGenerator.RandomInt(10, 20);
                     _speadCount = RandomGenerator.RandomInt(0, 3);
                     _render.SetBitmap("v_shrubland");
-                    Food = 4;
+                    Food = 5;
                     break;
 
                 case TerrainType.TemperateDeciduous:
@@ -159,6 +156,11 @@ namespace Evolusim.Terrain
 
         public override void Update(float pDeltaTime)
         {
+            if (InputManager.KeyPressed(Mouse.Right) && InputManager.IsFocused(this))
+            {
+                if (Organism.SelectedOrganism != null) Organism.SelectedOrganism.MoveTo(Position);
+            }
+
             if ((_lifetimeTimer += pDeltaTime) >= 1)
             {
                 _lifeTime -= 1;
