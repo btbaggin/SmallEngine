@@ -44,6 +44,8 @@ namespace Evolusim
         private int _currentMate;
         private float _matePercent;
 
+        private float _lifeTimeTick;
+        private int _currentLifetime;
         private int _lifeTime;
         private int _vision;
         private Brush _visionBrush;
@@ -121,7 +123,7 @@ namespace Evolusim
             _currentMate = _mate;
             _currentHunger = _hunger;
             _currentStamina = _stamina;
-            Coroutine.Start(LifeCycleTick);
+            _currentLifetime = _lifeTime;
         }
 
         public override void Update(float pDeltaTime)
@@ -132,6 +134,78 @@ namespace Evolusim
             if(InputManager.KeyPressed(Mouse.Left) && InputManager.IsFocused(this))
             {
                 MessageBus.SendMessage(new GameMessage("ToolbarOpen", this));
+            }
+
+            if ((_lifeTimeTick += pDeltaTime) >= 1)
+            {
+                _lifeTimeTick = 0;
+
+                //Lifetime
+                if ((_currentLifetime -= 1) <= 0)
+                {
+                    Destroy();
+                    return;
+                }
+
+                //If we are sleeping, just regen stamina, nothing else
+                if (OrganismStatus.HasFlag(Status.Sleeping))
+                {
+                    _staminaPercent += .1f;
+                    if (_staminaPercent >= 1f)
+                    {
+                        _currentStamina = _stamina + 1; //Add one because we are going to subtract 1
+                        OrganismStatus &= ~Status.Sleeping;
+                    }
+                    else return;
+                }
+
+                _currentMate -= 1;
+                _currentHunger -= 1;
+                _currentStamina -= 1;
+
+                _hungerPercent = (float)_currentHunger / _hunger;
+                _staminaPercent = (float)_currentStamina / _stamina;
+                _matePercent = (float)_currentStamina / _mate;
+
+                //Hard sleep check
+                if (_staminaPercent <= 0)
+                {
+                    //Go to sleep no matter what if we have no stamina
+                    OrganismStatus |= Status.Sleeping;
+                    return;
+                }
+
+                //*** Hunger
+                if (_hungerPercent <= 0)
+                {
+                    Destroy();
+                    return;
+                }
+                else if (_hungerPercent <= .25f)
+                {
+                    //Start seeking food no matter what
+                    OrganismStatus = Status.Hungry;
+                    return;
+                }
+                else if (_hungerPercent <= .75)
+                {
+                    //Start seeking food...
+                    OrganismStatus |= Status.Hungry;
+                    return;
+                }
+
+                //*** Stamina
+                if (_currentStamina <= .3)
+                {
+                    TrySleep();
+                    return;
+                }
+
+                //*** Mating
+                if (_currentMate <= .4f)
+                {
+                    OrganismStatus |= Status.Mating;
+                }
             }
         }
 
@@ -147,11 +221,11 @@ namespace Evolusim
             }
             else if(OrganismStatus.HasFlag(Status.Hungry))
             {
-                pSystem.DrawBitmap(_sleep, 1, pos, scale);
+                pSystem.DrawBitmap(_hungry, 1, pos, scale);
             }
             else if(OrganismStatus.HasFlag(Status.Mating))
             {
-                pSystem.DrawBitmap(_sleep, 1, pos, scale);
+                pSystem.DrawBitmap(_heart, 1, pos, scale);
             }
 
 #if DEBUG
@@ -164,7 +238,8 @@ namespace Evolusim
         public void Eat(Vegetation pFood)
         {
             _movement.Stop(1f);
-            _currentHunger = _hunger;
+            _currentHunger += pFood.Food;
+            if (_currentHunger > _hunger) _currentHunger = _hunger;
             pFood.Destroy();
             _audio.PlayImmediate();
             OrganismStatus = Status.None;
@@ -173,7 +248,7 @@ namespace Evolusim
         public void Mate(Organism pMate)
         {
             _movement.Stop(1f);
-            Organism.CreateFrom(this, pMate);
+            CreateFrom(this, pMate);
             _currentMate = _mate;
             OrganismStatus = Status.None;
         }
@@ -193,9 +268,12 @@ namespace Evolusim
             _movement.MoveTo(pPosition);
         }
 
-        public Traits.Trait GetTrait(TraitComponent.Traits pTrait)
+        public IEnumerable<Tuple<string, float>> GetStats()
         {
-            return _traits.GetTrait(pTrait);
+            yield return Tuple.Create("Hunger", _hungerPercent);
+            yield return Tuple.Create("Stamina", _staminaPercent);
+            yield return Tuple.Create("Mate", _matePercent);
+            yield return Tuple.Create("Lifetime", (float)_currentLifetime / _lifeTime);
         }
 
         public Status GetMovementType()
@@ -205,86 +283,7 @@ namespace Evolusim
             if (OrganismStatus.HasFlag(Status.Mating)) return Status.Mating;
             return Status.None;
         }
-
-        private IEnumerator<WaitEvent> LifeCycleTick()
-        {
-            while(!MarkedForDestroy)
-            {
-                //Lifetime
-                if((_lifeTime -= 1) <= 0)
-                {
-                    Destroy();
-                    break;
-                }
-
-                //If we are sleeping, just regen stamina, nothing else
-                if (OrganismStatus.HasFlag(Status.Sleeping))
-                {
-                    _staminaPercent += .1f;
-                    if (_staminaPercent >= 1f)
-                    {
-                        _currentStamina = _stamina + 1; //Add one because we are going to subtract 1
-                        OrganismStatus &= ~Status.Sleeping;
-                    }
-                    else
-                    {
-                        goto yield;
-                    }
-                }
-
-                _currentMate -= 1;
-                _currentHunger -= 1;
-                _currentStamina -= 1;
-
-                _hungerPercent = _currentHunger / _hunger;
-                _staminaPercent = _currentStamina / _stamina;
-                _matePercent = _currentStamina / _mate;
-
-                //Hard sleep check
-                if (_staminaPercent <= 0)
-                {
-                    //Go to sleep no matter what if we have no stamina
-                    OrganismStatus |= Status.Sleeping;
-                    goto yield;
-                }
-
-                //*** Hunger
-                if (_hungerPercent <= 0)
-                { 
-                    Destroy();
-                    break;
-                }
-                else if(_hungerPercent <= .25f)
-                {
-                    //Start seeking food no matter what
-                    OrganismStatus = Status.Hungry;
-                    goto yield;
-                }
-                else if(_hungerPercent <= .75)
-                {
-                    //Start seeking food...
-                    OrganismStatus |= Status.Hungry;
-                    goto yield;
-                }
-
-                //*** Stamina
-                if(_currentStamina <= .3)
-                {
-                    TrySleep();
-                    goto yield;
-                }
-
-                //*** Mating
-                if(_currentMate <= .4f)
-                {
-                    OrganismStatus |= Status.Mating;
-                }
-
-                yield:
-                yield return new WaitForSeconds(1);
-            }
-        }
-
+        
         private void AnimationEval()
         {
             if (Math.Abs(_movement.Speed.X) - Math.Abs(_movement.Speed.Y) > 0)

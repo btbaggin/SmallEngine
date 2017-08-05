@@ -70,8 +70,11 @@ namespace SmallEngine
                 Zoom = MathF.Clamp(Zoom, _minZoom, _maxZoom);
                 _inverseZoom = (_maxZoom - _minZoom) / Zoom;
 
+                var oldWidth = Width;
+                var oldHeight = Height;
                 Width = Game.Form.Width / Zoom;
                 Height = Game.Form.Height / Zoom;
+                Position += new Vector2((oldWidth - Width) / 2, (oldHeight - Height) / 2);
             }
 
             if (_position.X < Bounds.Left) _position.X = Bounds.Left;

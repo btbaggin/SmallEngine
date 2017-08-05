@@ -13,20 +13,19 @@ namespace Evolusim.UI
     {
         Brush _background;
         Brush _foreground;
-        float _value;
-        float _min;
-        float _max;
-        public AttributeElement(string pAttribute, float pValue, float pMin, float pMax)
+        float _percent;
+        public string Attribute { get; private set; }
+
+        public AttributeElement(string pAttribute, float pPercent)
         {
+            Attribute = pAttribute;
             Orientation = ElementOrientation.Vertical;
-            LabelElement le = new LabelElement(pAttribute, "Arial", 14, System.Drawing.Color.White) { WidthPercent = 1f, Height = 20 };
+            LabelElement le = new LabelElement(Attribute, "Arial", 14, System.Drawing.Color.White) { WidthPercent = 1f, Height = 20 };
             AddChild(le, AnchorDirection.Top | AnchorDirection.Left, Vector2.Zero);
             WidthPercent = 1f;
             Height = 40;
 
-            _value = pValue;
-            _min = pMin;
-            _max = pMax;
+            _percent = pPercent;
             _background = Game.Graphics.CreateBrush(System.Drawing.Color.Black);
             _foreground = Game.Graphics.CreateBrush(System.Drawing.Color.Gray);
         }
@@ -34,9 +33,14 @@ namespace Evolusim.UI
         public override void Draw(IGraphicsSystem pSystem)
         {
             base.Draw(pSystem);
-            var w = Width * ((_value - _min) / (_max - _min));
+            var w = Width * _percent;
             pSystem.DrawFillRect(new Rectangle(Position.X, Position.Y + 20, Width, 10), _background);
             pSystem.DrawFillRect(new Rectangle(Position.X + 1, Position.Y + 21, w, 8), _foreground);
+        }
+
+        public void UpdateValue(float pPercent)
+        {
+            _percent = pPercent;
         }
     }
 }

@@ -46,7 +46,7 @@ namespace SmallEngine.Graphics
             _effects.Add(new GaussianBlur(_context) { StandardDeviation = pAmount });
         }
 
-        public void Finalize()
+        public void Create()
         {
             _composite = new Composite(_context);
             _composite.InputCount = 2;
@@ -90,6 +90,7 @@ namespace SmallEngine.Graphics
             _context.BeginDraw();
             _context.DrawImage(_composite.Output);
             _context.EndDraw();
+            _context.Target = t;
 
             var retval = new BitmapResource() { DirectXBitmap = b };
             return retval;

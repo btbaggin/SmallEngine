@@ -16,6 +16,8 @@ namespace Evolusim.Terrain
 
         public bool IsDead { get { return _lifeTime <= 0; } }
 
+        public int Food { get; private set; }
+
         private int _lifeTime;
         private float _lifetimeTimer;
         BitmapRenderComponent _render;
@@ -30,9 +32,9 @@ namespace Evolusim.Terrain
             using (Effect e = new Effect())
             {
                 e.AddSaturation(.2f);
-                e.Finalize();
+                e.Create();
 
-                foreach (var s in new string[] { "v_water", "v_desert", "v_grassland", "v_shrubland", "v_temperatedeciduous"})
+                foreach (var s in new string[] { "v_water", "v_desert", "v_grassland", "v_shrubland", "v_temperatedeciduous" })
                 {
                     var b = e.ApplyTo(ResourceManager.Request<BitmapResource>(s));
                     ResourceManager.Add<BitmapResource>(s + "_dead", b, true);
@@ -103,30 +105,35 @@ namespace Evolusim.Terrain
                     _render.SetBitmap("v_water");
                     _lifeTime = RandomGenerator.RandomInt(20, 40);
                     _speadCount = RandomGenerator.RandomInt(1, 2);
+                    Food = 10;
                     break;
 
                 case TerrainType.Grassland:
                     _lifeTime = RandomGenerator.RandomInt(20, 40);
                     _speadCount = 1;
                     _render.SetBitmap("v_grassland");
+                    Food = 10;
                     break;
 
                 case TerrainType.Shrubland:
                     _lifeTime = RandomGenerator.RandomInt(10, 20);
                     _speadCount = RandomGenerator.RandomInt(0, 3);
                     _render.SetBitmap("v_shrubland");
+                    Food = 4;
                     break;
 
                 case TerrainType.TemperateDeciduous:
                     _lifeTime = RandomGenerator.RandomInt(40, 60);
                     _speadCount = RandomGenerator.RandomInt(1, 2);
                     _render.SetBitmap("v_temperatedeciduous");
+                    Food = 20;
                     break;
 
                 case TerrainType.Desert:
                     _lifeTime = RandomGenerator.RandomInt(60, 80);
                     _speadCount = 1;
                     _render.SetBitmap("v_desert");
+                    Food = 10;
                     break;
 
                 default:

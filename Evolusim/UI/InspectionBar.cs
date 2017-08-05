@@ -40,10 +40,9 @@ namespace Evolusim.UI
         private void UpdateContent()
         {
             Children.Clear();
-            foreach (TraitComponent.Traits e in Enum.GetValues(typeof(TraitComponent.Traits)))
+            foreach (var t in _organism.GetStats())
             {
-                var t = _organism.GetTrait(e);
-                AddChild(new AttributeElement(e.ToString(), t.Value, t.Min, t.Max), AnchorDirection.Left | AnchorDirection.Top, Vector2.Zero);
+                AddChild(new AttributeElement(t.Item1, t.Item2), AnchorDirection.Left | AnchorDirection.Top, Vector2.Zero);
             }
             SetLayout();
         }
@@ -58,6 +57,22 @@ namespace Evolusim.UI
         {
             base.Update(pDeltaTime);
 
+            if(_organism != null)
+            {
+                var l = _organism.GetStats();
+                foreach (var c in Children)
+                {
+                    var a = ((AttributeElement)c);
+                    foreach (var s in l)
+                    {
+                        if (s.Item1 == a.Attribute)
+                        {
+                            a.UpdateValue(s.Item2);
+                        }
+                    }
+                }
+            }
+            
             if(IsOpen)
             {
                 Position = new Vector2(Math.Min(Position.X + dx, 0), Position.Y);
