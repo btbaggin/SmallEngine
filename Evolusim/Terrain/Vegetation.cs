@@ -2,6 +2,7 @@
 using SmallEngine;
 using SmallEngine.Input;
 using SmallEngine.Graphics;
+using System.Collections.Generic;
 
 namespace Evolusim.Terrain
 {
@@ -34,7 +35,7 @@ namespace Evolusim.Terrain
                 foreach (var s in new string[] { "v_water", "v_desert", "v_grassland", "v_shrubland", "v_temperatedeciduous" })
                 {
                     var b = e.ApplyTo(ResourceManager.Request<BitmapResource>(s));
-                    ResourceManager.Add<BitmapResource>(s + "_dead", b, true);
+                    ResourceManager.Add(s + "_dead", b, true);
                 }
             }
         }
@@ -154,37 +155,26 @@ namespace Evolusim.Terrain
             }
         }
 
-        public override void Update(float pDeltaTime)
+        private IEnumerator<WaitEvent> LifeTick()
         {
-            if (InputManager.KeyPressed(Mouse.Right) && InputManager.IsFocused(_render))
+            while(!MarkedForDestroy)
             {
-                if (Organism.SelectedOrganism != null) Organism.SelectedOrganism.MoveTo(Position);
-            }
+                if (_lifeTime == 1)
+                {
+                    Spread();
+                }
+                else if (_lifeTime == 0)
+                {
+                    _render.SetBitmap(_render.Bitmap.Alias + "_dead");
+                }
+                else if (_lifeTime <= -1)
+                {
+                    Destroy();
+                    break;
+                }
 
-            if ((_lifetimeTimer += pDeltaTime) >= 1)
-            {
-                _lifeTime -= 1;
-                _lifetimeTimer = 0;
+                yield return new WaitForSeconds(1);
             }
-            else return;
-
-            if(_lifeTime == 1)
-            {
-                Spread();
-            }
-            else if(_lifeTime == 0)
-            {
-                _render.SetBitmap(_render.Bitmap.Alias + "_dead");
-            }
-            else if(_lifeTime <= -1)
-            {
-                Destroy();
-            }
-        }
-
-        public override void Dispose()
-        {
-            base.Dispose();
         }
     }
 }

@@ -64,7 +64,7 @@
     <Compile Include="Terrain\Terrain.cs" />
     <Compile Include="Terrain\TerrainType.cs" />
     <Compile Include="Terrain\Vegetation.cs" />
-    <Compile Include="ToolbarComponent.cs" />
+    <Compile Include="InspectionComponent.cs" />
     <Compile Include="Traits\Trait.cs" />
     <Compile Include="Traits\TraitComponent.cs" />
     <Compile Include="UI\AttributeElement.cs" />

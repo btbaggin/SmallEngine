@@ -105,10 +105,8 @@ namespace SmallEngine
 
         public Vector2 ToWorldSpace(Vector2 pCameraSpace)
         {
-            //TODO am i still right?
-            var dx = Width / Game.Form.Width;
-            var dy = Height / Game.Form.Height;
-            return new Vector2(pCameraSpace.X * dx, pCameraSpace.Y * dy) + _position;
+            var p = pCameraSpace / Zoom;
+            return p + _position;
         }
 
         public Vector2 ToCameraSpace(Vector2 pWorldSpace)

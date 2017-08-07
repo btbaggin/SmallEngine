@@ -62,7 +62,7 @@ namespace Evolusim
                 MessageBus.SendMessage(new GameMessage("ToolbarClose", null));
             }
 
-            else if(InputManager.KeyPressed(Mouse.Right) && !InputManager.HasFocus())
+            else if(InputManager.KeyPressed(Mouse.Right))
             {
                 if (Organism.SelectedOrganism != null)
                     Organism.SelectedOrganism.MoveTo(Game.ActiveCamera.ToWorldSpace(InputManager.MousePosition));

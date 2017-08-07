@@ -29,6 +29,7 @@ namespace Evolusim
             _heart = ResourceManager.Request<BitmapResource>("heart");
             _hungry = ResourceManager.Request<BitmapResource>("hungry");
             _sleep = ResourceManager.Request<BitmapResource>("sleep");
+            Visible = false;
         }
 
         protected override void DoDraw(IGraphicsSystem pSystem)
@@ -52,16 +53,19 @@ namespace Evolusim
         public void AddStatus(Status pStatus)
         {
             _currentStatus |= pStatus;
+            Visible = (_currentStatus != Status.None);
         }
 
         public void RemoveStatus(Status pStatus)
         {
             _currentStatus &= ~pStatus;
+            Visible = (_currentStatus != Status.None);
         }
 
         public void OverrideStatus(Status pStatus)
         {
             _currentStatus = pStatus;
+            Visible = (_currentStatus != Status.None);
         }
 
         public bool HasStatus(Status pStatus)

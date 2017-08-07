@@ -36,7 +36,6 @@ namespace Evolusim
         private int _currentMate;
         private float _matePercent;
 
-        private float _lifeTimeTick;
         private int _currentLifetime;
         private int _lifeTime;
         private int _totalHealth;
@@ -56,7 +55,7 @@ namespace Evolusim
                                             typeof(TraitComponent),
                                             typeof(MovementComponent),
                                             typeof(StatusComponent),
-                                            typeof(ToolbarComponent));
+                                            typeof(InspectionComponent));
         }
 
         public static Organism Create()
@@ -114,23 +113,19 @@ namespace Evolusim
             _currentHunger = _hunger;
             _currentStamina = _stamina;
             _currentLifetime = _lifeTime;
+
+            Coroutine.Start(LifeTick);
         }
 
-        public override void Update(float pDeltaTime)
+        private IEnumerator<WaitEvent> LifeTick()
         {
-            //TODO move all update/draw to components
-
-
-
-            if ((_lifeTimeTick += pDeltaTime) >= 1)
+            while(!MarkedForDestroy)
             {
-                _lifeTimeTick = 0;
-
                 //Lifetime
                 if ((_currentLifetime -= 1) <= 0)
                 {
                     Destroy();
-                    return;
+                    break;
                 }
 
                 //If we are sleeping, just regen stamina, nothing else
@@ -142,7 +137,10 @@ namespace Evolusim
                         _currentStamina = _stamina + 1; //Add one because we are going to subtract 1
                         _status.RemoveStatus(StatusComponent.Status.Sleeping);
                     }
-                    else return;
+                    else
+                    {
+                        yield return new WaitForSeconds(1);
+                    }
                 }
 
                 _currentMate -= 1;
@@ -158,14 +156,14 @@ namespace Evolusim
                 {
                     //Go to sleep no matter what if we have no stamina
                     _status.AddStatus(StatusComponent.Status.Sleeping);
-                    return;
+                    yield return new WaitForSeconds(1);
                 }
 
                 //*** Hunger
                 if (_hungerPercent <= 0)
                 {
                     Destroy();
-                    return;
+                    yield return new WaitForSeconds(1);
                 }
                 else if (_hungerPercent <= .25f)
                 {
@@ -182,7 +180,7 @@ namespace Evolusim
                 if (_currentStamina <= .3)
                 {
                     TrySleep();
-                    return;
+                    yield return new WaitForSeconds(1);
                 }
 
                 //*** Mating
@@ -190,6 +188,8 @@ namespace Evolusim
                 {
                     _status.AddStatus(StatusComponent.Status.Mating);
                 }
+
+                yield return new WaitForSeconds(1);
             }
         }
 

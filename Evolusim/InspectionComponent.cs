@@ -9,7 +9,7 @@ using SmallEngine.Input;
 
 namespace Evolusim
 {
-    class ToolbarComponent : DependencyComponent
+    class InspectionComponent : DependencyComponent
     {
         [ImportComponent(false, true)]
         private RenderComponent _render = null;
@@ -18,7 +18,7 @@ namespace Evolusim
         {
             if (InputManager.KeyPressed(Mouse.Left) && InputManager.IsFocused(_render))
             {
-                MessageBus.SendMessage(new GameMessage("ToolbarOpen", this));
+                MessageBus.SendMessage(new GameMessage("ToolbarOpen", GameObject));
             }
         }
     }
