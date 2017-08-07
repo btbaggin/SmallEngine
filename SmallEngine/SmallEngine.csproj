@@ -108,7 +108,6 @@
     <Compile Include="Components\IComponent.cs" />
     <Compile Include="Graphics\RenderComponent.cs" />
     <Compile Include="IMessageReciever.cs" />
-    <Compile Include="Input\IFocusElement.cs" />
     <Compile Include="Input\InputManager.cs" />
     <Compile Include="Input\InputInfo.cs" />
     <Compile Include="Input\InputState.cs" />
@@ -140,6 +139,7 @@
     <Compile Include="Audio\AudioComponent.cs" />
     <Compile Include="Physics\RigidBodyComponent.cs" />
     <Compile Include="Utils\PerlinNoise.cs" />
+    <Compile Include="Utils\ObjectPool.cs" />
     <Compile Include="Utils\RandomGenerator.cs" />
     <Compile Include="Vector2.cs" />
   </ItemGroup>

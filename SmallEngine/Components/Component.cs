@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SmallEngine
 {
-    public abstract class Component : IComponent
+    public abstract class Component : IComponent, IUpdatable
     {
         public EventHandler<EventArgs> Added;
         public EventHandler<EventArgs> Removed;
@@ -46,6 +46,7 @@ namespace SmallEngine
         public virtual void OnAdded(IGameObject pGameObject)
         {
             GameObject = pGameObject;
+            SceneManager.Current.AddUpdatable(this);
             Added?.Invoke(this, new EventArgs());
         }
 
@@ -56,6 +57,10 @@ namespace SmallEngine
         }
 
         public virtual void OnActiveChanged(bool pActive)
+        {
+        }
+
+        public virtual void Update(float pDeltaTime)
         {
         }
 

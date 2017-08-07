@@ -43,8 +43,8 @@ namespace Evolusim
 
         public override void Draw(IGraphicsSystem pSystem)
         {
-            base.Draw(pSystem);
             _terrain.Draw(pSystem);
+            base.Draw(pSystem);
         }
 
         public override void Update(float pDeltaTime)

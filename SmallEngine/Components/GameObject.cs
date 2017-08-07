@@ -30,8 +30,6 @@ namespace SmallEngine
             get { return new Rectangle(Position, Scale); }
         }
 
-        public bool Persistant { get; set; }
-
         protected Game Game { get; private set; }
 
         public bool MarkedForDestroy { get; private set; }
@@ -89,29 +87,17 @@ namespace SmallEngine
 
         public void AddComponent(IComponent pComponent)
         {
-            _components.Add(pComponent.GetType(), pComponent);
-            pComponent.OnAdded(this);
+            if(!_components.ContainsKey(pComponent.GetType()))
+            {
+                _components.Add(pComponent.GetType(), pComponent);
+                pComponent.OnAdded(this);
+            }
         }
 
         public void RemoveComponent(Type pComponent)
         {
             _components[pComponent].OnRemoved();
             _components.Remove(pComponent);
-        }
-
-        public IFocusElement GetFocusedElement(Vector2 pPoint)
-        {
-            var s = Scale * Game.ActiveCamera.Zoom;
-            var sp = ScreenPosition;
-            if (pPoint.X >= sp.X && 
-                pPoint.X <= sp.X + s.X &&
-                pPoint.Y >= sp.Y &&
-                pPoint.Y <= sp.Y + s.Y)
-            {
-                return this;
-            }
-
-            return null;
         }
 
         public void SetGame(Game pGame)

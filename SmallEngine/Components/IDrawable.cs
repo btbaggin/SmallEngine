@@ -11,5 +11,6 @@ namespace SmallEngine
     {
         int Order { get; }
         void Draw(IGraphicsSystem pSystem);
+        IDrawable GetFocusElement(Vector2 pPosition);
     }
 }

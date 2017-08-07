@@ -9,7 +9,7 @@ using SmallEngine.Input;
 
 namespace SmallEngine.UI
 {
-    public abstract class UIElement : IDrawable, IUpdatable, IFocusElement
+    public abstract class UIElement : IUpdatable, IDrawable, IComparable
     {
         #region Properties
         private Vector2 _position;
@@ -128,14 +128,14 @@ namespace SmallEngine.UI
             Children.Add(pElement);
         }
 
-        public IFocusElement GetFocusedElement(Vector2 pPoint)
+        public IDrawable GetFocusElement(Vector2 pPoint)
         {
-            IFocusElement focus = null;
+            IDrawable focus = null;
             if(Bounds.Contains(pPoint))
             {
                 foreach(var c in Children)
                 {
-                    focus = c.GetFocusedElement(pPoint);
+                    focus = c.GetFocusElement(pPoint);
                     if (focus != null) return focus;
                 }
                 focus = this;
@@ -190,6 +190,11 @@ namespace SmallEngine.UI
                     pTop += c.TotalHeight;
                 }
             }
+        }
+
+        public int CompareTo(object o)
+        {
+            return Order.CompareTo(((UIElement)o).Order);
         }
     }
 }

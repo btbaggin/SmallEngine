@@ -12,6 +12,9 @@ namespace Evolusim
         [ImportComponent]
         private TraitComponent _traits = null;
 
+        [ImportComponent]
+        private StatusComponent _status = null;
+
         int _speed;
         int _vision;
         public Vector2 _destination;
@@ -37,9 +40,9 @@ namespace Evolusim
             _gameObject = (Organism)GameObject;
         }
 
-        public void Move(float pDeltaTime, TerrainType pTerrain)
+        public override void Update(float pDeltaTime)
         {
-            if (!_destinationSet) GetDestination(pTerrain);
+            if (!_destinationSet) GetDestination(TerrainType.None);
 
             if(_stopped)
             {
@@ -71,20 +74,20 @@ namespace Evolusim
         {
             if(!_override)
             {
-                switch (_gameObject.GetMovementType())
+                switch (GetMovementType())
                 {
-                    case Organism.Status.None:
+                    case StatusComponent.Status.None:
                         //TODO only move to preferred terrain
                         RandomDestination();
                         break;
 
-                    case Organism.Status.Hungry:
+                    case StatusComponent.Status.Hungry:
                         _food = (Vegetation)SceneManager.Current.GameObjects.NearestWithinDistance(GameObject, _vision * 64, "Vegetation");
                         if (_food != null) _destination = _food.Position;
                         else if (!_destinationSet) RandomDestination();
                         break;
 
-                    case Organism.Status.Mating:
+                    case StatusComponent.Status.Mating:
                         _mate = (Organism)SceneManager.Current.GameObjects.NearestWithinDistance(GameObject, _vision * 64, "Organism");
                         if (_mate != null) _destination = _mate.Position;
                         else if (!_destinationSet) RandomDestination();
@@ -101,18 +104,18 @@ namespace Evolusim
 
             if(!_override)
             {
-                switch (_gameObject.GetMovementType())
+                switch (GetMovementType())
                 {
-                    case Organism.Status.Hungry:
+                    case StatusComponent.Status.Hungry:
                         if (_food == null || _food.IsDead) GetDestination(TerrainType.None);
                         break;
 
-                    case Organism.Status.Mating:
+                    case StatusComponent.Status.Mating:
                         if (_mate == null || _mate.MarkedForDestroy) GetDestination(TerrainType.None);
                         else _destination = _mate.Position;
                         break;
 
-                    case Organism.Status.Sleeping:
+                    case StatusComponent.Status.Sleeping:
                         return;
 
                     default:
@@ -129,12 +132,12 @@ namespace Evolusim
         {
             if(!_override)
             {
-                switch (_gameObject.GetMovementType())
+                switch (GetMovementType())
                 {
-                    case Organism.Status.None:
+                    case StatusComponent.Status.None:
                         break;
 
-                    case Organism.Status.Hungry:
+                    case StatusComponent.Status.Hungry:
                         if (_food == null)
                         {
                             _destinationSet = false;
@@ -145,7 +148,7 @@ namespace Evolusim
                         _food = null;
                         break;
 
-                    case Organism.Status.Mating:
+                    case StatusComponent.Status.Mating:
                         if (_mate == null)
                         {
                             _destinationSet = false;
@@ -172,5 +175,14 @@ namespace Evolusim
             var y = w * MathF.Sin(t);
             _destination = GameObject.Position + new Vector2(x, y);
         }
+
+        private StatusComponent.Status GetMovementType()
+        {
+            if (_status.HasStatus(StatusComponent.Status.Sleeping)) return StatusComponent.Status.Sleeping;
+            if (_status.HasStatus(StatusComponent.Status.Hungry)) return StatusComponent.Status.Hungry;
+            if (_status.HasStatus(StatusComponent.Status.Mating)) return StatusComponent.Status.Mating;
+            return StatusComponent.Status.None;
+        }
+
     }
 }

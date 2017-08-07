@@ -99,14 +99,10 @@ namespace SmallEngine
         {
             _isInUpdate = true;
             _uiManager.Update(pDeltaTime);
-            Scene.Update(pDeltaTime);
             ActiveCamera.Update(pDeltaTime);
 
-            //Update game objects
-            foreach (var go in Scene.GameObjects)
-            {
-                go.Update(pDeltaTime);
-            }
+            Scene.Update(pDeltaTime);
+
             //Update physics
             GameWorld.Update(pDeltaTime);
             _isInUpdate = false;
@@ -117,14 +113,6 @@ namespace SmallEngine
         private void Draw()
         {
             Scene.Draw(Graphics);
-
-            //Update game objects
-            //TODO speed!
-            foreach (var go in Scene.GameObjects.OrderBy(pGo => pGo.Order))
-            {
-                go.Draw(Graphics);
-            }
-
             _uiManager.Draw(Graphics);
         }
         #endregion

@@ -10,10 +10,11 @@ namespace SmallEngine
     public class Scene : IUpdatable
     {
         private List<IGameObject> _gameObjects;
-        private List<IGameObject> _requestedGO;
+        public List<IDrawable> _drawable;
+        private List<IUpdatable> _updatable;
         private Dictionary<string, IGameObject> _namedObjects;
-        private static List<IGameObject> _persistantObjects;
         private static List<IGameObject> _toRemove;
+        private List<IGameObject> _requestedGO;
 
         #region Properties
         public List<IGameObject> GameObjects
@@ -27,13 +28,14 @@ namespace SmallEngine
         #region Constructors
         static Scene()
         {
-            _persistantObjects = new List<IGameObject>();
             _toRemove = new List<IGameObject>();
         }
 
         public Scene()
         {
             _gameObjects = new List<IGameObject>();
+            _drawable = new List<IDrawable>();
+            _updatable = new List<IUpdatable>();
             _requestedGO = new List<IGameObject>();
             _namedObjects = new Dictionary<string, IGameObject>();
         }
@@ -41,10 +43,18 @@ namespace SmallEngine
 
         public virtual void Draw(IGraphicsSystem pSystem)
         {
+            foreach(var d in _drawable)
+            {
+                d.Draw(pSystem);
+            }
         }
 
         public virtual void Update(float pDeltaTime)
         {
+            foreach(var u in _updatable)
+            {
+                u.Update(pDeltaTime);
+            }
         }
 
         protected internal virtual void Begin()
@@ -53,23 +63,16 @@ namespace SmallEngine
 
         protected internal virtual void End()
         {
-            foreach (var g in _gameObjects.Where((pG) => pG.Persistant))
-            {
-                _persistantObjects.Add(g);
-            }
-
             DisposeGameObjects();
         }
 
         internal void BeginScene(Game pGame)
         {
-            _gameObjects.AddRange(_persistantObjects);
-            _persistantObjects.Clear();
             Game = pGame;
             Begin();
         }
 
-        //TODO use pooling
+        //TODO use pooling of GO
         #region CreateGameObject
         public IGameObject CreateGameObject(params IComponent[] pComponents)
         {
@@ -166,14 +169,29 @@ namespace SmallEngine
             }
             else
             {
-                _gameObjects.Add(pGameObject);
+                var i = _gameObjects.BinarySearch(pGameObject);
+                _gameObjects.Insert(i, pGameObject);
             }
+        }
+
+        internal void AddUpdatable(IUpdatable pUpdatable)
+        {
+            _updatable.Add(pUpdatable);
+        }
+
+        internal void AddDrawable(IDrawable pDrawable)
+        {
+            var i = _drawable.BinarySearch(pDrawable, RenderComponent.Comparer);
+            if (i == -1) _drawable.Add(pDrawable);
+            else _drawable.Insert(i, pDrawable);
         }
 
         internal void AddRequestedGameObjects()
         {
             foreach(var go in _requestedGO)
             {
+                //var i = _gameObjects.BinarySearch(go);
+                //_gameObjects.Insert(i, go);
                 _gameObjects.Add(go);
             }
             _requestedGO.Clear();
@@ -181,6 +199,8 @@ namespace SmallEngine
 
         internal void AddGameObject(IGameObject pGameObject, string pName)
         {
+            //var i = _gameObjects.BinarySearch(pGameObject);
+            //_gameObjects.Insert(i, pGameObject);
             _gameObjects.Add(pGameObject);
             _namedObjects.Add(pName, pGameObject);
         }
@@ -206,7 +226,10 @@ namespace SmallEngine
             {
                 _gameObjects.Remove(go);
                 go.Dispose();
-                //TODO named objects?
+                if(!string.IsNullOrEmpty(go.Name) && _namedObjects.ContainsKey(go.Name))
+                {
+                    _namedObjects.Remove(go.Name);
+                }
             }
 
             _toRemove.Clear();

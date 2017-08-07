@@ -14,21 +14,13 @@ namespace Evolusim
 {
     class Organism : GameObject
     {
-        [Flags]
-        public enum Status
-        {
-            None,
-            Hungry,
-            Sleeping,
-            Mating
-        }
-
-        public Status OrganismStatus { get; private set; }
+        public int Health { get; set; }
 
         private AnimationRenderComponent _render;
         private AudioComponent _audio;
         private MovementComponent _movement;
         private TraitComponent _traits;
+        private StatusComponent _status;
 
         private TerrainType _preferredTerrain;
 
@@ -47,14 +39,10 @@ namespace Evolusim
         private float _lifeTimeTick;
         private int _currentLifetime;
         private int _lifeTime;
+        private int _totalHealth;
+
         private int _vision;
         private Brush _visionBrush;
-
-        private BitmapResource _sleep;
-        private BitmapResource _heart;
-        private BitmapResource _hungry;
-
-        public int Attractive { get; private set; }
 
         public static Organism SelectedOrganism { get; set; }
 
@@ -66,7 +54,9 @@ namespace Evolusim
             SceneManager.Define("organism", typeof(AnimationRenderComponent),
                                             typeof(AudioComponent),
                                             typeof(TraitComponent),
-                                            typeof(MovementComponent));
+                                            typeof(MovementComponent),
+                                            typeof(StatusComponent),
+                                            typeof(ToolbarComponent));
         }
 
         public static Organism Create()
@@ -87,13 +77,10 @@ namespace Evolusim
         public Organism()
         {
             Position = new Vector2(RandomGenerator.RandomInt(0, Evolusim.WorldSize), RandomGenerator.RandomInt(0, Evolusim.WorldSize));
-            Scale = new Vector2(64);
+            Scale = new Vector2(TerrainMap.BitmapSize);
             _preferredTerrain = TerrainMap.GetTerrainTypeAt(Position);
 
             _visionBrush = Game.Graphics.CreateBrush(System.Drawing.Color.Yellow);
-            _heart = ResourceManager.Request<BitmapResource>("heart");
-            _hungry = ResourceManager.Request<BitmapResource>("hungry");
-            _sleep = ResourceManager.Request<BitmapResource>("sleep");
         }
         #endregion
 
@@ -107,19 +94,22 @@ namespace Evolusim
             _audio.SetAudio("nom");
 
             _movement = GetComponent<MovementComponent>();
+            _status = GetComponent<StatusComponent>();
 
             _traits = GetComponent<TraitComponent>();
             _hunger = (int)_traits.GetTrait(TraitComponent.Traits.Hunger).Value;
 
             _lifeTime = (int)_traits.GetTrait(TraitComponent.Traits.Lifetime).Value;
+            _totalHealth = (int)_traits.GetTrait(TraitComponent.Traits.Health).Value;
+
             _vision = (int)_traits.GetTrait(TraitComponent.Traits.Vision).Value;
             _stamina = (int)_traits.GetTrait(TraitComponent.Traits.Stamina).Value;
 
-            Attractive = (int)_traits.GetTrait(TraitComponent.Traits.Attractive).Value;
             var mateRate = (int)_traits.GetTrait(TraitComponent.Traits.MateRate).Value;
             if (mateRate == 0) _mate = _lifeTime;
             else _mate = _lifeTime / mateRate;
 
+            Health = _totalHealth;
             _currentMate = _mate;
             _currentHunger = _hunger;
             _currentStamina = _stamina;
@@ -128,13 +118,9 @@ namespace Evolusim
 
         public override void Update(float pDeltaTime)
         {
-            _movement.Move(pDeltaTime, _preferredTerrain);
-            _render.Update(pDeltaTime);
+            //TODO move all update/draw to components
 
-            if(InputManager.KeyPressed(Mouse.Left) && InputManager.IsFocused(this))
-            {
-                MessageBus.SendMessage(new GameMessage("ToolbarOpen", this));
-            }
+
 
             if ((_lifeTimeTick += pDeltaTime) >= 1)
             {
@@ -148,13 +134,13 @@ namespace Evolusim
                 }
 
                 //If we are sleeping, just regen stamina, nothing else
-                if (OrganismStatus.HasFlag(Status.Sleeping))
+                if (_status.HasStatus(StatusComponent.Status.Sleeping))
                 {
                     _staminaPercent += .1f;
                     if (_staminaPercent >= 1f)
                     {
                         _currentStamina = _stamina + 1; //Add one because we are going to subtract 1
-                        OrganismStatus &= ~Status.Sleeping;
+                        _status.RemoveStatus(StatusComponent.Status.Sleeping);
                     }
                     else return;
                 }
@@ -171,7 +157,7 @@ namespace Evolusim
                 if (_staminaPercent <= 0)
                 {
                     //Go to sleep no matter what if we have no stamina
-                    OrganismStatus |= Status.Sleeping;
+                    _status.AddStatus(StatusComponent.Status.Sleeping);
                     return;
                 }
 
@@ -184,12 +170,12 @@ namespace Evolusim
                 else if (_hungerPercent <= .25f)
                 {
                     //Start seeking food no matter what
-                    OrganismStatus = Status.Hungry;
+                    _status.OverrideStatus(StatusComponent.Status.Hungry);
                 }
                 else if (_hungerPercent <= .5)
                 {
                     //Start seeking food...
-                    OrganismStatus |= Status.Hungry;
+                    _status.AddStatus(StatusComponent.Status.Hungry);
                 }
 
                 //*** Stamina
@@ -202,45 +188,18 @@ namespace Evolusim
                 //*** Mating
                 if (_currentMate <= .4f)
                 {
-                    OrganismStatus |= Status.Mating;
+                    _status.AddStatus(StatusComponent.Status.Mating);
                 }
             }
-        }
-
-        public override void Draw(IGraphicsSystem pSystem)
-        {
-            _render.Draw(pSystem);
-
-            var scale = new Vector2(Scale.X / 2, Scale.X / 2) * Game.ActiveCamera.Zoom;
-            var pos = ScreenPosition + new Vector2(scale.X / 2, -scale.Y / 2);
-            if(OrganismStatus.HasFlag(Status.Sleeping))
-            {
-                pSystem.DrawBitmap(_sleep, 1, pos, scale);
-            }
-            else if(OrganismStatus.HasFlag(Status.Hungry))
-            {
-                pSystem.DrawBitmap(_hungry, 1, pos, scale);
-            }
-            else if(OrganismStatus.HasFlag(Status.Mating))
-            {
-                pSystem.DrawBitmap(_heart, 1, pos, scale);
-            }
-
-#if DEBUG
-            pSystem.DrawElipse(ScreenPosition, _vision * 64 * Game.ActiveCamera.Zoom, _visionBrush);
-            var p = Game.ActiveCamera.ToCameraSpace(_movement._destination);
-            pSystem.DrawFillRect(new Rectangle(p, 5, 5), _visionBrush);
-#endif
         }
 
         public void Eat(Vegetation pFood)
         {
             _movement.Stop(1f);
-            _currentHunger += pFood.Food;
-            if (_currentHunger > _hunger) _currentHunger = _hunger;
+            _currentHunger = Math.Min(_hunger, _currentHunger + pFood.Food);
             pFood.Destroy();
             _audio.PlayImmediate();
-            OrganismStatus = Status.None;
+            _status.RemoveStatus(StatusComponent.Status.Hungry);
         }
 
         public void Mate(Organism pMate)
@@ -248,21 +207,21 @@ namespace Evolusim
             _movement.Stop(1f);
             CreateFrom(this, pMate);
             _currentMate = _mate;
-            OrganismStatus = Status.None;
+            _status.RemoveStatus(StatusComponent.Status.Mating);
         }
 
         public void TrySleep()
         {
             //TODO maybe look around for stuff
-            if(OrganismStatus.HasFlag(Status.Hungry) && _hungerPercent > .4f)
+            if (_status.HasStatus(StatusComponent.Status.Hungry) && _hungerPercent > .4f)
             {
-                OrganismStatus |= Status.Sleeping;
+                _status.AddStatus(StatusComponent.Status.Sleeping);
             }
         }
 
         public void MoveTo(Vector2 pPosition)
         {
-            if (OrganismStatus.HasFlag(Status.Sleeping)) return;
+            if (_status.HasStatus(StatusComponent.Status.Sleeping)) return;
             _movement.MoveTo(pPosition);
         }
 
@@ -272,14 +231,7 @@ namespace Evolusim
             yield return Tuple.Create("Stamina", _staminaPercent);
             yield return Tuple.Create("Mate", _matePercent);
             yield return Tuple.Create("Lifetime", (float)_currentLifetime / _lifeTime);
-        }
-
-        public Status GetMovementType()
-        {
-            if (OrganismStatus.HasFlag(Status.Sleeping)) return Status.Sleeping;
-            if (OrganismStatus.HasFlag(Status.Hungry)) return Status.Hungry;
-            if (OrganismStatus.HasFlag(Status.Mating)) return Status.Mating;
-            return Status.None;
+            yield return Tuple.Create("Health", (float)Health / _totalHealth);
         }
         
         private void AnimationEval()

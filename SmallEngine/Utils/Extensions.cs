@@ -40,5 +40,10 @@ namespace SmallEngine
             }
             return closest;
         }
+
+        public static IGameObject Nearest(this IEnumerable<IGameObject> pGameObjects, IGameObject pGameObject, string pTag)
+        {
+            return NearestWithinDistance(pGameObjects, pGameObject, float.MaxValue, pTag);
+        }
     }
 }

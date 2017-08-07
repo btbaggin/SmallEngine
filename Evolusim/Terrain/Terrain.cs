@@ -152,6 +152,11 @@ namespace Evolusim.Terrain
             return pTile * BitmapSize;
         }
 
+        public static Vector2 GetPosition(int pX, int pY)
+        {
+            return new Vector2(pX, pY) * BitmapSize;
+        }
+
         internal void BitmapData(ref BitmapResource pResource, int pResolution)
         {
             if (!_updateBitmap)

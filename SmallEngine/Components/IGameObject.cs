@@ -8,7 +8,7 @@ using SmallEngine.Input;
 
 namespace SmallEngine
 {
-    public interface IGameObject : IUpdatable, IDrawable, IMessageReceiver, IFocusElement, IDisposable
+    public interface IGameObject : IMessageReceiver, IDisposable
     {
         #region Properties
         string Name { get; }
@@ -22,8 +22,6 @@ namespace SmallEngine
         float Rotation { get; set; }
 
         Rectangle Bounds { get; }
-
-        bool Persistant { get; set; }
 
         string Tag { get; set; }
         #endregion

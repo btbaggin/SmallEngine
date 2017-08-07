@@ -178,19 +178,19 @@ namespace SmallEngine.Input
             }
         }
 
-        private static IFocusElement _focus;
+        private static IDrawable _focus;
         private static void CheckMouseFocus()
         {
             _focus = null;
-            foreach(var ui in UI.UIManager.Elements.OrderBy(pUi => pUi.Order))
+            foreach(var ui in UI.UIManager.Elements)
             {
-                _focus = ui.GetFocusedElement(MousePosition);
+                _focus = ui.GetFocusElement(MousePosition);
                 if (_focus != null) return;
             }
 
-            foreach(var go in SceneManager.Current.GameObjects.OrderBy(pGo => pGo.Order))
+            foreach (var go in SceneManager.Current._drawable)//GameObjects.OrderBy(pGo => pGo.Order))
             {
-                _focus = go.GetFocusedElement(MousePosition);
+                _focus = go.GetFocusElement(MousePosition);
                 if (_focus != null) return;
             }
         }
@@ -246,7 +246,7 @@ namespace SmallEngine.Input
             return _mode == Mode.Drag;
         }
 
-        public static bool IsFocused(IFocusElement pElement)
+        public static bool IsFocused(IDrawable pElement)
         {
             return pElement == _focus;
         }

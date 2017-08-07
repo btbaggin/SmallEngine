@@ -13,8 +13,7 @@ namespace SmallEngine
             var t = GetType();
             DetermineDepencencies(t);
 
-            while ((t = t.BaseType) != null &&
-                   IsComponent(t))
+            while ((t = t.BaseType) != null && IsComponent(t))
             {
                 DetermineDepencencies(t);
             }
@@ -22,19 +21,37 @@ namespace SmallEngine
 
         public override void OnAdded(IGameObject pGameObject)
         {
+            base.OnAdded(pGameObject);
             GameObject = pGameObject;
             foreach (var d in _dependencies)
             {
-                var component = pGameObject.GetComponent(d.Key.FieldType);
-                if(component == null)
+                IComponent component = null;
+                if (d.Value.AllowInheritedTypes)
                 {
+                    //Look for any inherited types
+                    foreach(var c in pGameObject.GetComponents())
+                    {
+                        if(d.Key.FieldType.IsAssignableFrom(c.GetType()))
+                        {
+                            component = c;
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    //Get actual type
+                    component = pGameObject.GetComponent(d.Key.FieldType);
+                }
+
+                if(component == null && d.Value.Required)
+                {
+                    //Create if required
                     component = Create(d.Key.FieldType);
                     pGameObject.AddComponent(component);
                 }
-                if (component == null)
-                {
-                    continue;
-                }
+
+                if (component == null) continue;
 
                 d.Key.SetValue(this, component);
             }
@@ -50,8 +67,7 @@ namespace SmallEngine
                 var att = f.GetCustomAttribute<ImportComponentAttribute>();
                 if (att != null)
                 {
-                    System.Diagnostics.Debug.Assert(IsComponent(type) && 
-                                                    type.GetConstructor(Type.EmptyTypes) != null, 
+                    System.Diagnostics.Debug.Assert(IsComponent(type) && type.GetConstructor(Type.EmptyTypes) != null, 
                                                     "ImportComponent must be IComponent and have an empty constructor");
                     _dependencies.Add(f, att);
                 }

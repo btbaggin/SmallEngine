@@ -156,7 +156,7 @@ namespace Evolusim.Terrain
 
         public override void Update(float pDeltaTime)
         {
-            if (InputManager.KeyPressed(Mouse.Right) && InputManager.IsFocused(this))
+            if (InputManager.KeyPressed(Mouse.Right) && InputManager.IsFocused(_render))
             {
                 if (Organism.SelectedOrganism != null) Organism.SelectedOrganism.MoveTo(Position);
             }
@@ -180,11 +180,6 @@ namespace Evolusim.Terrain
             {
                 Destroy();
             }
-        }
-
-        public override void Draw(IGraphicsSystem pSystem)
-        {
-            _render.Draw(pSystem);
         }
 
         public override void Dispose()

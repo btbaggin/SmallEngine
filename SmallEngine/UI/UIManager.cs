@@ -19,7 +19,9 @@ namespace SmallEngine.UI
 
         public static void Register(UIElement pElement)
         {
-            Elements.Add(pElement);
+            var i = Elements.BinarySearch(pElement);
+            if (i == -1) Elements.Add(pElement);
+            else Elements.Insert(i, pElement);
         }
 
         public static void Unregister(UIElement pElement)
@@ -29,8 +31,7 @@ namespace SmallEngine.UI
 
         internal void Draw(IGraphicsSystem pSystem)
         {
-            //TODO speed
-            foreach (var e in Elements.OrderBy((pE) => pE.Order))
+            foreach (var e in Elements)
             {
                 if (e.Visible)
                 {
