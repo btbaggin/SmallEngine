@@ -141,6 +141,7 @@
     <Compile Include="Utils\PerlinNoise.cs" />
     <Compile Include="Utils\ObjectPool.cs" />
     <Compile Include="Utils\RandomGenerator.cs" />
+    <Compile Include="Utils\Timer.cs" />
     <Compile Include="Vector2.cs" />
   </ItemGroup>
   <ItemGroup>

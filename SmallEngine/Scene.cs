@@ -51,7 +51,7 @@ namespace SmallEngine
 
         public virtual void Update(float pDeltaTime)
         {
-            foreach(var u in _updatable)
+            foreach(var u in _updatable)//TODO switch to for(i?
             {
                 u.Update(pDeltaTime);
             }
@@ -89,7 +89,7 @@ namespace SmallEngine
 
             go.SetGame(Game);
             go.Initialize();
-            if (pName == null) { AddGameObject(go); } else { AddGameObject(go, pName); }
+            AddGameObject(go, pName);
             return go;
         }
 
@@ -108,7 +108,7 @@ namespace SmallEngine
 
             go.SetGame(Game);
             go.Initialize();
-            if (pName == null) { AddGameObject(go); } else { AddGameObject(go, pName); }
+            AddGameObject(go, pName);
             return go;
         }
 
@@ -129,7 +129,7 @@ namespace SmallEngine
 
                 go.SetGame(Game);
                 go.Initialize();
-                if (pName == null) { AddGameObject(go); } else { AddGameObject(go, pName); }
+                AddGameObject(go, pName);
                 return go;
             }
 
@@ -153,7 +153,7 @@ namespace SmallEngine
 
                 go.SetGame(Game);
                 go.Initialize();
-                if (pName == null) { AddGameObject(go); } else { AddGameObject(go, pName); }
+                AddGameObject(go, pName);
                 return go;
             }
 
@@ -161,7 +161,7 @@ namespace SmallEngine
         }
         #endregion  
 
-        private void AddGameObject(IGameObject pGameObject)
+        private void AddGameObject(IGameObject pGameObject, string pName)
         {
             if(Game._isInUpdate)
             {
@@ -169,40 +169,39 @@ namespace SmallEngine
             }
             else
             {
-                var i = _gameObjects.BinarySearch(pGameObject);
-                _gameObjects.Insert(i, pGameObject);
+                _gameObjects.Add(pGameObject);
+                if (pName != null) _namedObjects.Add(pName, pGameObject);
             }
         }
-
-        internal void AddUpdatable(IUpdatable pUpdatable)
+        public void AddUpdatable(IUpdatable pUpdatable)
         {
             _updatable.Add(pUpdatable);
         }
 
-        internal void AddDrawable(IDrawable pDrawable)
+        public void RemoveUpdatable(IUpdatable pUpdatable)
+        {
+            _updatable.Remove(pUpdatable);
+        }
+
+        public void AddDrawable(IDrawable pDrawable)
         {
             var i = _drawable.BinarySearch(pDrawable, RenderComponent.Comparer);
             if (i == -1) _drawable.Add(pDrawable);
             else _drawable.Insert(i, pDrawable);
         }
 
+        public void RemoveDrawable(IDrawable pDrawable)
+        {
+            _drawable.Remove(pDrawable);
+        }
+
         internal void AddRequestedGameObjects()
         {
             foreach(var go in _requestedGO)
             {
-                //var i = _gameObjects.BinarySearch(go);
-                //_gameObjects.Insert(i, go);
                 _gameObjects.Add(go);
             }
             _requestedGO.Clear();
-        }
-
-        internal void AddGameObject(IGameObject pGameObject, string pName)
-        {
-            //var i = _gameObjects.BinarySearch(pGameObject);
-            //_gameObjects.Insert(i, pGameObject);
-            _gameObjects.Add(pGameObject);
-            _namedObjects.Add(pName, pGameObject);
         }
 
         public IGameObject FindGameObject(string pName)
@@ -224,8 +223,8 @@ namespace SmallEngine
         {
             foreach(var go in _toRemove)
             {
-                _gameObjects.Remove(go);
                 go.Dispose();
+                _gameObjects.Remove(go);
                 if(!string.IsNullOrEmpty(go.Name) && _namedObjects.ContainsKey(go.Name))
                 {
                     _namedObjects.Remove(go.Name);

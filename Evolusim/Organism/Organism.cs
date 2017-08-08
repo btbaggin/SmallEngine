@@ -19,29 +19,9 @@ namespace Evolusim
         private AnimationRenderComponent _render;
         private AudioComponent _audio;
         private MovementComponent _movement;
-        private TraitComponent _traits;
         private StatusComponent _status;
 
         private TerrainType _preferredTerrain;
-
-        private int _hunger;
-        private int _currentHunger;
-        private float _hungerPercent;
-
-        private int _stamina;
-        private int _currentStamina;
-        private float _staminaPercent;
-
-        private int _mate;
-        private int _currentMate;
-        private float _matePercent;
-
-        private int _currentLifetime;
-        private int _lifeTime;
-        private int _totalHealth;
-
-        private int _vision;
-        private Brush _visionBrush;
 
         public static Organism SelectedOrganism { get; set; }
 
@@ -78,8 +58,6 @@ namespace Evolusim
             Position = new Vector2(RandomGenerator.RandomInt(0, Evolusim.WorldSize), RandomGenerator.RandomInt(0, Evolusim.WorldSize));
             Scale = new Vector2(TerrainMap.BitmapSize);
             _preferredTerrain = TerrainMap.GetTerrainTypeAt(Position);
-
-            _visionBrush = Game.Graphics.CreateBrush(System.Drawing.Color.Yellow);
         }
         #endregion
 
@@ -95,143 +73,58 @@ namespace Evolusim
             _movement = GetComponent<MovementComponent>();
             _status = GetComponent<StatusComponent>();
 
-            _traits = GetComponent<TraitComponent>();
-            _hunger = (int)_traits.GetTrait(TraitComponent.Traits.Hunger).Value;
-
-            _lifeTime = (int)_traits.GetTrait(TraitComponent.Traits.Lifetime).Value;
-            _totalHealth = (int)_traits.GetTrait(TraitComponent.Traits.Health).Value;
-
-            _vision = (int)_traits.GetTrait(TraitComponent.Traits.Vision).Value;
-            _stamina = (int)_traits.GetTrait(TraitComponent.Traits.Stamina).Value;
-
-            var mateRate = (int)_traits.GetTrait(TraitComponent.Traits.MateRate).Value;
-            if (mateRate == 0) _mate = _lifeTime;
-            else _mate = _lifeTime / mateRate;
-
-            Health = _totalHealth;
-            _currentMate = _mate;
-            _currentHunger = _hunger;
-            _currentStamina = _stamina;
-            _currentLifetime = _lifeTime;
-
-            Coroutine.Start(LifeTick);
+            //Coroutine.Start(LifeTick);
+            MessageBus.Register(this);
         }
 
-        private IEnumerator<WaitEvent> LifeTick()
+        public override void ReceiveMessage(GameMessage pM)
         {
-            while(!MarkedForDestroy)
+            switch(pM.MessageType)
             {
-                //Lifetime
-                if ((_currentLifetime -= 1) <= 0)
-                {
-                    Destroy();
+                case "EnemySpan":
+                    var p = pM.GetValue<Vector2>();
+                    if(Vector2.DistanceSqrd(p, Position) < 225)
+                    {
+                        _status.AddStatus(StatusComponent.Status.Scared);
+                    }
+                    Coroutine.Start(RunScared, p);
                     break;
-                }
-
-                //If we are sleeping, just regen stamina, nothing else
-                if (_status.HasStatus(StatusComponent.Status.Sleeping))
-                {
-                    _staminaPercent += .1f;
-                    if (_staminaPercent >= 1f)
-                    {
-                        _currentStamina = _stamina + 1; //Add one because we are going to subtract 1
-                        _status.RemoveStatus(StatusComponent.Status.Sleeping);
-                    }
-                    else
-                    {
-                        yield return new WaitForSeconds(1);
-                    }
-                }
-
-                _currentMate -= 1;
-                _currentHunger -= 1;
-                _currentStamina -= 1;
-
-                _hungerPercent = (float)_currentHunger / _hunger;
-                _staminaPercent = (float)_currentStamina / _stamina;
-                _matePercent = (float)_currentStamina / _mate;
-
-                //Hard sleep check
-                if (_staminaPercent <= 0)
-                {
-                    //Go to sleep no matter what if we have no stamina
-                    _status.AddStatus(StatusComponent.Status.Sleeping);
-                    yield return new WaitForSeconds(1);
-                }
-
-                //*** Hunger
-                if (_hungerPercent <= 0)
-                {
-                    Destroy();
-                    yield return new WaitForSeconds(1);
-                }
-                else if (_hungerPercent <= .25f)
-                {
-                    //Start seeking food no matter what
-                    _status.OverrideStatus(StatusComponent.Status.Hungry);
-                }
-                else if (_hungerPercent <= .5)
-                {
-                    //Start seeking food...
-                    _status.AddStatus(StatusComponent.Status.Hungry);
-                }
-
-                //*** Stamina
-                if (_currentStamina <= .3)
-                {
-                    TrySleep();
-                    yield return new WaitForSeconds(1);
-                }
-
-                //*** Mating
-                if (_currentMate <= .4f)
-                {
-                    _status.AddStatus(StatusComponent.Status.Mating);
-                }
-
-                yield return new WaitForSeconds(1);
             }
+        }
+
+        private IEnumerator<WaitEvent> RunScared(object pState)
+        {
+            var m = Vector2.MultiplyInDirection(100, Position, Position - (Vector2)pState);
+            _movement.MoveTo(m, false);
+
+            yield return new WaitForSeconds(2);//Run for 2 seconds
+            _movement.MoveTo(Position, false);
+            _status.RemoveStatus(StatusComponent.Status.Scared);
         }
 
         public void Eat(Vegetation pFood)
         {
             _movement.Stop(1f);
-            _currentHunger = Math.Min(_hunger, _currentHunger + pFood.Food);
+            _status.Eat(pFood);
             pFood.Destroy();
             _audio.PlayImmediate();
-            _status.RemoveStatus(StatusComponent.Status.Hungry);
         }
 
         public void Mate(Organism pMate)
         {
             _movement.Stop(1f);
             CreateFrom(this, pMate);
-            _currentMate = _mate;
-            _status.RemoveStatus(StatusComponent.Status.Mating);
-        }
-
-        public void TrySleep()
-        {
-            //TODO maybe look around for stuff
-            if (_status.HasStatus(StatusComponent.Status.Hungry) && _hungerPercent > .4f)
-            {
-                _status.AddStatus(StatusComponent.Status.Sleeping);
-            }
-        }
-
-        public void MoveTo(Vector2 pPosition)
-        {
-            if (_status.HasStatus(StatusComponent.Status.Sleeping)) return;
-            _movement.MoveTo(pPosition);
+            _status.Mate(pMate);
         }
 
         public IEnumerable<Tuple<string, float>> GetStats()
         {
-            yield return Tuple.Create("Hunger", _hungerPercent);
-            yield return Tuple.Create("Stamina", _staminaPercent);
-            yield return Tuple.Create("Mate", _matePercent);
-            yield return Tuple.Create("Lifetime", (float)_currentLifetime / _lifeTime);
-            yield return Tuple.Create("Health", (float)Health / _totalHealth);
+            return _status.GetStats();
+        }
+
+        public void MoveTo(Vector2 pPosition)
+        {
+            _movement.MoveTo(pPosition, true);
         }
         
         private void AnimationEval()

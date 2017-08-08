@@ -55,9 +55,15 @@ namespace Evolusim
             if(GameObject.Position ==  _destination) ResolveDestination();
         }
 
-        public void MoveTo(Vector2 pPosition)
+        public void MoveTo(Vector2 pPosition, bool pOverride)
         {
-            _override = true;
+            if (_status.HasStatus(StatusComponent.Status.Sleeping))
+            {
+                if (pOverride) _status.RemoveStatus(StatusComponent.Status.Sleeping);
+                else return;
+            }
+
+            _override = pOverride;
             _destination = pPosition;
             _destinationSet = true;
             _mate = null;
@@ -79,6 +85,10 @@ namespace Evolusim
                     case StatusComponent.Status.None:
                         //TODO only move to preferred terrain
                         RandomDestination();
+                        break;
+
+                    case StatusComponent.Status.Scared:
+                        //Shouldn't need to do anything
                         break;
 
                     case StatusComponent.Status.Hungry:
@@ -135,6 +145,7 @@ namespace Evolusim
                 switch (GetMovementType())
                 {
                     case StatusComponent.Status.None:
+                    case StatusComponent.Status.Scared:
                         break;
 
                     case StatusComponent.Status.Hungry:
@@ -178,6 +189,7 @@ namespace Evolusim
 
         private StatusComponent.Status GetMovementType()
         {
+            if (_status.HasStatus(StatusComponent.Status.Scared)) return StatusComponent.Status.Scared;
             if (_status.HasStatus(StatusComponent.Status.Sleeping)) return StatusComponent.Status.Sleeping;
             if (_status.HasStatus(StatusComponent.Status.Hungry)) return StatusComponent.Status.Hungry;
             if (_status.HasStatus(StatusComponent.Status.Mating)) return StatusComponent.Status.Mating;

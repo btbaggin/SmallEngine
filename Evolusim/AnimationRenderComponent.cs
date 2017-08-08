@@ -8,9 +8,8 @@ using SmallEngine.Graphics;
 
 namespace Evolusim
 {
-    class AnimationRenderComponent : RenderComponent, IUpdatable
+    class AnimationRenderComponent : BitmapRenderComponent
     {
-        BitmapResource _bitmap;
         int _currentFrame;
         int _maxFrames;
         Vector2 _frameSize;
@@ -25,11 +24,6 @@ namespace Evolusim
         {
         }
 
-        public void SetBitmap(string pAlias)
-        {
-            _bitmap = ResourceManager.Request<BitmapResource>(pAlias);
-        }
-
         public void SetAnimation(int pMaxFrames, Vector2 pFrameSize, float pFrameDuration, Action pEvaluator)
         {
             _maxFrames = pMaxFrames - 1;
@@ -40,11 +34,11 @@ namespace Evolusim
 
         protected override void DoDraw(IGraphicsSystem pSystem)
         {
-            pSystem.DrawBitmap(_bitmap, 
-                Opacity, 
-                GameObject.ScreenPosition, 
-                GameObject.Scale * Game.ActiveCamera.Zoom, 
-                new Rectangle(_currentFrame * _frameSize.X, AnimationNum * _frameSize.Y, _frameSize.X, _frameSize.Y));
+            pSystem.DrawBitmap(Bitmap, 
+                               Opacity, 
+                               GameObject.ScreenPosition, 
+                               GameObject.Scale * Game.ActiveCamera.Zoom, 
+                               new Rectangle(_currentFrame * _frameSize.X, AnimationNum * _frameSize.Y, _frameSize.X, _frameSize.Y));
         }
 
         protected override void DoDraw(IGraphicsSystem pSystem, Effect pEffect)
@@ -52,7 +46,19 @@ namespace Evolusim
             throw new NotImplementedException();
         }
 
-        public void Update(float pDeltaTime)
+        public override void OnAdded(IGameObject pGameObject)
+        {
+            base.OnAdded(pGameObject);
+            SceneManager.Current.AddUpdatable(this);
+        }
+
+        public override void OnRemoved()
+        {
+            base.OnRemoved();
+            SceneManager.Current.RemoveUpdatable(this);//TODO i don't like this. Use weak references?
+        }
+
+        public override void Update(float pDeltaTime)
         {
             _evaluator.Invoke();
             if((_frameTimer += pDeltaTime) >= _frameDuration)
@@ -72,11 +78,6 @@ namespace Evolusim
         {
             if (_currentFrame == 0) _currentFrame = _maxFrames;
             else _currentFrame--;
-        }
-
-        public override void Dispose()
-        {
-            ResourceManager.Dispose<BitmapResource>(_bitmap.Alias);
         }
     }
 }

@@ -72,6 +72,7 @@ namespace SmallEngine
 
     public struct GameMessage
     {
+        //TODO conditions?
         public string MessageType { get; private set; }
         private object _value;
 

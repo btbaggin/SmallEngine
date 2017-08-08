@@ -48,14 +48,20 @@ namespace SmallEngine.Graphics
 
         public override void OnAdded(IGameObject pGameObject)
         {
-            //TODO don't add renders to updatable?
-            base.OnAdded(pGameObject);
+            GameObject = pGameObject;
             SceneManager.Current.AddDrawable(this);
+            Added?.Invoke(this, new EventArgs());
+        }
+
+        public override void OnRemoved()
+        {
+            base.OnRemoved();
+            SceneManager.Current.RemoveDrawable(this);
         }
 
         public IDrawable GetFocusElement(Vector2 pPoint)
         {
-            if (IsVisible())
+            if (GameObject != null && IsVisible())
             {
                 var s = GameObject.Scale * Game.ActiveCamera.Zoom;
                 var sp = GameObject.ScreenPosition;

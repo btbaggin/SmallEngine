@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 
 namespace SmallEngine
 {
@@ -159,6 +160,7 @@ namespace SmallEngine
         /// </summary>
         /// <param name="pV1"></param>
         /// <returns>Vector2 pointing in the opposite direction</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector2 Reverse(Vector2 pV1)
         {
             return new Vector2(-pV1.X, -pV1.Y);
@@ -171,19 +173,14 @@ namespace SmallEngine
         /// <param name="pVectorTo">To vector</param>
         /// <param name="pAmount">Amount to interpolate where 0 = From, 1 = To, .5 = Average of From and To</param>
         /// <returns>Vector interpolated by pAmount</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector2 Lerp(Vector2 pVectorFrom, Vector2 pVectorTo, float pAmount)
         {
-            if (pVectorFrom == null) throw new ArgumentNullException("pV1");
-            if (pVectorTo == null) throw new ArgumentNullException("pV2");
-
             return  pVectorFrom + ((pVectorTo - pVectorFrom) * pAmount);
         }
 
         public static Vector2 MoveTowards(Vector2 pVectorFrom, Vector2 pVectorTo, float pAmount)
         {
-            if (pVectorFrom == null) throw new ArgumentNullException("pV1");
-            if (pVectorTo == null) throw new ArgumentNullException("pV2");
-
             float d = DistanceSqrd(pVectorFrom, pVectorTo);
             Vector2 direction = pVectorFrom + Normalize(pVectorTo - pVectorFrom) * pAmount;
             if(Vector2.DistanceSqrd(pVectorFrom, direction) >= d)
@@ -198,10 +195,9 @@ namespace SmallEngine
         /// </summary>
         /// <param name="pV1">Vector to normalize</param>
         /// <returns>Vector with a length of 1</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector2 Normalize(Vector2 pV1)
         {
-            if (pV1 == null) throw new ArgumentNullException("pV1");
-
             if (pV1.Length == 0) return pV1;
             return pV1 / pV1.Length;
         }
@@ -212,11 +208,9 @@ namespace SmallEngine
         /// <param name="pV1">First vector to calculate distance</param>
         /// <param name="pV2">Second vector to calculate distance</param>
         /// <returns>Distance between pV1 and pV2</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float Distance(Vector2 pV1, Vector2 pV2)
         {
-            if (pV1 == null) throw new ArgumentNullException("pV1");
-            if (pV2 == null) throw new ArgumentNullException("pV2");
-
             var x = pV2.X - pV1.X;
             var y = pV2.Y - pV1.Y;
             return MathF.Sqrt((x * x) + (y * y));
@@ -228,11 +222,9 @@ namespace SmallEngine
         /// <param name="pV1">First vector to calculate distance</param>
         /// <param name="pV2">Second vector to calculate distance</param>
         /// <returns>Distance between pV1 and pV2</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float DistanceSqrd(Vector2 pV1, Vector2 pV2)
         {
-            if (pV1 == null) throw new ArgumentNullException("pV1");
-            if (pV2 == null) throw new ArgumentNullException("pV2");
-
             var x = pV2.X - pV1.X;
             var y = pV2.Y - pV1.Y;
             return (x * x) + (y * y);
@@ -244,11 +236,9 @@ namespace SmallEngine
         /// <param name="pV1">First vector to calculate the dot product</param>
         /// <param name="pV2">Second vector to calculate the dot product</param>
         /// <returns>Dot product of pV1 and pV2</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float DotProduct(Vector2 pV1, Vector2 pV2)
         {
-            if (pV1 == null) throw new ArgumentNullException("pV1");
-            if (pV2 == null) throw new ArgumentNullException("pV2");
-
             return (pV1.X * pV2.X + pV1.Y * pV2.Y);
         }
 
@@ -258,14 +248,13 @@ namespace SmallEngine
         /// <param name="pV1">First vector to calculate the cross product</param>
         /// <param name="pV2">Second vector to calculate the cross product</param>
         /// <returns>Cross product of pV1 and pV2</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector2 CrossProduct(Vector2 pV1, Vector2 pV2)
         {
-            if (pV1 == null) throw new ArgumentNullException("pV1");
-            if (pV2 == null) throw new ArgumentNullException("pV2");
-
             return new Vector2(pV1.Y - pV2.Y, pV2.X - pV1.X);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector2 Clamp(Vector2 pValue, Vector2 pMin, Vector2 pMax)
         {
             if (pValue.X > pMax.X) pValue.X = pMax.X;
@@ -389,6 +378,7 @@ namespace SmallEngine
         /// <param name="pV1">First vector for the midpoint</param>
         /// <param name="pV2"><Second vector for the midpoint/param>
         /// <returns>Vector halfway between pV1 and pV2</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector2 Midpoint(Vector2 pV1, Vector2 pV2)
         {
             return new Vector2((pV1.X + pV2.X) / 2, (pV1.Y + pV2.Y) / 2);
@@ -401,6 +391,7 @@ namespace SmallEngine
         /// <param name="pV1">Vector to multiply</param>
         /// <param name="pDirection">Direction to apply the multiplication</param>
         /// <returns>Multiplied vector</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector2 MultiplyInDirection(float pScalar, Vector2 pV1, Vector2 pDirection)
         {
             pDirection.Normalize();

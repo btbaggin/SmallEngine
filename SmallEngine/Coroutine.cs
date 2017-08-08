@@ -96,6 +96,15 @@ namespace SmallEngine
             }
         }
 
+        public static void Start(Func<object, IEnumerator<WaitEvent>> pCoroutine, object pState)
+        {
+            var e = pCoroutine.Invoke(pState);
+            if(e.MoveNext())
+            {
+                _coroutines.Add(e);
+            }
+        }
+
         internal static void Update(float pDeltaTime)
         {
             foreach (IEnumerator<WaitEvent> e in _coroutines.ToList())

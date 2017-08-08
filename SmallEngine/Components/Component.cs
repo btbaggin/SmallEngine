@@ -53,6 +53,7 @@ namespace SmallEngine
         public virtual void OnRemoved()
         {
             Removed?.Invoke(this, new EventArgs());
+            SceneManager.Current.RemoveUpdatable(this);
             GameObject = null;
         }
 

@@ -53,6 +53,7 @@
     <Compile Include="Organism\Enemy.cs" />
     <Compile Include="Organism\EnemyMovementComponent.cs" />
     <Compile Include="Organism\EnemySpawner.cs" />
+    <Compile Include="Organism\EnemySpawnerComponent.cs" />
     <Compile Include="Organism\StatusComponent.cs" />
     <Compile Include="Terrain\HeightMap.cs" />
     <Compile Include="MenuScene.cs" />
