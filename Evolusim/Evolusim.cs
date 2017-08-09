@@ -29,6 +29,8 @@ namespace Evolusim
             ResourceManager.Add<BitmapResource>("heart", "Graphics/heart.png", true);
             ResourceManager.Add<BitmapResource>("sleep", "Graphics/sleep.png", true);
 
+            ResourceManager.Add<BitmapResource>("enemy_spawner", "Graphics/enemy_spawner.png", true);
+
             ResourceManager.Add<BitmapResource>("v_water", "Graphics/v_water.png", true);
             ResourceManager.Add<BitmapResource>("v_grassland", "Graphics/v_grassland.png", true);
             ResourceManager.Add<BitmapResource>("v_shrubland", "Graphics/v_shrubland.png", true);

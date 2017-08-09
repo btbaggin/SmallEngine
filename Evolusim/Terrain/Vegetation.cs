@@ -12,19 +12,19 @@ namespace Evolusim.Terrain
 
         public int Y { get; private set; }
 
-        public bool IsDead { get { return _lifeTime <= 0; } }
+        public TerrainType Terrain { get; private set; }
+
+        public bool IsDead { get { return _life.LifeTime <= 0; } }
 
         public int Food { get; private set; }
 
-        private int _lifeTime;
-        private float _lifetimeTimer;
         BitmapRenderComponent _render;
-        TerrainType _terrainType;
-        private int _speadCount;
+        VegetationLifeComponent _life;
 
         static Vegetation()
         {
-            SceneManager.Define("vegetation", typeof(BitmapRenderComponent));
+            SceneManager.Define("vegetation", typeof(BitmapRenderComponent),
+                                              typeof(VegetationLifeComponent));
 
             //Add dead bitmaps
             using (Effect e = new Effect())
@@ -89,91 +89,54 @@ namespace Evolusim.Terrain
             base.Initialize();
             Scale = new Vector2(64);
             _render = GetComponent<BitmapRenderComponent>();
+            _life = GetComponent<VegetationLifeComponent>();
         }
 
         private void SetXY(int pX, int pY)
         {
             X = pX;
             Y = pY;
-            _terrainType = TerrainMap.GetTerrainType(pX, pY);
+            Terrain = TerrainMap.GetTerrainType(pX, pY);
             Position = TerrainMap.GetPosition(new Vector2(pX, pY));
-            switch (_terrainType)
+            switch (Terrain)
             {
                 case TerrainType.Water:
                     _render.SetBitmap("v_water");
-                    _lifeTime = RandomGenerator.RandomInt(20, 40);
-                    _speadCount = RandomGenerator.RandomInt(1, 2);
+                    _life.LifeTime = RandomGenerator.RandomInt(20, 40);
+                    _life.SpreadCount = RandomGenerator.RandomInt(1, 2);
                     Food = 10;
                     break;
 
                 case TerrainType.Grassland:
-                    _lifeTime = RandomGenerator.RandomInt(20, 40);
-                    _speadCount = 1;
+                    _life.LifeTime = RandomGenerator.RandomInt(20, 40);
+                    _life.SpreadCount = 1;
                     _render.SetBitmap("v_grassland");
                     Food = 10;
                     break;
 
                 case TerrainType.Shrubland:
-                    _lifeTime = RandomGenerator.RandomInt(10, 20);
-                    _speadCount = RandomGenerator.RandomInt(0, 3);
+                    _life.LifeTime = RandomGenerator.RandomInt(10, 20);
+                    _life.SpreadCount = RandomGenerator.RandomInt(0, 3);
                     _render.SetBitmap("v_shrubland");
                     Food = 5;
                     break;
 
                 case TerrainType.TemperateDeciduous:
-                    _lifeTime = RandomGenerator.RandomInt(40, 60);
-                    _speadCount = RandomGenerator.RandomInt(1, 2);
+                    _life.LifeTime = RandomGenerator.RandomInt(40, 60);
+                    _life.SpreadCount = RandomGenerator.RandomInt(1, 2);
                     _render.SetBitmap("v_temperatedeciduous");
                     Food = 20;
                     break;
 
                 case TerrainType.Desert:
-                    _lifeTime = RandomGenerator.RandomInt(60, 80);
-                    _speadCount = 1;
+                    _life.LifeTime = RandomGenerator.RandomInt(60, 80);
+                    _life.SpreadCount = 1;
                     _render.SetBitmap("v_desert");
                     Food = 10;
                     break;
 
                 default:
                     throw new Exception("Unsupported terrain type");
-            }
-        }
-
-        private void Spread()
-        {
-            for(int i = 0; i < _speadCount; i++)
-            {
-                var dx = RandomGenerator.RandomInt(X - 1, X + 1);
-                var dy = RandomGenerator.RandomInt(Y - 1, Y + 1);
-                dx = (int)MathF.Clamp(dx, 0, TerrainMap.Size);
-                dy = (int)MathF.Clamp(dy, 0, TerrainMap.Size);
-
-                if (TerrainMap.GetTerrainType(dx, dy) == _terrainType)
-                {
-                    Create(dx, dy);
-                }
-            }
-        }
-
-        private IEnumerator<WaitEvent> LifeTick()
-        {
-            while(!MarkedForDestroy)
-            {
-                if (_lifeTime == 1)
-                {
-                    Spread();
-                }
-                else if (_lifeTime == 0)
-                {
-                    _render.SetBitmap(_render.Bitmap.Alias + "_dead");
-                }
-                else if (_lifeTime <= -1)
-                {
-                    Destroy();
-                    break;
-                }
-
-                yield return new WaitForSeconds(1);
             }
         }
     }

@@ -94,10 +94,8 @@ namespace SmallEngine
         {
         }
 
-        internal bool _isInUpdate;
         public virtual void Update(float pDeltaTime)
         {
-            _isInUpdate = true;
             _uiManager.Update(pDeltaTime);
             ActiveCamera.Update(pDeltaTime);
 
@@ -105,9 +103,6 @@ namespace SmallEngine
 
             //Update physics
             GameWorld.Update(pDeltaTime);
-            _isInUpdate = false;
-
-            Scene.AddRequestedGameObjects();
         }
 
         private void Draw()

@@ -14,7 +14,6 @@ namespace SmallEngine
         private List<IUpdatable> _updatable;
         private Dictionary<string, IGameObject> _namedObjects;
         private static List<IGameObject> _toRemove;
-        private List<IGameObject> _requestedGO;
 
         #region Properties
         public List<IGameObject> GameObjects
@@ -36,7 +35,6 @@ namespace SmallEngine
             _gameObjects = new List<IGameObject>();
             _drawable = new List<IDrawable>();
             _updatable = new List<IUpdatable>();
-            _requestedGO = new List<IGameObject>();
             _namedObjects = new Dictionary<string, IGameObject>();
         }
         #endregion
@@ -51,9 +49,9 @@ namespace SmallEngine
 
         public virtual void Update(float pDeltaTime)
         {
-            foreach(var u in _updatable)//TODO switch to for(i?
+            for(int i = 0; i < _updatable.Count; i++)
             {
-                u.Update(pDeltaTime);
+                _updatable[i].Update(pDeltaTime);
             }
         }
 
@@ -163,15 +161,8 @@ namespace SmallEngine
 
         private void AddGameObject(IGameObject pGameObject, string pName)
         {
-            if(Game._isInUpdate)
-            {
-                _requestedGO.Add(pGameObject);
-            }
-            else
-            {
-                _gameObjects.Add(pGameObject);
-                if (pName != null) _namedObjects.Add(pName, pGameObject);
-            }
+            _gameObjects.Add(pGameObject);
+            if (pName != null) _namedObjects.Add(pName, pGameObject);
         }
         public void AddUpdatable(IUpdatable pUpdatable)
         {
@@ -193,15 +184,6 @@ namespace SmallEngine
         public void RemoveDrawable(IDrawable pDrawable)
         {
             _drawable.Remove(pDrawable);
-        }
-
-        internal void AddRequestedGameObjects()
-        {
-            foreach(var go in _requestedGO)
-            {
-                _gameObjects.Add(go);
-            }
-            _requestedGO.Clear();
         }
 
         public IGameObject FindGameObject(string pName)

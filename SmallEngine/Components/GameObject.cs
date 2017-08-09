@@ -107,10 +107,6 @@ namespace SmallEngine
 
         public virtual void Initialize() { }
 
-        public virtual void Update(float pDeltaTime) { }
-
-        public virtual void Draw(IGraphicsSystem pSystem) { }
-
         public virtual void ReceiveMessage(GameMessage pM) { }
 
         public void Destroy()

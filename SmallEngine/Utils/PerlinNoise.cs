@@ -125,9 +125,7 @@ namespace SmallEngine
             int g = index * 3;
             return _gradients[g] * fx + _gradients[g + 1] * fy + _gradients[g + 2] * fz;
         }
-
-        
-
+      
         private float Smooth(float x)
         {
             /* Smoothing curve. This is used to calculate interpolants so that the noise

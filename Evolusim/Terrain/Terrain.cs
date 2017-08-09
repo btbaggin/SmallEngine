@@ -40,7 +40,7 @@ namespace Evolusim.Terrain
             _bitmapWidth = Size * BitmapSize;
             _bitmapHeight = Size * BitmapSize;
             _terrain = new TerrainType[Size, Size];
-            _scale = new Vector2(64);
+            _scale = new Vector2(BitmapSize);
 
             _water = Game.Graphics.CreateBrush(System.Drawing.Color.Blue);//done
             _desert = Game.Graphics.CreateBrush(System.Drawing.Color.SandyBrown);//done

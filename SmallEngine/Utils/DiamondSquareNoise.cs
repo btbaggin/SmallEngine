@@ -33,17 +33,17 @@ namespace SmallEngine
             {
                 modNoise = (pMax - pMin) * pNoise * ((float)i / _size);
 
-                for (int y = 0; y < _size; y += i)
+                for (int x = 0; x < _size; x += i)
                 {
-                    for (int x = 0; x < _size; x += i)
+                    for (int y = 0; y < _size; y += i)
                     {
                         SampleDiamond(x, y, i, modNoise);
                     }
                 }
 
-                for (int y = 0; y < _size; y += i)
+                for (int x = 0; y < _size; x += i)
                 {
-                    for (int x = 0; x < _size; x += i)
+                    for (int y = 0; y < _size; y += i)
                     {
                         SampleSquare(x, y, i, modNoise);
                     }

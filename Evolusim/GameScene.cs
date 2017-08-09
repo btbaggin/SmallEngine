@@ -18,11 +18,6 @@ namespace Evolusim
         {
             base.Begin();
 
-            _terrain = new TerrainMap();
-            _minimap = new Minimap(_terrain, 200, 256);
-            _toolbar = new InspectionBar();
-            Vegetation.Populate();
-
             UIManager.Register(_toolbar);
             UIManager.Register(_minimap);
 
@@ -34,11 +29,6 @@ namespace Evolusim
 
             InputManager.Listen(Mouse.Left);
             InputManager.Listen(Mouse.Right);
-
-            for(int i = 0; i < 100; i++)
-            {
-                Organism.Create();
-            }
         }
 
         public override void Draw(IGraphicsSystem pSystem)
@@ -51,7 +41,7 @@ namespace Evolusim
         {
             base.Update(pDeltaTime);
 
-            if(InputManager.KeyPressed(Keys.Escape))
+            if (InputManager.KeyPressed(Keys.Escape))
             {
                 _toolbar.Hide();
                 SceneManager.BeginScene(new MenuScene(true), SceneLoadMode.Additive);
@@ -62,7 +52,7 @@ namespace Evolusim
                 MessageBus.SendMessage(new GameMessage("ToolbarClose", null));
             }
 
-            else if(InputManager.KeyPressed(Mouse.Right))
+            else if (InputManager.KeyPressed(Mouse.Right))
             {
                 if (Organism.SelectedOrganism != null)
                     Organism.SelectedOrganism.MoveTo(Game.ActiveCamera.ToWorldSpace(InputManager.MousePosition));
@@ -86,6 +76,29 @@ namespace Evolusim
 
             InputManager.StopListening(Mouse.Left);
             InputManager.StopListening(Mouse.Right);
+        }
+
+        private void InitializeLevel()
+        {
+            //Create terrain
+            _terrain = new TerrainMap();
+            _minimap = new Minimap(_terrain, 200, 256);
+            _toolbar = new InspectionBar();
+
+            Vegetation.Populate();
+
+            for (int i = 0; i < 5; i++)
+            {
+                var x = RandomGenerator.RandomInt(0, TerrainMap.Size);
+                var y = RandomGenerator.RandomInt(0, TerrainMap.Size);
+                EnemySpawner.Create(x, y);
+            }
+
+
+            for (int i = 0; i < 100; i++)
+            {
+                Organism.Create();
+            }
         }
     }
 }

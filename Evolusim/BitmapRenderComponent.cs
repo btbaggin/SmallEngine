@@ -11,9 +11,12 @@ namespace Evolusim
     class BitmapRenderComponent : RenderComponent
     {
         public BitmapResource Bitmap { get; private set; }
-        
-        public BitmapRenderComponent()
+
+        public BitmapRenderComponent() { }
+
+        public BitmapRenderComponent(string pAlias)
         {
+            Bitmap = ResourceManager.Request<BitmapResource>(pAlias);
         }
 
         public void SetBitmap(string pAlias)
