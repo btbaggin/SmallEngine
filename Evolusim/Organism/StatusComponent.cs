@@ -27,6 +27,7 @@ namespace Evolusim
         private BitmapResource _sleep;
         private BitmapResource _heart;
         private BitmapResource _hungry;
+        private BitmapResource _scared;
 
         private int _hunger;
         private int _currentHunger;
@@ -51,6 +52,7 @@ namespace Evolusim
             _heart = ResourceManager.Request<BitmapResource>("heart");
             _hungry = ResourceManager.Request<BitmapResource>("hungry");
             _sleep = ResourceManager.Request<BitmapResource>("sleep");
+            _scared = ResourceManager.Request<BitmapResource>("scared");
             Visible = false;
         }
 
@@ -83,7 +85,11 @@ namespace Evolusim
             //TODO make a custom component that handles rendering this?
             var scale = new Vector2(GameObject.Scale.X / 2, GameObject.Scale.Y / 2) * Game.ActiveCamera.Zoom;
             var pos = GameObject.ScreenPosition + new Vector2(scale.X / 2, -scale.Y / 2);
-            if (_currentStatus.HasFlag(Status.Sleeping))
+            if(_currentStatus.HasFlag(Status.Scared))
+            {
+                pSystem.DrawBitmap(_scared, 1, pos, scale);
+            }
+            else if (_currentStatus.HasFlag(Status.Sleeping))
             {
                 pSystem.DrawBitmap(_sleep, 1, pos, scale);
             }
@@ -154,14 +160,14 @@ namespace Evolusim
                 }
 
                 //*** Stamina
-                if (_currentStamina <= .3)
+                if (_staminaPercent <= .3)
                 {
                     TrySleep();
                     return;
                 }
 
                 //*** Mating
-                if (_currentMate <= .4f)
+                if (_matePercent <= .4f)
                 {
                     AddStatus(Status.Mating);
                 }
@@ -211,11 +217,13 @@ namespace Evolusim
         public void Eat(Terrain.Vegetation pFood)
         {
             _currentHunger = Math.Min(_hunger, _currentHunger + pFood.Food);
+            RemoveStatus(Status.Hungry);
         }
 
         public void Mate(Organism pMate)
         {
             _currentMate = _mate;
+            RemoveStatus(Status.Mating);
         }
 
         protected override void DoDraw(IGraphicsSystem pSystem, Effect pEffect)

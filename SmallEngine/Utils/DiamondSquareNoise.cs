@@ -41,7 +41,7 @@ namespace SmallEngine
                     }
                 }
 
-                for (int x = 0; y < _size; x += i)
+                for (int x = 0; x < _size; x += i)
                 {
                     for (int y = 0; y < _size; y += i)
                     {

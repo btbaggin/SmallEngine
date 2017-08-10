@@ -73,7 +73,6 @@ namespace Evolusim
             _movement = GetComponent<MovementComponent>();
             _status = GetComponent<StatusComponent>();
 
-            //Coroutine.Start(LifeTick);
             MessageBus.Register(this);
         }
 
@@ -81,13 +80,13 @@ namespace Evolusim
         {
             switch(pM.MessageType)
             {
-                case "EnemySpan":
+                case "EnemySpawn":
                     var p = pM.GetValue<Vector2>();
-                    if(Vector2.DistanceSqrd(p, Position) < 225)
+                    if(Vector2.DistanceSqrd(p, Position) < (15 * 64) * (15 * 64))
                     {
                         _status.AddStatus(StatusComponent.Status.Scared);
+                        Coroutine.Start(RunScared, p);
                     }
-                    Coroutine.Start(RunScared, p);
                     break;
             }
         }

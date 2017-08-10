@@ -73,7 +73,7 @@ namespace SmallEngine.Physics
             Acceleration += pForce;
         }
 
-        public void Update(float pDeltaTime)
+        public override void Update(float pDeltaTime)
         {
             if (Static) { return; }
 

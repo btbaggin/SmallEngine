@@ -18,6 +18,8 @@ namespace Evolusim
         {
             base.Begin();
 
+            InitializeLevel();
+
             UIManager.Register(_toolbar);
             UIManager.Register(_minimap);
 
@@ -89,8 +91,8 @@ namespace Evolusim
 
             for (int i = 0; i < 5; i++)
             {
-                var x = RandomGenerator.RandomInt(0, TerrainMap.Size);
-                var y = RandomGenerator.RandomInt(0, TerrainMap.Size);
+                var x = RandomGenerator.RandomInt(0, 100);// TerrainMap.Size);
+                var y = RandomGenerator.RandomInt(0, 100);// TerrainMap.Size);
                 EnemySpawner.Create(x, y);
             }
 

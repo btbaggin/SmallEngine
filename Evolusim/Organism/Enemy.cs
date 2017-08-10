@@ -30,6 +30,7 @@ namespace Evolusim
 
         public override void Initialize()
         {
+            GetComponent<BitmapRenderComponent>().SetBitmap("enemy");
         }
 
         public void Attack(Organism pGameObject)

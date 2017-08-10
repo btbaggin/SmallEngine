@@ -14,7 +14,7 @@ namespace SmallEngine
         public Timer(float pTime)
         {
             TickTime = pTime;
-            _timer = 0;
+            _timer = pTime;
         }
 
         public bool Tick()
