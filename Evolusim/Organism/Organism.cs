@@ -14,7 +14,16 @@ namespace Evolusim
 {
     class Organism : GameObject
     {
-        public int Health { get; set; }
+        private int _health;
+        public int Health
+        {
+            get { return _health; }
+            set
+            {
+                _health = value;
+                if (_health <= 0) Destroy();
+            }
+        }
 
         private AnimationRenderComponent _render;
         private AudioComponent _audio;

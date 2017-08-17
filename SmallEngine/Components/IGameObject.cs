@@ -10,6 +10,7 @@ namespace SmallEngine
 {
     public interface IGameObject : IMessageReceiver, IDisposable
     {
+        //TODO? http://archive.gamedev.net/archive/reference/programming/features/scenegraph/page2.html
         #region Properties
         string Name { get; }
 
