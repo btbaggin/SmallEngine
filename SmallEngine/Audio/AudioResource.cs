@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 using SharpDX.XAudio2;
@@ -342,7 +340,7 @@ namespace SmallEngine.Audio
         }
         #endregion
 
-        #region "Static functions"
+        #region Static functions
         static AudioResource()
         {
             Device = new XAudio2();
@@ -391,7 +389,7 @@ namespace SmallEngine.Audio
         }
         #endregion
 
-        #region "Disposable support"
+        #region Disposable support
         public static void DisposeVoices()
         {
             lock (_freeVoices)
@@ -406,7 +404,7 @@ namespace SmallEngine.Audio
         }
         #endregion
 
-        #region "Callback"
+        #region Callback
         protected struct SoundCompleteCallback
         {
             private SourceVoice _voice;

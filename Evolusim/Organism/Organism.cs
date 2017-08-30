@@ -25,7 +25,6 @@ namespace Evolusim
             }
         }
 
-        private AnimationRenderComponent _render;
         private AudioComponent _audio;
         private MovementComponent _movement;
         private StatusComponent _status;
@@ -72,9 +71,9 @@ namespace Evolusim
 
         public override void Initialize()
         {
-            _render = GetComponent<AnimationRenderComponent>();
-            _render.SetBitmap("organism");
-            _render.SetAnimation(4, new Vector2(16, 32), .5f, AnimationEval);
+            var render = GetComponent<AnimationRenderComponent>();
+            render.SetBitmap("organism");
+            render.SetAnimation(4, new Vector2(16, 32), .5f, AnimationEval);
 
             _audio = GetComponent<AudioComponent>();
             _audio.SetAudio("nom");
@@ -135,15 +134,15 @@ namespace Evolusim
             _movement.MoveTo(pPosition, true);
         }
         
-        private void AnimationEval()
+        private void AnimationEval(AnimationRenderComponent pComponent)
         {
             if (Math.Abs(_movement.Speed.X) - Math.Abs(_movement.Speed.Y) > 0)
             {
-                _render.AnimationNum = _movement.Speed.X > 0 ? 3 : 1;
+                pComponent.AnimationNum = _movement.Speed.X > 0 ? 3 : 1;
             }
             else
             {
-                _render.AnimationNum = _movement.Speed.Y > 0 ? 2 : 0;
+                pComponent.AnimationNum = _movement.Speed.Y > 0 ? 2 : 0;
             }
         }
     }

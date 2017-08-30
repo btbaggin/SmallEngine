@@ -27,6 +27,10 @@ namespace SmallEngine.Input
         [return: MarshalAs(UnmanagedType.Bool)]
         static extern bool GetCursorPos(out POINT lpPoint);
 
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        static extern bool GetKeyboardState(byte[] lpKeyState);
+
         [StructLayout(LayoutKind.Sequential)]
         public struct POINT
         {
@@ -107,15 +111,18 @@ namespace SmallEngine.Input
 
         internal void ProcessInput()
         {
+            var keyInput = new byte[256];
+            GetKeyboardState(keyInput);
+
+            var mouseInput = new byte[5];
+            mouseInput[0] = IsKeyPressed((int)Mouse.Left) ? (byte)0xff : (byte)0x00;
+            mouseInput[1] = IsKeyPressed((int)Mouse.Right) ? (byte)0xff : (byte)0x00;
+            mouseInput[2] = IsKeyPressed((int)Mouse.Middle) ? (byte)0xff : (byte)0x00;
+            mouseInput[3] = IsKeyPressed((int)Mouse.X1) ? (byte)0xff : (byte)0x00;
+            mouseInput[4] = IsKeyPressed((int)Mouse.X2) ? (byte)0xff : (byte)0x00;
+
             _previousState = _inputState;
-            _inputState = new InputState();
-            foreach (var ii in _keys)
-            {
-                var i = ii;
-                GetStatus(ref i, out bool pressed, out bool held);
-                if (pressed) { _inputState.AddPressed(ii); }
-                if (held) { _inputState.AddHeld(ii); }
-            }
+            _inputState = new InputState(keyInput, mouseInput);
 
             //Get mouse position
             GetCursorPos(out POINT p);
@@ -123,27 +130,6 @@ namespace SmallEngine.Input
             _mousePos = new Vector2(p.X, p.Y);
             CheckDrag();
             CheckMouseFocus();
-        }
-
-        private void GetStatus(ref InputInfo pKey, out bool pPressed, out bool pHeld)
-        {
-            var time = GameTime.CurrentTime;
-            var keyPressed = IsKeyPressed(pKey.Value);
-
-            //Pressed if the key is down and enough time has passed since it was last registered
-            pPressed = keyPressed && time > pKey.LastPressed + pKey.Delay;
-            //Held if its pressed, its currently begin held, and its been held for long enough to trigger hold
-            pHeld = (keyPressed && _previousState.IsPressed(pKey.Value) && time > pKey.LastPressed + _holdDelay);   //TODO can we get this from windows?
-
-            //If status has changed set variables
-            if (pKey.IsPressed != keyPressed)
-            {
-                if (keyPressed)
-                {
-                    pKey.LastPressed = time;
-                }
-                pKey.IsPressed = keyPressed;
-            }
         }
 
         private static Vector2 _dragStart;

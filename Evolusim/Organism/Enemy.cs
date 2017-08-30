@@ -12,9 +12,11 @@ namespace Evolusim
     {
         public int AttackPower { get; private set; }
 
+        EnemyMovementComponent _movement;
+
         static Enemy()
         {
-            SceneManager.Define("enemy", typeof(BitmapRenderComponent),
+            SceneManager.Define("enemy", typeof(AnimationRenderComponent),
                                          typeof(EnemyMovementComponent));
         }
 
@@ -33,12 +35,28 @@ namespace Evolusim
 
         public override void Initialize()
         {
-            GetComponent<BitmapRenderComponent>().SetBitmap("enemy");
+            var render = GetComponent<AnimationRenderComponent>();
+            render.SetBitmap("enemy");
+            render.SetAnimation(4, new Vector2(16, 32), .5f, AnimationEval);
+
+            _movement = GetComponent<EnemyMovementComponent>();
         }
 
         public void Attack(Organism pGameObject)
         {
             pGameObject.Health -= AttackPower;
+        }
+
+        private void AnimationEval(AnimationRenderComponent pComponent)
+        {
+            if (Math.Abs(_movement.Speed.X) - Math.Abs(_movement.Speed.Y) > 0)
+            {
+                pComponent.AnimationNum = _movement.Speed.X > 0 ? 3 : 1;
+            }
+            else
+            {
+                pComponent.AnimationNum = _movement.Speed.Y > 0 ? 2 : 0;
+            }
         }
     }
 }

@@ -8,13 +8,13 @@ using SmallEngine.Graphics;
 
 namespace Evolusim
 {
-    class AnimationRenderComponent : BitmapRenderComponent
+    class AnimationRenderComponent  : BitmapRenderComponent
     {
         int _currentFrame;
         int _maxFrames;
         Vector2 _frameSize;
         float _frameDuration;
-        Action _evaluator;
+        Action<AnimationRenderComponent> _evaluator;
 
         float _frameTimer;
 
@@ -24,7 +24,7 @@ namespace Evolusim
         {
         }
 
-        public void SetAnimation(int pMaxFrames, Vector2 pFrameSize, float pFrameDuration, Action pEvaluator)
+        public void SetAnimation(int pMaxFrames, Vector2 pFrameSize, float pFrameDuration, Action<AnimationRenderComponent> pEvaluator)
         {
             _maxFrames = pMaxFrames - 1;
             _frameSize = pFrameSize;
@@ -60,7 +60,7 @@ namespace Evolusim
 
         public override void Update(float pDeltaTime)
         {
-            _evaluator.Invoke();
+            _evaluator.Invoke(this);
             if((_frameTimer += pDeltaTime) >= _frameDuration)
             {
                 MoveNextFrame();

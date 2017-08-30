@@ -9,48 +9,38 @@ namespace SmallEngine.Input
 {
     public class InputState
     {
-        private Hashtable _pressedKeys;
-        private Hashtable _heldKeys;
+        private byte[] _keys;
+        private byte[] _mouse;
 
-        internal InputState()
+        internal InputState(byte[] pKeys, byte[] pMouse)
         {
-            _pressedKeys = new Hashtable();
-            _heldKeys = new Hashtable();
-        }
-
-        internal void AddPressed(InputInfo pI)
-        {
-            _pressedKeys.Add(pI.Value, pI);
-        }
-
-        internal void AddHeld(InputInfo pI)
-        {
-            _heldKeys.Add(pI.Value, pI);
+            _keys = pKeys;
+            _mouse = pMouse;
         }
 
         public bool IsPressed(Keys pKey)
         {
-            return _pressedKeys.ContainsKey((int)pKey);
-        }
 
-        internal bool IsPressed(int pValue)
-        {
-            return _pressedKeys.ContainsKey(pValue);
-        }
-
-        public bool IsHeld(Keys pKey)
-        {
-            return _heldKeys.ContainsKey((int)pKey);
+            var code = GetVirtualKeyCode(pKey);
+            return (_keys[code] & 0x80) != 0;
         }
 
         public bool IsPressed(Mouse pMouse)
         {
-            return _pressedKeys.ContainsKey((int)pMouse);
+            var code = GetVirtualKeyCode(pMouse);
+            return (_mouse[code] & 0x80) != 0;
         }
 
-        public bool IsHeld(Mouse pMouse)
+        private static byte GetVirtualKeyCode(Keys pKey)
         {
-            return _heldKeys.ContainsKey((int)pMouse);
+            int value = (int)pKey;
+            return (byte)(value & 0xFF);
+        }
+
+        private static byte GetVirtualKeyCode(Mouse pMouse)
+        {
+            int value = (int)pMouse;
+            return (byte)(value & 0xFF);
         }
     }
 }

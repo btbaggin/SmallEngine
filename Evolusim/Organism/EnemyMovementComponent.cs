@@ -13,6 +13,8 @@ namespace Evolusim
         private Enemy _gameObject;
         private float _speed = 125;
 
+        public Vector2 Speed { get { return Vector2.UnitX; } }
+
         public EnemyMovementComponent() : base()
         {
         }
