@@ -12,8 +12,8 @@ namespace SmallEngine.Graphics
     {
         //https://english.r2d2rigo.es/2014/08/19/applying-direct2d-built-in-effects-to-bitmaps-with-sharpdx/
         //https://msdn.microsoft.com/en-us/library/windows/desktop/hh973241(v=vs.85).aspx
-        List<SharpDX.Direct2D1.Effect> _effects;
-        DeviceContext _context;
+        readonly List<SharpDX.Direct2D1.Effect> _effects;
+        readonly DeviceContext _context;
         Composite _composite;
 
         public Effect()

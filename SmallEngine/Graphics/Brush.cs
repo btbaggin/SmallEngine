@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using SharpDX.Direct2D1;
 using SharpDX.Mathematics.Interop;
-using System.Drawing;
 
 namespace SmallEngine.Graphics
 {
@@ -22,7 +21,7 @@ namespace SmallEngine.Graphics
             Color = pColor;
         }
 
-        internal static Brush Create(Color pColor, SharpDX.Direct2D1.RenderTarget pTarget)
+        internal static Brush Create(Color pColor, RenderTarget pTarget)
         {
             if(!_cache.ContainsKey(pColor))
             {

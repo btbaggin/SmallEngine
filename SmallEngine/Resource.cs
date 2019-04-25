@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SmallEngine
 {
-    public abstract class Resource
+    public abstract class Resource : IDisposable
     {
         #region Public properties
         /// <summary>

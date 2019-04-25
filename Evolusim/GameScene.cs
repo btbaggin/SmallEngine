@@ -3,6 +3,7 @@ using SmallEngine.Graphics;
 using SmallEngine.Input;
 using Evolusim.UI;
 using SmallEngine.UI;
+using SmallEngine.Messages;
 
 using Evolusim.Terrain;
 
@@ -33,11 +34,12 @@ namespace Evolusim
             InputManager.Listen(Mouse.Right);
         }
 
-        public override void Draw(IGraphicsSystem pSystem)
-        {
-            _terrain.Draw(pSystem);
-            base.Draw(pSystem);
-        }
+        //TODO change terrain to rendercomponent
+        //public override void Draw(IGraphicsAdapter pSystem)
+        //{
+        //    _terrain.Draw(pSystem);
+        //    base.Draw(pSystem);
+        //}
 
         public override void Update(float pDeltaTime)
         {
@@ -46,18 +48,17 @@ namespace Evolusim
             if (InputManager.KeyPressed(Keys.Escape))
             {
                 _toolbar.Hide();
-                SceneManager.BeginScene(new MenuScene(true), SceneLoadMode.Additive);
+                BeginScene(new MenuScene(true), SceneLoadMode.Additive);
             }
 
             if (InputManager.KeyPressed(Mouse.Left) && !InputManager.HasFocus())
             {
-                MessageBus.SendMessage(new GameMessage("ToolbarClose", null));
+                Game.Messages.SendMessage(new GameMessage("ToolbarClose", null));
             }
 
-            else if (InputManager.KeyPressed(Mouse.Right))
+            else if (InputManager.KeyPressed(Mouse.Right) && Organism.SelectedOrganism != null)
             {
-                if (Organism.SelectedOrganism != null)
-                    Organism.SelectedOrganism.MoveTo(Game.ActiveCamera.ToWorldSpace(InputManager.MousePosition));
+                Organism.SelectedOrganism.MoveTo(Game.ActiveCamera.ToWorldSpace(InputManager.MousePosition));
             }
         }
 
@@ -91,8 +92,8 @@ namespace Evolusim
 
             for (int i = 0; i < 5; i++)
             {
-                var x = RandomGenerator.RandomInt(0, 100);// TerrainMap.Size);
-                var y = RandomGenerator.RandomInt(0, 100);// TerrainMap.Size);
+                var x = Generator.Random.Next(0, 100);
+                var y = Generator.Random.Next(0, 100);
                 EnemySpawner.Create(x, y);
             }
 

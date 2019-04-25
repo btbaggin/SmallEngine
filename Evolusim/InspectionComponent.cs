@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using SmallEngine;
 using SmallEngine.Graphics;
 using SmallEngine.Input;
+using SmallEngine.Messages;
 
 namespace Evolusim
 {
@@ -18,7 +19,7 @@ namespace Evolusim
         {
             if (InputManager.KeyPressed(Mouse.Left) && InputManager.IsFocused(_render))
             {
-                MessageBus.SendMessage(new GameMessage("ToolbarOpen", GameObject));
+                Game.Messages.SendMessage(new GameMessage("ToolbarOpen", GameObject));
             }
         }
     }

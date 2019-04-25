@@ -38,9 +38,9 @@ namespace Evolusim.UI
 
         public void SetAllOff()
         {
-            foreach(ToggleButton b in Children)
+            foreach(UIElement child in Children)
             {
-                b.IsSelected = false;
+                if(child is ToggleButton b) b.IsSelected = false;
             }
         }
 

@@ -46,10 +46,10 @@ namespace Evolusim
         public override void Initialize()
         {
             MaxFps = 120;
-            Game.Form.Text = "Evolusim";
-            Game.Form.Width = 1280;
-            Game.Form.Height = 720;
-            SceneManager.BeginScene(new MenuScene(false));
+            Form.Text = "Evolusim";
+            Form.Width = 1280;
+            Form.Height = 720;
+            Scene.BeginScene(new MenuScene(false));
 
             InputManager.Listen(Keys.Left);
             InputManager.Listen(Keys.Right);

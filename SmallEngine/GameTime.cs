@@ -3,17 +3,17 @@ using System.Diagnostics;
 
 namespace SmallEngine
 {
-    public sealed class GameTime
+    public static class GameTime
     {
-        static readonly double _secondsPerCount;
-        static double _deltaTime;
+        static readonly double _secondsPerCount = 1d / Stopwatch.Frequency;
+        static double _deltaTime = 0;
         static double _unscaleDeltaTime;
-        static float _timeScale;
+        static float _timeScale = 1f;
         static float _savedTimeScale;
 
-        static long _startTime;
-        static long _lastTime;
-        static long _currentTime;
+        static long _startTime = 0;
+        static long _lastTime = 0;
+        static long _currentTime = 0;
 
         #region "Properties"
         /// <summary>
@@ -72,26 +72,13 @@ namespace SmallEngine
             get { return _timeScale; }
             set
             {
-                if (_timeScale < 0) throw new ArgumentException("TimeScale");
+                if (value < 0) throw new ArgumentException("TimeScale");
                 _timeScale = value;
             }
         }
         #endregion
 
-        #region "Constructor"
-        static GameTime()
-        {
-            _deltaTime = 0;
-            _currentTime = 0;
-            _lastTime = 0;
-            _currentTime = 0;
-            Stopped = false;
-            _secondsPerCount = 1.0 / Stopwatch.Frequency;
-            _timeScale = 1f;
-        }
-        #endregion
-
-        #region "Public functions"
+        #region Public functions
         /// <summary>
         /// Ticks the clock to set delta time
         /// </summary>
@@ -99,7 +86,7 @@ namespace SmallEngine
         {
             _currentTime = Stopwatch.GetTimestamp();
             _unscaleDeltaTime = (_currentTime - _lastTime) * _secondsPerCount;
-            _deltaTime = _unscaleDeltaTime * _timeScale;
+            _deltaTime = _unscaleDeltaTime * TimeScale;
             _lastTime = _currentTime;
         }
 
@@ -113,7 +100,6 @@ namespace SmallEngine
             _startTime = resetTime;
             _lastTime = resetTime;
             _currentTime = resetTime;
-            //_stopTime = 0;
             Stopped = false;
         }
 
@@ -124,8 +110,8 @@ namespace SmallEngine
         {
             if (!Stopped)
             {
-                _savedTimeScale = _timeScale;
-                _timeScale = 0;
+                _savedTimeScale = TimeScale;
+                TimeScale = 0;
                 Stopped = true;
             }
         }
@@ -138,7 +124,7 @@ namespace SmallEngine
             if (Stopped)
             {
                 var lastTime = Stopwatch.GetTimestamp();
-                _timeScale = _savedTimeScale;
+                TimeScale = _savedTimeScale;
                 _lastTime = lastTime;
                 Stopped = false;
             }

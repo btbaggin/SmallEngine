@@ -11,7 +11,7 @@ namespace Evolusim
     {
         public static EnemySpawner Create(int pX, int pY)
         {
-            var es = SceneManager.Current.CreateGameObject<EnemySpawner>(new EnemySpawnerComponent(), 
+            var es = Scene.Current.CreateGameObject<EnemySpawner>(new EnemySpawnerComponent(), 
                                                                          new BitmapRenderComponent("enemy_spawner"));
             es.SetXY(pX, pY);
             return es;

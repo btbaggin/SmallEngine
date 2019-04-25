@@ -6,10 +6,9 @@ namespace SmallEngine
 {
     public abstract class DependencyComponent : Component
     {
-        private Dictionary<FieldInfo, ImportComponentAttribute> _dependencies;
-        public DependencyComponent()
+        readonly Dictionary<FieldInfo, ImportComponentAttribute> _dependencies = new Dictionary<FieldInfo, ImportComponentAttribute>();
+        protected DependencyComponent()
         {
-            _dependencies = new Dictionary<FieldInfo, ImportComponentAttribute>();
             var t = GetType();
             DetermineDepencencies(t);
 
@@ -31,7 +30,7 @@ namespace SmallEngine
                     //Look for any inherited types
                     foreach(var c in pGameObject.GetComponents())
                     {
-                        if(d.Key.FieldType.IsAssignableFrom(c.GetType()))
+                        if(d.Key.FieldType.IsInstanceOfType(c))
                         {
                             component = c;
                             break;

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SmallEngine.Input;
+using SmallEngine.Messages;
 
 namespace SmallEngine
 {
@@ -16,18 +17,14 @@ namespace SmallEngine
 
         Vector2 Position { get; set; }
 
-        Vector2 ScreenPosition { get; }
-
         Vector2 Scale { get; set; }
 
         float Rotation { get; set; }
 
-        Rectangle Bounds { get; }
-
         string Tag { get; set; }
         #endregion
 
-        //T GetComponent<T>() where T : class, IComponent;
+        IComponent GetComponentOfType(Type pType);
         IComponent GetComponent(Type pType);
         IEnumerable<IComponent> GetComponents();
         bool HasComponent<T>() where T : class, IComponent;
@@ -35,8 +32,8 @@ namespace SmallEngine
         void AddComponent(IComponent pComponent);
         void RemoveComponent(Type pComponent);
 
-        void SetGame(Game pGame);
         void Initialize();
+        void Update(float pDeltaTime);
         void Destroy();
     }
 }

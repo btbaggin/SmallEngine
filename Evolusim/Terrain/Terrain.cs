@@ -8,40 +8,30 @@ namespace Evolusim.Terrain
     {
         public const int BitmapSize = 64;
         public static int Size { get { return 513; } }
-        static TerrainType[,] _terrain;
+        static TerrainType[,] _terrain = new TerrainType[Size, Size];
         static bool _updateBitmap;
 
-        float _bitmapWidth;
-        float _bitmapHeight;
+        readonly Brush _water;
+        readonly Brush _tropicalSeasonal;
+        readonly Brush _tropicalRain;
+        readonly Brush _grassland;
+        readonly Brush _temperateDeciduous;
+        readonly Brush _temperateRain;
+        readonly Brush _desert;
+        readonly Brush _shrubland;
+        readonly Brush _taiga;
+        readonly Brush _scorched;
+        readonly Brush _bare;
+        readonly Brush _tundra;
+        readonly Brush _snow;
+        readonly Brush _ice;
+        readonly Brush _none;
 
-        Vector2 _scale;
-
-        Brush _water;
-        Brush _tropicalSeasonal;
-        Brush _tropicalRain;
-        Brush _grassland;
-        Brush _temperateDeciduous;
-        Brush _temperateRain;
-        Brush _desert;
-        Brush _shrubland;
-        Brush _taiga;
-        Brush _scorched;
-        Brush _bare;
-        Brush _tundra;
-        Brush _snow;
-        Brush _ice;
-        Brush _none;
-
-        HeightMap _height;
-        HeightMap _climate;
+        readonly HeightMap _height;
+        readonly HeightMap _climate;
 
         public TerrainMap()
         {
-            _bitmapWidth = Size * BitmapSize;
-            _bitmapHeight = Size * BitmapSize;
-            _terrain = new TerrainType[Size, Size];
-            _scale = new Vector2(BitmapSize);
-
             _water = Game.Graphics.CreateBrush(System.Drawing.Color.Blue);//done
             _desert = Game.Graphics.CreateBrush(System.Drawing.Color.SandyBrown);//done
             _tropicalSeasonal = Game.Graphics.CreateBrush(System.Drawing.Color.Thistle);
@@ -73,7 +63,7 @@ namespace Evolusim.Terrain
             _updateBitmap = true;
         }
 
-        public void Draw(IGraphicsSystem pSystem)
+        public void Draw(IGraphicsAdapter pSystem)
         {
             int x = (int)(Evolusim.ActiveCamera.Position.X / BitmapSize);
             int y = (int)(Evolusim.ActiveCamera.Position.Y / BitmapSize);
@@ -117,10 +107,7 @@ namespace Evolusim.Terrain
             int y = (int)Math.Floor(pPoint.Y / BitmapSize);
             if(x >= 0 && y >= 0 && x < _terrain.GetUpperBound(0) && y < _terrain.GetUpperBound(1))
             {
-                if (_terrain[x, y] != pTerrainType)
-                {
-                    _terrain[x, y] = pTerrainType;
-                }
+                _terrain[x, y] = pTerrainType;
             }
             _updateBitmap = true;
         }
@@ -168,7 +155,7 @@ namespace Evolusim.Terrain
             {
                 for (int y = 0; y < pResolution; y++)
                 {
-                    var i = (int)(pResolution * 4 * y + x * 4);
+                    var i = (pResolution * 4 * y + x * 4);
                     var color = GetBrush(x * step, y * step).Color;
                     memory[i] = color.B;
                     memory[i + 1] = color.G;
@@ -217,13 +204,13 @@ namespace Evolusim.Terrain
                 case TerrainType.None:
                     return _none;
                 default:
-                    throw new Exception();
+                    throw new UnknownEnumException(typeof(TerrainType), _terrain[pX, pY]);
             }
         }
 
 
         //x axis is temp; y axis is height
-        private TerrainType[,] _terrainMap = { { TerrainType.Snow,          TerrainType.Snow,               TerrainType.Snow,               TerrainType.Tundra,           TerrainType.Bare,      TerrainType.Scorched },
+        readonly TerrainType[,] _terrainMap = { { TerrainType.Snow,          TerrainType.Snow,               TerrainType.Snow,               TerrainType.Tundra,           TerrainType.Bare,      TerrainType.Scorched },
                                                { TerrainType.Taiga,         TerrainType.Taiga,              TerrainType.Shrubland,          TerrainType.Shrubland,        TerrainType.Desert,    TerrainType.Desert },
                                                { TerrainType.TemperateRain, TerrainType.TemperateDeciduous, TerrainType.TemperateDeciduous, TerrainType.Grassland,        TerrainType.Grassland, TerrainType.Desert },
                                                { TerrainType.TropicalRain,  TerrainType.TropicalRain,       TerrainType.TropicalSeasonal,   TerrainType.TropicalSeasonal, TerrainType.Grassland, TerrainType.Desert },

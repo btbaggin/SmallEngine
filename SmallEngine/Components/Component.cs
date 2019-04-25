@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace SmallEngine
 {
-    public abstract class Component : IComponent, IUpdatable
+    public abstract class Component : IComponent
     {
-        public EventHandler<EventArgs> Added;
-        public EventHandler<EventArgs> Removed;
+        public EventHandler<EventArgs> Added { get; set; }
+        public EventHandler<EventArgs> Removed { get; set; }
 
-        public Component()
+        protected Component()
         {
         }
 
@@ -33,35 +33,22 @@ namespace SmallEngine
 
         public static IComponent Create(Type pType)
         {
-            try
-            {
-                return (IComponent)Activator.CreateInstance(pType);
-            }
-            catch
-            {
-                throw new Exception();
-            }
+            return (IComponent)Activator.CreateInstance(pType);
         }
 
         public virtual void OnAdded(IGameObject pGameObject)
         {
             GameObject = pGameObject;
-            SceneManager.Current.AddUpdatable(this);
             Added?.Invoke(this, new EventArgs());
         }
 
         public virtual void OnRemoved()
         {
             Removed?.Invoke(this, new EventArgs());
-            SceneManager.Current.RemoveUpdatable(this);
             GameObject = null;
         }
 
         public virtual void OnActiveChanged(bool pActive)
-        {
-        }
-
-        public virtual void Update(float pDeltaTime)
         {
         }
 

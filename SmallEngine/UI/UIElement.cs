@@ -85,7 +85,7 @@ namespace SmallEngine.UI
         }
         #endregion
 
-        public UIElement()
+        protected UIElement()
         {
             Children = new List<UIElement>();
             Visible = true;
@@ -109,7 +109,7 @@ namespace SmallEngine.UI
             }
         }
 
-        public virtual void Draw(IGraphicsSystem pSystem)
+        public virtual void Draw(IGraphicsAdapter pSystem)
         {
             foreach (var e in Children)
             {
@@ -128,14 +128,14 @@ namespace SmallEngine.UI
             Children.Add(pElement);
         }
 
-        public IDrawable GetFocusElement(Vector2 pPoint)
+        public IDrawable GetFocusElement(Vector2 pPosition)
         {
             IDrawable focus = null;
-            if(Bounds.Contains(pPoint))
+            if(Bounds.Contains(pPosition))
             {
                 foreach(var c in Children)
                 {
-                    focus = c.GetFocusElement(pPoint);
+                    focus = c.GetFocusElement(pPosition);
                     if (focus != null) return focus;
                 }
                 focus = this;
@@ -171,7 +171,7 @@ namespace SmallEngine.UI
 
             if (Anchor.HasFlag(AnchorDirection.Bottom))
                 Position = new Vector2(_position.X, pSize.Height - (AnchorPoint.Y + Height));
-            _position += new Vector2(pLeft, pTop);// pPosition;
+            _position += new Vector2(pLeft, pTop);
 
             _position.X = Math.Max(Margin.X, _position.X);
             _position.Y = Math.Max(Margin.Y, _position.Y);
@@ -192,9 +192,9 @@ namespace SmallEngine.UI
             }
         }
 
-        public int CompareTo(object o)
+        public int CompareTo(object obj)
         {
-            return Order.CompareTo(((UIElement)o).Order);
+            return Order.CompareTo(((UIElement)obj).Order);
         }
     }
 }

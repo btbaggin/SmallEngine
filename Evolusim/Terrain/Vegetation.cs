@@ -23,7 +23,7 @@ namespace Evolusim.Terrain
 
         static Vegetation()
         {
-            SceneManager.Define("vegetation", typeof(BitmapRenderComponent),
+            Scene.Define("vegetation", typeof(BitmapRenderComponent),
                                               typeof(VegetationLifeComponent));
 
             //Add dead bitmaps
@@ -42,7 +42,7 @@ namespace Evolusim.Terrain
 
         public static Vegetation Create(int pX, int pY)
         {
-            var v = SceneManager.Current.CreateGameObject<Vegetation>("vegetation");
+            var v = Scene.Current.CreateGameObject<Vegetation>("vegetation");
             v.SetXY(pX, pY);
             v.Tag = "Vegetation";
             return v;
@@ -54,7 +54,7 @@ namespace Evolusim.Terrain
             {
                 for (int y = 0; y < TerrainMap.Size; y++)
                 {
-                    if (RandomGenerator.RandomFloat() < GetPercent(TerrainMap.GetTerrainType(x, y)))
+                    if (Generator.Random.NextFloat() < GetPercent(TerrainMap.GetTerrainType(x, y)))
                     {
                         Create(x, y);
                     }
@@ -102,41 +102,41 @@ namespace Evolusim.Terrain
             {
                 case TerrainType.Water:
                     _render.SetBitmap("v_water");
-                    _life.LifeTime = RandomGenerator.RandomInt(20, 40);
-                    _life.SpreadCount = RandomGenerator.RandomInt(1, 2);
+                    _life.LifeTime = Generator.Random.Next(20, 40);
+                    _life.SpreadCount = Generator.Random.Next(1, 2);
                     Food = 10;
                     break;
 
                 case TerrainType.Grassland:
-                    _life.LifeTime = RandomGenerator.RandomInt(20, 40);
+                    _life.LifeTime = Generator.Random.Next(20, 40);
                     _life.SpreadCount = 1;
                     _render.SetBitmap("v_grassland");
                     Food = 10;
                     break;
 
                 case TerrainType.Shrubland:
-                    _life.LifeTime = RandomGenerator.RandomInt(10, 20);
-                    _life.SpreadCount = RandomGenerator.RandomInt(0, 3);
+                    _life.LifeTime = Generator.Random.Next(10, 20);
+                    _life.SpreadCount = Generator.Random.Next(0, 3);
                     _render.SetBitmap("v_shrubland");
                     Food = 5;
                     break;
 
                 case TerrainType.TemperateDeciduous:
-                    _life.LifeTime = RandomGenerator.RandomInt(40, 60);
-                    _life.SpreadCount = RandomGenerator.RandomInt(1, 2);
+                    _life.LifeTime = Generator.Random.Next(40, 60);
+                    _life.SpreadCount = Generator.Random.Next(1, 2);
                     _render.SetBitmap("v_temperatedeciduous");
                     Food = 20;
                     break;
 
                 case TerrainType.Desert:
-                    _life.LifeTime = RandomGenerator.RandomInt(60, 80);
+                    _life.LifeTime = Generator.Random.Next(60, 80);
                     _life.SpreadCount = 1;
                     _render.SetBitmap("v_desert");
                     Food = 10;
                     break;
 
                 default:
-                    throw new Exception("Unsupported terrain type");
+                    throw new UnknownEnumException(typeof(TerrainType), Terrain);
             }
         }
     }

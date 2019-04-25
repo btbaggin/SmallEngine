@@ -9,14 +9,14 @@ namespace Evolusim
 {
     class MenuScene : Scene
     {
-        private List<string> mItems;
-        private int mCurrentIndex;
-        private bool _inGame;
-        private Font _titleFont;
-        private Font _font;
-        private Font _highlightFont;
-        private Brush _backgroundBrush;
-        private AudioResource _menu;
+        readonly List<string> mItems;
+        int mCurrentIndex;
+        readonly bool _inGame;
+        Font _titleFont;
+        Font _font;
+        Font _highlightFont;
+        Brush _backgroundBrush;
+        AudioResource _menu;
 
         public MenuScene(bool pInGame) : base()
         {
@@ -61,32 +61,33 @@ namespace Evolusim
             _highlightFont.Alignment = Alignment.Center;
         }
 
-        public override void Draw(IGraphicsSystem pSystem)
-        {
-            base.Draw(pSystem);
+        //TODO create menu rendercomponent
+        //public override void Draw(IGraphicsAdapter pSystem)
+        //{
+        //    base.Draw(pSystem);
 
-            pSystem.DrawFillRect(new Rectangle(0, 0, Game.Form.Width, Game.Form.Height), _backgroundBrush);
+        //    pSystem.DrawFillRect(new Rectangle(0, 0, Game.Form.Width, Game.Form.Height), _backgroundBrush);
 
-            //pSystem.DrawText("Evolusim", new System.Drawing.RectangleF(0, 50, Game.Form.Width, 30), _titleFont);
+        //    pSystem.DrawText("Evolusim", new System.Drawing.RectangleF(0, 50, Game.Form.Width, 30), _titleFont);
 
-            float y = 120;
-            for(int i = 0; i < mItems.Count; i++)
-            {
-                System.Drawing.SizeF fontSize = _highlightFont.MeasureString(mItems[i], Game.Form.Width);
-                var x = (Game.Form.Width / 2) - (fontSize.Width / 2);
-                var currentY = y - (fontSize.Height / 2);
+        //    float y = 120;
+        //    for (int i = 0; i < mItems.Count; i++)
+        //    {
+        //        System.Drawing.SizeF fontSize = _highlightFont.MeasureString(mItems[i], Game.Form.Width);
+        //        var x = (Game.Form.Width / 2) - (fontSize.Width / 2);
+        //        var currentY = y - (fontSize.Height / 2);
 
-                if(mCurrentIndex == i)
-                {
-                    pSystem.DrawText(mItems[i], new Rectangle(x, currentY, fontSize.Width, fontSize.Height), _highlightFont);
-                }
-                else
-                {
-                    pSystem.DrawText(mItems[i], new Rectangle(x, currentY, fontSize.Width, fontSize.Height), _font);
-                }
-                y += fontSize.Height + 5;
-            }
-        }
+        //        if (mCurrentIndex == i)
+        //        {
+        //            pSystem.DrawText(mItems[i], new Rectangle(x, currentY, fontSize.Width, fontSize.Height), _highlightFont);
+        //        }
+        //        else
+        //        {
+        //            pSystem.DrawText(mItems[i], new Rectangle(x, currentY, fontSize.Width, fontSize.Height), _font);
+        //        }
+        //        y += fontSize.Height + 5;
+        //    }
+        //}
 
         public override void Update(float pDeltaTime)
         {
@@ -96,19 +97,19 @@ namespace Evolusim
             {
                 if (mCurrentIndex == 0) mCurrentIndex = mItems.Count - 1;
                 else mCurrentIndex--;
-                _menu.PlayImmediate();
+                AudioPlayer.Play(_menu);
 
             }
             else if(InputManager.KeyPressed(Keys.Down))
             {
                 if (mCurrentIndex == mItems.Count - 1) mCurrentIndex = 0;
                 else mCurrentIndex++;
-                _menu.PlayImmediate();
+                AudioPlayer.Play(_menu);
             }
 
             if(InputManager.KeyPressed(Keys.Enter))
             {
-                SceneManager.EndScene();
+                EndScene();
             }
         }
 
@@ -130,19 +131,21 @@ namespace Evolusim
             {
                 case 0:
                     if(!_inGame)
-                        SceneManager.BeginScene(new GameScene());
+                        BeginScene(new GameScene());
                     break;
                 case 1:
                     if (!_inGame)
-                        SceneManager.BeginScene(new GameScene());
+                        BeginScene(new GameScene());
                     else
-                        Game.IsPlaying = false;
+                        Game.Instance.IsPlaying = false;
                     break;
+
                 case 2:
-                    Game.IsPlaying = false;
+                    Game.Instance.IsPlaying = false;
                     break;
+
                 default:
-                    throw new Exception("unknown index");
+                    throw new ArgumentException("unknown index");
             }
         }
     }

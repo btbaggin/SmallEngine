@@ -21,7 +21,7 @@ namespace Evolusim
             Health
         }
 
-        private Dictionary<Traits, Trait> _traits;
+        readonly Dictionary<Traits, Trait> _traits;
         public TraitComponent()
         {
             _traits = new Dictionary<Traits, Trait>();

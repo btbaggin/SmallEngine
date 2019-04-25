@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace SmallEngine
 {
-    public class MathF
+    public static class MathF
     {
         public static float PI
         {
@@ -31,7 +31,9 @@ namespace SmallEngine
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float Clamp(float pValue, float pMin, float pMax)
         {
-            return (pValue < pMin) ? pMin : ((pValue > pMax) ? pMax : pValue);
+            if (pValue < pMin) return pMin;
+            else if (pValue > pMax) return pMax;
+            return pValue;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

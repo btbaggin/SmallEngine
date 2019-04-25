@@ -26,11 +26,11 @@ namespace SmallEngine
 
     public class GameForm : Form
     {
-        public EventHandler<WindowEventArgs> WindowActivateChanged;
-        public EventHandler<WindowEventArgs> WindowDestory;
-        public EventHandler<WindowEventArgs> WindowEnableChanged;
-        public EventHandler<WindowEventArgs> WindowMaximizeChanged;
-        public EventHandler<WindowEventArgs> WindowSizeChanged;
+        public EventHandler<WindowEventArgs> WindowActivateChanged { get; set; }
+        public EventHandler<WindowEventArgs> WindowDestory { get; set; }
+        public EventHandler<WindowEventArgs> WindowEnableChanged { get; set; }
+        public EventHandler<WindowEventArgs> WindowMaximizeChanged { get; set; }
+        public EventHandler<WindowEventArgs> WindowSizeChanged { get; set; }
 
         #region "Properties"
         public bool Vsync { get; set; }
@@ -180,24 +180,24 @@ namespace SmallEngine
         #endregion
 
         #region "WndPrc"
-        protected override void WndProc(ref Message pM)
+        protected override void WndProc(ref Message m)
         {
-            switch (pM.Msg)
+            switch (m.Msg)
             {
                 case WM_ACTIVATE:
-                    Activated = !(GetWLowWord(pM) == 0);
+                    Activated = GetWLowWord(m) != 0;
                     return;
 
                 case WM_MOUSEWHEEL:
-                    Input.InputManager.MouseWheel = (short)GetWHighWord(pM);
+                    Input.InputManager.MouseWheel = (short)GetWHighWord(m);
                     return;
 
                 case WM_ENABLE:
-                    Enabled = (pM.WParam.ToInt32() != 0);
+                    Enabled = (m.WParam.ToInt32() != 0);
                     return;
 
                 case WM_SIZE:
-                    switch (pM.WParam.ToInt32())
+                    switch (m.WParam.ToInt32())
                     {
                         case SIZE_MAXIMIZED:
                             Maximized = true;
@@ -210,7 +210,7 @@ namespace SmallEngine
 
                     if (AllowUserResizing)
                     {
-                        Size = new System.Drawing.Size(GetLLowWord(pM), GetLHighWord(pM));
+                        Size = new System.Drawing.Size(GetLLowWord(m), GetLHighWord(m));
                     }
 
                     return;
@@ -220,7 +220,7 @@ namespace SmallEngine
                     return;
 
                 default:
-                    base.WndProc(ref pM);
+                    base.WndProc(ref m);
                     return;
 
             }

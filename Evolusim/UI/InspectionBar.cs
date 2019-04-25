@@ -2,6 +2,7 @@
 using SmallEngine;
 using SmallEngine.Graphics;
 using SmallEngine.UI;
+using SmallEngine.Messages;
 
 namespace Evolusim.UI
 {
@@ -11,7 +12,7 @@ namespace Evolusim.UI
 
         public bool IsOpen { get; private set; }
 
-        Brush _background;
+        readonly Brush _background;
         private Organism _organism;
 
         public InspectionBar() : base()
@@ -23,18 +24,18 @@ namespace Evolusim.UI
             Orientation = ElementOrientation.Vertical;
             Order = 10;
 
-            MessageBus.Register(this);
+            Game.Messages.Register(this);
         }
 
         public void Toggle()
         {
+            Visible = true;
             IsOpen = !IsOpen;
         }
 
         public void Hide()
         {
-            IsOpen = false;
-            Position = new Vector2(-Width, Position.Y);
+            Visible = false;
         }
 
         private void UpdateContent()
@@ -47,7 +48,7 @@ namespace Evolusim.UI
             SetLayout();
         }
 
-        public override void Draw(IGraphicsSystem pSystem)
+        public override void Draw(IGraphicsAdapter pSystem)
         {
             pSystem.DrawFillRect(new Rectangle(Position, Width, Height), _background);
             base.Draw(pSystem);
@@ -83,13 +84,13 @@ namespace Evolusim.UI
             }
         }
 
-        public void ReceiveMessage(GameMessage pM)
+        public void ReceiveMessage(IMessage pMessage)
         {
-            switch(pM.MessageType)
+            switch(pMessage.Type)
             {
                 case "ToolbarOpen":
                     IsOpen = true;
-                    _organism = pM.GetValue<Organism>();
+                    _organism = pMessage.GetData<Organism>();
                     Organism.SelectedOrganism = _organism;
                     Game.ActiveCamera.Zoom = 1;
                     Game.ActiveCamera.Follow(_organism);

@@ -11,9 +11,10 @@ namespace Evolusim.UI
 {
     class AttributeElement : UIElement
     {
-        Brush _background;
-        Brush _foreground;
+        readonly Brush _background;
+        readonly Brush _foreground;
         float _percent;
+
         public string Attribute { get; private set; }
 
         public AttributeElement(string pAttribute, float pPercent)
@@ -30,7 +31,7 @@ namespace Evolusim.UI
             _foreground = Game.Graphics.CreateBrush(System.Drawing.Color.Gray);
         }
 
-        public override void Draw(IGraphicsSystem pSystem)
+        public override void Draw(IGraphicsAdapter pSystem)
         {
             base.Draw(pSystem);
             var w = Width * _percent;

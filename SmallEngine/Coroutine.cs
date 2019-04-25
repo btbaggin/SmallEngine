@@ -24,7 +24,8 @@ namespace SmallEngine
 
         public override bool Update(float pDeltaTime)
         {
-            return (_timer -= pDeltaTime) <= 0f;
+            _timer -= pDeltaTime;
+            return _timer <= 0f;
         }
     }
 
@@ -74,14 +75,9 @@ namespace SmallEngine
     #endregion
 
     //http://twistedoakstudios.com/blog/Post83_coroutines-more-than-you-want-to-know
-    public class Coroutine
+    public static class Coroutine
     {
-        private static List<IEnumerator<WaitEvent>> _coroutines;
-
-        static Coroutine()
-        {
-            _coroutines = new List<IEnumerator<WaitEvent>>();
-        }
+        private static List<IEnumerator<WaitEvent>> _coroutines = new List<IEnumerator<WaitEvent>>();
 
         /// <summary>
         /// Start a coroutine
@@ -109,12 +105,9 @@ namespace SmallEngine
         {
             foreach (IEnumerator<WaitEvent> e in _coroutines.ToList())
             { 
-                if(e.Current.Update(pDeltaTime))
+                if(e.Current.Update(pDeltaTime) && !e.MoveNext())
                 {
-                    if(!e.MoveNext())
-                    {
-                        _coroutines.Remove(e);
-                    }
+                    _coroutines.Remove(e);
                 }
             }
         }

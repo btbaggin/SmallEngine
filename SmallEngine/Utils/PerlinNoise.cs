@@ -10,7 +10,6 @@ namespace SmallEngine
     {
         private const int GradientSizeTable = 256;
 
-        private float[,] _grid;
         private readonly int _size;
         private readonly float[] _gradients = new float[GradientSizeTable * 3];
         private readonly byte[] _perm = new byte[] { 225,155,210,108,175,199,221,144,203,116, 70,213, 69,158, 33,252,
@@ -36,9 +35,9 @@ namespace SmallEngine
 
             for (int i = 0; i < GradientSizeTable; i++)
             {
-                float z = 1f - 2f * RandomGenerator.RandomFloat();
+                float z = 1f - 2f * Generator.Random.NextFloat();
                 float r = MathF.Sqrt(1f - z * z);
-                float theta = 2 * MathF.PI * RandomGenerator.RandomFloat();
+                float theta = 2 * MathF.PI * Generator.Random.NextFloat();
                 _gradients[i * 3] = r * MathF.Cos(theta);
                 _gradients[i * 3 + 1] = r * MathF.Sin(theta);
                 _gradients[i * 3 + 2] = z;
@@ -47,7 +46,7 @@ namespace SmallEngine
 
         public float[,] Generate(int pOctives, params float[] pWeights)
         {
-            _grid = new float[_size, _size];
+            var grid = new float[_size, _size];
             for (int x = 0; x < _size; x++)
             {
                 for (int y = 0; y < _size; y++)
@@ -55,12 +54,12 @@ namespace SmallEngine
                     var mul = 2;
                     for (int i = 0; i < pOctives; i++)
                     {
-                        _grid[x, y] += Noise(mul * x * (1f / _size), mul * y * (1f / _size), -0.5f) * pWeights[i];
+                        grid[x, y] += Noise(mul * x * (1f / _size), mul * y * (1f / _size), -0.5f) * pWeights[i];
                         mul *= 2;
                     }
                 }
             }
-            return _grid;
+            return grid;
         }
 
         public float Noise(float x, float y, float z)

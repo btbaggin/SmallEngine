@@ -9,8 +9,8 @@ namespace Evolusim
 {
     class HeightMap
     {
-        float[,] _map;
-        float _size;
+        readonly float[,] _map;
+        readonly float _size;
         public HeightMap(bool pPerlin, int pSize)
         {
             _size = pSize;

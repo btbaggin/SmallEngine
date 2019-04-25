@@ -42,11 +42,12 @@ namespace Evolusim
 
         public override void Update(float pDeltaTime)
         {
-            if (!_destinationSet) GetDestination(TerrainType.None);
+            if (!_destinationSet) GetDestination();
 
             if(_stopped)
             {
-                _stopped = (_stopDuration -= pDeltaTime) > 0;
+                float v = _stopDuration -= pDeltaTime;
+                _stopped = v > 0;
             }
 
             //TODO use pathing
@@ -76,7 +77,7 @@ namespace Evolusim
             _stopped = true;
         }
 
-        private void GetDestination(TerrainType pTerrain)
+        private void GetDestination()
         {
             if(!_override)
             {
@@ -92,13 +93,13 @@ namespace Evolusim
                         break;
 
                     case StatusComponent.Status.Hungry:
-                        _food = (Vegetation)SceneManager.Current.GameObjects.NearestWithinDistance(GameObject, _vision * 64, "Vegetation");
+                        _food = (Vegetation)Scene.Current.GameObjects.NearestWithinDistance(GameObject, _vision * 64, "Vegetation");
                         if (_food != null) _destination = _food.Position;
                         else if (!_destinationSet) RandomDestination();
                         break;
 
                     case StatusComponent.Status.Mating:
-                        _mate = (Organism)SceneManager.Current.GameObjects.NearestWithinDistance(GameObject, _vision * 64, "Organism");
+                        _mate = (Organism)Scene.Current.GameObjects.NearestWithinDistance(GameObject, _vision * 64, "Organism");
                         if (_mate != null) _destination = _mate.Position;
                         else if (!_destinationSet) RandomDestination();
                         break;
@@ -117,11 +118,11 @@ namespace Evolusim
                 switch (GetMovementType())
                 {
                     case StatusComponent.Status.Hungry:
-                        if (_food == null || _food.IsDead) GetDestination(TerrainType.None);
+                        if (_food == null || _food.IsDead) GetDestination();
                         break;
 
                     case StatusComponent.Status.Mating:
-                        if (_mate == null || _mate.MarkedForDestroy) GetDestination(TerrainType.None);
+                        if (_mate == null || _mate.MarkedForDestroy) GetDestination();
                         else _destination = _mate.Position;
                         break;
 
@@ -178,8 +179,8 @@ namespace Evolusim
 
         private void RandomDestination()
         {
-            var u = RandomGenerator.RandomFloat();
-            var v = RandomGenerator.RandomFloat();
+            var u = Generator.Random.NextFloat();
+            var v = Generator.Random.NextFloat();
             var w = (_vision * 64) * MathF.Sqrt(u);
             var t = 2 * MathF.PI * v;
             var x = w * MathF.Cos(t);

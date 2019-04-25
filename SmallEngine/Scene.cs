@@ -4,54 +4,45 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SmallEngine.Graphics;
+using SmallEngine.Components;
 
 namespace SmallEngine
 {
+
+    public enum SceneLoadMode
+    {
+        Replace,
+        Additive
+    }
+
     public class Scene : IUpdatable
     {
-        private List<IGameObject> _gameObjects;
-        public List<IDrawable> _drawable;
-        private List<IUpdatable> _updatable;
-        private Dictionary<string, IGameObject> _namedObjects;
-        private static List<IGameObject> _toRemove;
+        readonly Dictionary<string, IGameObject> _namedObjects;
+        readonly List<IGameObject> _toRemove = new List<IGameObject>();
+
+        static List<ComponentSystem> _systems = new List<ComponentSystem>();
+        static Stack<Scene> _scenes = new Stack<Scene>();
+        internal readonly static Dictionary<string, List<Type>> _definitions = new Dictionary<string, List<Type>>();
 
         #region Properties
-        public List<IGameObject> GameObjects
-        {
-            get { return _gameObjects; }
-        }
+        public List<IGameObject> GameObjects { get; }
 
-        public Game Game { get; private set; }
+        public static Scene Current { get; private set; }
         #endregion  
 
         #region Constructors
-        static Scene()
-        {
-            _toRemove = new List<IGameObject>();
-        }
-
         public Scene()
         {
-            _gameObjects = new List<IGameObject>();
-            _drawable = new List<IDrawable>();
-            _updatable = new List<IUpdatable>();
+            GameObjects = new List<IGameObject>();
             _namedObjects = new Dictionary<string, IGameObject>();
         }
         #endregion
 
-        public virtual void Draw(IGraphicsSystem pSystem)
-        {
-            foreach(var d in _drawable)
-            {
-                d.Draw(pSystem);
-            }
-        }
-
         public virtual void Update(float pDeltaTime)
         {
-            for(int i = 0; i < _updatable.Count; i++)
+            foreach(var go in GameObjects)
             {
-                _updatable[i].Update(pDeltaTime);
+                go.Update(pDeltaTime);
             }
         }
 
@@ -64,11 +55,49 @@ namespace SmallEngine
             DisposeGameObjects();
         }
 
-        internal void BeginScene(Game pGame)
+        #region Static methods
+        public static void Register(ComponentSystem pSystem)
         {
-            Game = pGame;
-            Begin();
+            _systems.Add(pSystem);
         }
+
+        public static void Define(string pName, params Type[] pComponents)
+        {
+            if (!_definitions.ContainsKey(pName))
+            {
+                _definitions.Add(pName, pComponents.ToList());
+            }
+            else
+            {
+                _definitions[pName] = pComponents.ToList();
+            }
+        }
+
+        public static void BeginScene(Scene pScene)
+        {
+            BeginScene(pScene, SceneLoadMode.Replace);
+        }
+
+        public static void BeginScene(Scene pScene, SceneLoadMode pMode)
+        {
+            if (pMode == SceneLoadMode.Additive)
+            {
+                _scenes.Push(Current);
+            }
+
+            Current = pScene;
+            Current.Begin();
+        }
+
+        public static void EndScene()
+        {
+            Current.End();
+            if (_scenes.Count > 0)
+            {
+                Current = _scenes.Pop();
+            }
+        }
+        #endregion
 
         //TODO use pooling of GO
         #region CreateGameObject
@@ -85,9 +114,8 @@ namespace SmallEngine
                 go.AddComponent(c);
             }
 
-            go.SetGame(Game);
             go.Initialize();
-            AddGameObject(go, pName);
+            AddGameObject(go, pName, null);
             return go;
         }
 
@@ -98,15 +126,14 @@ namespace SmallEngine
 
         public T CreateGameObject<T>(string pName, params IComponent[] pComponents) where T : IGameObject
         {
-            T go = (T)Activator.CreateInstance(typeof(T), new object[] { });
+            T go = (T)Activator.CreateInstance(typeof(T), new object[] { pName });
             foreach (IComponent c in pComponents)
             {
                 go.AddComponent(c);
             }
 
-            go.SetGame(Game);
             go.Initialize();
-            AddGameObject(go, pName);
+            AddGameObject(go, pName, null);
             return go;
         }
 
@@ -117,17 +144,16 @@ namespace SmallEngine
 
         public T CreateGameObject<T>(string pName, string pTemplate) where T : IGameObject
         {
-            if (SceneManager._definitions.ContainsKey(pTemplate))
+            if (_definitions.ContainsKey(pTemplate))
             {
-                T go = (T)Activator.CreateInstance(typeof(T), new object[] { });
-                foreach (Type t in SceneManager._definitions[pTemplate])
+                T go = (T)Activator.CreateInstance(typeof(T), new object[] { pName });
+                foreach (Type t in _definitions[pTemplate])
                 {
                     go.AddComponent(Component.Create(t));
                 }
 
-                go.SetGame(Game);
                 go.Initialize();
-                AddGameObject(go, pName);
+                AddGameObject(go, pName, pTemplate);
                 return go;
             }
 
@@ -141,17 +167,16 @@ namespace SmallEngine
 
         public IGameObject CreateGameObject(string pName, string pTemplate)
         {
-            if (SceneManager._definitions.ContainsKey(pTemplate))
+            if (_definitions.ContainsKey(pTemplate))
             {
                 GameObject go = new GameObject(pName);
-                foreach (Type t in SceneManager._definitions[pTemplate])
+                foreach (Type t in _definitions[pTemplate])
                 {
                     go.AddComponent(Component.Create(t));
                 }
 
-                go.SetGame(Game);
                 go.Initialize();
-                AddGameObject(go, pName);
+                AddGameObject(go, pName, pTemplate);
                 return go;
             }
 
@@ -159,31 +184,14 @@ namespace SmallEngine
         }
         #endregion  
 
-        private void AddGameObject(IGameObject pGameObject, string pName)
+        private void AddGameObject(IGameObject pGameObject, string pName, string pTemplate)
         {
-            _gameObjects.Add(pGameObject);
+            GameObjects.Add(pGameObject);
             if (pName != null) _namedObjects.Add(pName, pGameObject);
-        }
-        public void AddUpdatable(IUpdatable pUpdatable)
-        {
-            _updatable.Add(pUpdatable);
-        }
-
-        public void RemoveUpdatable(IUpdatable pUpdatable)
-        {
-            _updatable.Remove(pUpdatable);
-        }
-
-        public void AddDrawable(IDrawable pDrawable)
-        {
-            var i = _drawable.BinarySearch(pDrawable, RenderComponent.Comparer);
-            if (i == -1) _drawable.Add(pDrawable);
-            else _drawable.Insert(i, pDrawable);
-        }
-
-        public void RemoveDrawable(IDrawable pDrawable)
-        {
-            _drawable.Remove(pDrawable);
+            foreach(var s in _systems)
+            {
+                s.GameObjectAdded(pTemplate, pGameObject);
+            }
         }
 
         public IGameObject FindGameObject(string pName)
@@ -205,12 +213,17 @@ namespace SmallEngine
         {
             foreach(var go in _toRemove)
             {
-                go.Dispose();
-                _gameObjects.Remove(go);
-                if(!string.IsNullOrEmpty(go.Name) && _namedObjects.ContainsKey(go.Name))
+                GameObjects.Remove(go);
+                foreach(var s in _systems)
+                {
+                    s.GameObjectRemoved(go);
+                }
+
+                if (!string.IsNullOrEmpty(go.Name) && _namedObjects.ContainsKey(go.Name))
                 {
                     _namedObjects.Remove(go.Name);
                 }
+                go.Dispose();
             }
 
             _toRemove.Clear();

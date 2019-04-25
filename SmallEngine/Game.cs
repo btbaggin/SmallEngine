@@ -10,43 +10,58 @@ using SmallEngine.Audio;
 using SmallEngine.Graphics;
 using SmallEngine.Physics;
 using SmallEngine.UI;
+using SmallEngine.Messages;
 
 namespace SmallEngine
 {
     public class Game : IDisposable
     {
         /*TODO
-         * MessageBus dropping messages if too busy
          * Generic render component?
+         * make my own system.drawing.color
          */
 
-        public enum RenderSystem
+        public enum RenderTypes
         {
             DirectX,
             OpenGL
         }
 
-        private UIManager _uiManager;
-        private SceneManager _sceneManager;
-        private InputManager _inputManager;
-        private MessageBus _messageBus;
-        private float _timeElapsed;
-        private int _frameCount;
+        readonly UIManager _uiManager;
+        readonly RenderSystem _render;
+        readonly PhysicsSystem _physics;
+        float _timeElapsed;
+        int _frameCount;
+        float _physicsStep;
+        float _physicsStepTime;
 
         #region Properties
-        public static IGraphicsSystem Graphics { get; private set; }
+        public static Game Instance { get; private set; }
 
-        public int MaxFps { get; set; } = 0;
+        public static IGraphicsAdapter Graphics { get; private set; }
+
+        public static GameForm Form { get; private set; }
+
+        public static RenderTypes Render { get; set; }
+
+        public static MessageBus Messages { get; private set; }
+
+        private int _maxFps;
+        public int MaxFps
+        {
+            get { return _maxFps; }
+            set
+            {
+                _maxFps = value;
+                _physicsStepTime = 1f / _maxFps;
+            }
+        }
 
         public int CurrentFps { get; set; }
 
         public bool IsPlaying { get; set; }
 
-        protected Scene Scene { get { return SceneManager.Current; } }
-
-        public static GameForm Form { get; private set; }
-
-        public static RenderSystem Render { get; set; }
+        protected Scene Scene { get { return Scene.Current; } }
 
         public bool PlayInBackground { get; set; }
         
@@ -59,26 +74,29 @@ namespace SmallEngine
             }
         }
 
-        public World GameWorld { get; private set; }
-
         public static Camera ActiveCamera { get; set; }
         #endregion  
 
         public Game()
         {
+            Instance = this;
             Form = new GameForm();
-            _uiManager = new UIManager();
-            _sceneManager = new SceneManager(this);
-            _inputManager = new InputManager(Form.Handle);
-            _messageBus = new MessageBus();
-            GameWorld = new World();
+
+            InputManager.Initialize(Form.Handle);
+            Messages = new QueueingMessageBus();
 
             Form.WindowActivateChanged += WindowActivateChanged;
             Form.WindowDestory += WindowDestroyed;
             Form.WindowSizeChanged += WindowSizeChanged;
 
-            Graphics = Render == RenderSystem.DirectX ? new DirectXGraphicSystem() : null;
+            Graphics = Render == RenderTypes.DirectX ? new DirectXGraphicSystem() : null;
             Graphics.Initialize(Form, false);
+
+            _uiManager = new UIManager();
+            _render = new RenderSystem(Graphics);
+            _physics = new PhysicsSystem();
+
+            if (MaxFps == 0) MaxFps = 60;
         }
 
         #region Overridable game functions
@@ -100,29 +118,21 @@ namespace SmallEngine
             ActiveCamera.Update(pDeltaTime);
 
             Scene.Update(pDeltaTime);
-
-            //Update physics
-            GameWorld.Update(pDeltaTime);
         }
 
-        private void Draw()
+        private void Draw(float pDeltaTime)
         {
-            Scene.Draw(Graphics);
+            _render.Update(pDeltaTime);
             _uiManager.Draw(Graphics);
         }
         #endregion
-
-        internal void Destroy(IGameObject pGameObject)
-        {
-            Scene.Destroy(pGameObject);
-        }
 
         public void Run()
         {
             IsPlaying = true;
             LoadContent();
             Initialize();
-            _messageBus.Start();
+            Messages.Start();
             GameTime.Reset();
 
             Application.Idle += OnIdle;
@@ -139,6 +149,8 @@ namespace SmallEngine
         {
             Graphics.Dispose();
             Form.Dispose();
+
+            AudioPlayer.DisposePlayer();
         }
 
         private void WindowDestroyed(object sender, WindowEventArgs e)
@@ -148,7 +160,12 @@ namespace SmallEngine
 
         private void WindowActivateChanged(object sender, WindowEventArgs e)
         {
+#if DEBUG
+            if (!e.Activated) GameTime.TimeScale = .01f;
+            else GameTime.TimeScale = 1f;
+#else
             Paused = !e.Activated && !PlayInBackground;
+#endif
         }
 
         private void WindowSizeChanged(object sender, WindowEventArgs e)
@@ -162,8 +179,8 @@ namespace SmallEngine
             {
                 if (!IsPlaying)
                 {
-                    _messageBus.Stop();
-                    SceneManager.EndScene();
+                    Messages.Stop();
+                    Scene.EndScene();
                     UnloadContent();
                     Application.Exit();
                     return;
@@ -173,15 +190,26 @@ namespace SmallEngine
                 GameTime.Tick();
 
                 //Cache pressed keys
-                _inputManager.ProcessInput();
+                InputManager.ProcessInput();
 
                 Coroutine.Update(GameTime.DeltaTime);
 
                 Update(GameTime.DeltaTime);
+
+                _physicsStep += GameTime.DeltaTime;
+                if (_physicsStep > .02f)
+                    _physicsStep = .02f;
+
+                while (_physicsStep > _physicsStepTime)
+                {
+                    //Update physics
+                    _physics.Update(_physicsStepTime);
+                    _physicsStep -= _physicsStepTime;
+                }
                 InputManager.MouseWheelDelta = 0;
 
                 Graphics.BeginDraw();
-                Draw();
+                Draw(_physicsStep / _physicsStepTime);
                 Graphics.EndDraw();
 
                 //If the max updates is set and we have cycles, sleep the thread
@@ -208,7 +236,7 @@ namespace SmallEngine
             }
         }      
 
-        #region PeekMessage PInvoke
+#region PeekMessage PInvoke
         [System.Runtime.InteropServices.DllImport("User32.dll", CharSet = System.Runtime.InteropServices.CharSet.Auto)]
         private static extern bool PeekMessage(out NativeMessage pMsg, IntPtr pHWnd, uint pMessageFilterMin, uint pMessageFilterMax, uint pFlags);
 
@@ -222,6 +250,6 @@ namespace SmallEngine
             public uint time;
             public System.Drawing.Point p;
         }
-        #endregion
+#endregion
     }
 }

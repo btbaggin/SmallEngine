@@ -13,21 +13,21 @@ namespace Evolusim
         [Flags]
         public enum Status
         {
-            None,
-            Hungry,
-            Sleeping,
-            Mating,
-            Scared
+            None = 0,
+            Hungry = 1,
+            Sleeping = 2,
+            Mating = 4,
+            Scared = 8
         }
 
         [ImportComponent]
         private TraitComponent _traits = null;
 
         private Status _currentStatus;
-        private BitmapResource _sleep;
-        private BitmapResource _heart;
-        private BitmapResource _hungry;
-        private BitmapResource _scared;
+        readonly BitmapResource _sleep;
+        readonly BitmapResource _heart;
+        readonly BitmapResource _hungry;
+        readonly BitmapResource _scared;
 
         private int _hunger;
         private int _currentHunger;
@@ -59,7 +59,6 @@ namespace Evolusim
         public override void OnAdded(IGameObject pGameObject)
         {
             base.OnAdded(pGameObject);
-            SceneManager.Current.AddUpdatable(this);
 
             _traits = (TraitComponent)pGameObject.GetComponent(typeof(TraitComponent));//TODO
 
@@ -80,7 +79,7 @@ namespace Evolusim
             _currentLifetime = _lifeTime;
         }
 
-        protected override void DoDraw(IGraphicsSystem pSystem)
+        protected override void DoDraw(IGraphicsAdapter pSystem)
         {
             //TODO make a custom component that handles rendering this?
             var scale = new Vector2(GameObject.Scale.X / 2, GameObject.Scale.Y / 2) * Game.ActiveCamera.Zoom;
@@ -226,7 +225,7 @@ namespace Evolusim
             RemoveStatus(Status.Mating);
         }
 
-        protected override void DoDraw(IGraphicsSystem pSystem, Effect pEffect)
+        protected override void DoDraw(IGraphicsAdapter pSystem, Effect pEffect)
         {
             throw new NotImplementedException();
         }

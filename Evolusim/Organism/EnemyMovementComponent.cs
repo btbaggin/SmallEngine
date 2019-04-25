@@ -9,9 +9,9 @@ namespace Evolusim
 {
     class EnemyMovementComponent : Component
     {
-        private Organism _target;
-        private Enemy _gameObject;
-        private float _speed = 125;
+        Organism _target;
+        Enemy _gameObject;
+        const float _speed = 125;
 
         public Vector2 Speed { get { return Vector2.UnitX; } }
 
@@ -32,7 +32,7 @@ namespace Evolusim
         {
             base.OnAdded(pGameObject);
             _gameObject = (Enemy)pGameObject;
-            _target = (Organism)SceneManager.Current.GameObjects.Nearest(GameObject, "Organism");
+            _target = (Organism)Scene.Current.GameObjects.Nearest(GameObject, "Organism");
         }
     }
 }

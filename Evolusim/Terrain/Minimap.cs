@@ -10,14 +10,14 @@ using SmallEngine.Input;
 
 namespace Evolusim.Terrain
 {
-    class Minimap : UIElement
+    class Minimap : UIElement, IDisposable
     {
-        TerrainMap _terrain;
-        int _resolution;
+        readonly TerrainMap _terrain;
+        readonly int _resolution;
         BitmapResource _image;
-        float _ratio;
-        float _inverseRatio;
-        Brush _cameraOutline;
+        readonly float _ratio;
+        readonly float _inverseRatio;
+        readonly Brush _cameraOutline;
 
         public Minimap(TerrainMap pTerrain, int pSize, int pResolution)
         {
@@ -34,7 +34,7 @@ namespace Evolusim.Terrain
             SetLayout();
         }
 
-        public override void Draw(IGraphicsSystem pSystem)
+        public override void Draw(IGraphicsAdapter pSystem)
         {
             _terrain.BitmapData(ref _image, _resolution);
 

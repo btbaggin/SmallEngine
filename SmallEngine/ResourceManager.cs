@@ -6,18 +6,10 @@ using System.Threading.Tasks;
 
 namespace SmallEngine
 {
-    public class ResourceManager
+    public static class ResourceManager
     {
-        private static Dictionary<string, Resource> _resources;
-        private static Dictionary<string, string[]> _groups;
-
-        #region Constructor
-        static ResourceManager()
-        {
-            _resources = new Dictionary<string, Resource>();
-            _groups = new Dictionary<string, string[]>();
-        }
-        #endregion
+        private static Dictionary<string, Resource> _resources = new Dictionary<string, Resource>();
+        private static Dictionary<string, string[]> _groups = new Dictionary<string, string[]>();
 
         #region Public functions
         /// <summary>
@@ -40,7 +32,7 @@ namespace SmallEngine
         /// <typeparam name="T">Type of the resource to load</typeparam>
         /// <param name="pAlias">Name to give to the resource</param>
         /// <param name="pPath">Path to the resource</param>
-        /// <param name="pKeepReference">Whether or not to keep a refernce if resource has been disposed so it can be reloaded.</param>
+        /// <param name="pKeepReference">Whether or not to keep a reference if resource has been disposed so it can be reloaded.</param>
         /// <returns>Handle to the resource</returns>
         public static T Add<T>(string pAlias, string pPath, bool pKeepReference) where T : Resource, new()
         {
@@ -96,7 +88,7 @@ namespace SmallEngine
         /// <typeparam name="T">Type of the resource to load</typeparam>
         /// <param name="pAlias">Name to give to the resource</param>
         /// <param name="pPath">Path to the resource</param>
-        /// <param name="pKeepReference">Whether or not to keep a refernce if resource has been disposed so it can be reloaded.</param>
+        /// <param name="pKeepReference">Whether or not to keep a reference if resource has been disposed so it can be reloaded.</param>
         /// <returns>Handle to the resource</returns>
         public async static Task<T> AddAsync<T>(string pAlias, string pPath, bool pKeepReference) where T : Resource, new()
         {
@@ -104,7 +96,7 @@ namespace SmallEngine
         }
 
         /// <summary>
-        /// Asychronously loads the resource.
+        /// Asynchronously loads the resource.
         /// Will return if the resource is already loaded
         /// </summary>
         /// <typeparam name="T">Type of the resource to load</typeparam>
@@ -118,14 +110,14 @@ namespace SmallEngine
         }
 
         /// <summary>
-        /// Asychronously loads the resource.
+        /// Asynchronously loads the resource.
         /// Will return if the resource is already loaded
         /// </summary>
         /// <typeparam name="T">Type of the resource to load</typeparam>
         /// <param name="pAlias">Name to give to the resource</param>
         /// <param name="pPath">Path to the resource</param>
         /// <param name="pCallback">Method to call when loading the resource is complete</param>
-        /// <param name="pKeepReference">Whether or not to keep a refernce if resource has been disposed so it can be reloaded.</param>
+        /// <param name="pKeepReference">Whether or not to keep a reference if resource has been disposed so it can be reloaded.</param>
         /// <returns>Handle to the resource</returns>
         public async static Task<T> AddAsync<T>(string pAlias, string pPath, bool pKeepReference, Action<T> pCallback) where T : Resource, new()
         {
@@ -181,7 +173,7 @@ namespace SmallEngine
         public static T RequestFromGroup<T>(string pGroup) where T : Resource, new()
         {
             System.Diagnostics.Debug.Assert(_groups.ContainsKey(pGroup));
-            return Request<T>(_groups[pGroup][RandomGenerator.RandomInt(0, _groups[pGroup].Length)]);
+            return Request<T>(_groups[pGroup][Generator.Random.Next(0, _groups[pGroup].Length)]);
         }
 
         /// <summary>
@@ -189,7 +181,7 @@ namespace SmallEngine
         /// </summary>
         /// <typeparam name="T">Type of the resource to dispose</typeparam>
         /// <param name="pAlias">Name of the resource to dispose</param>
-        public static void Dispose<T>(string pAlias) where T : Resource, new()
+        public static void DisposeResource(string pAlias)
         {
             if (_resources.ContainsKey(pAlias))
             {
@@ -210,14 +202,14 @@ namespace SmallEngine
         /// <typeparam name="T">Type of the resource to dispose</typeparam>
         /// <param name="pAlias">Name of the resource to dispose</param>
         /// <param name="pForce">Whether or not to force collection of the resource</param>
-        public static void ForceDispose<T>(string pAlias) where T : Resource, new()
+        public static void ForceDispose(string pAlias)
         {
             if (_resources.ContainsKey(pAlias))
             {
                 var r = _resources[pAlias];
                 r.DisposeResource(true);
 
-                //Remove refernce to class so GC takes care of it
+                //Remove reference to class so GC takes care of it
                 _resources.Remove(pAlias);
             }
         }
@@ -254,7 +246,7 @@ namespace SmallEngine
         /// <summary>
         /// Completely disposes of all resources
         /// </summary>
-        public static void Dispose()
+        public static void DisposeResources()
         {
             foreach (Resource r in _resources.Values)
             {

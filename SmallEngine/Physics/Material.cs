@@ -8,12 +8,21 @@ namespace SmallEngine.Physics
 {
     public class Material
     {
-        public Material() { }
+        public float Restitution { get; private set; }
 
-        public float Restitution { get; set; } = 0.0f;
+        public float Density { get; private set; }
 
-        public float StaticFriction { get; set; } = 0.6f;
+        public float StaticFriction { get; private set; }
 
-        public float KineticFriction { get; set; } = 0.3f;
+        public float DynamicFriction { get; private set; }
+
+        public Material(float pRestitution, float pDensity, float pStaticFriction, float pDynamicFriction)
+        {
+            System.Diagnostics.Debug.Assert(pStaticFriction >= pDynamicFriction, "Static friction must be greater than dynamic friction");
+            Restitution = pRestitution;
+            Density = pDensity;
+            StaticFriction = pStaticFriction;
+            DynamicFriction = pDynamicFriction;
+        }
     }
 }

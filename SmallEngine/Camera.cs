@@ -37,7 +37,7 @@ namespace SmallEngine
         }
         #endregion
 
-        private float _minZoom, _maxZoom;
+        readonly float _minZoom, _maxZoom;
         private float _inverseZoom;
 
         private IGameObject _followObject;

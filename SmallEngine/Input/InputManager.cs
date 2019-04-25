@@ -10,15 +10,15 @@ namespace SmallEngine.Input
 {
     public class InputManager
     {
-        private static List<InputInfo> _keys;
-        private IntPtr _handle;
-        private static InputState _inputState;
-        private static InputState _previousState;
+        static List<InputInfo> _keys = new List<InputInfo>();
+        static IntPtr _handle;
+        static InputState _inputState;
+        static InputState _previousState;
 
         #region Win32 functions
         [DllImport("user32.dll")]
         static extern short GetAsyncKeyState(int pKey);
-        public bool IsKeyPressed(int pKey)
+        public static bool IsKeyPressed(int pKey)
         {
             return 0 != (GetAsyncKeyState(pKey) & 0x8000);
         }
@@ -100,16 +100,15 @@ namespace SmallEngine.Input
         #endregion
 
         #region Constructor
-        public InputManager(IntPtr pHandle)
+        public static void Initialize(IntPtr pHandle)
         {
-            _keys = new List<InputInfo>();
             _handle = pHandle;
             HoldDelay = 500;    //Default half second for holding a key
 
         }
         #endregion
 
-        internal void ProcessInput()
+        internal static void ProcessInput()
         {
             var keyInput = new byte[256];
             GetKeyboardState(keyInput);
@@ -174,11 +173,12 @@ namespace SmallEngine.Input
                 if (_focus != null) return;
             }
 
-            foreach (var go in SceneManager.Current._drawable)//GameObjects.OrderBy(pGo => pGo.Order))
-            {
-                _focus = go.GetFocusElement(MousePosition);
-                if (_focus != null) return;
-            }
+            //TODO this is shit
+            //foreach (var go in Scene.Current._drawable)
+            //{
+            //    _focus = go.GetFocusElement(MousePosition);
+            //    if (_focus != null) return;
+            //}
         }
 
         #region Public functions

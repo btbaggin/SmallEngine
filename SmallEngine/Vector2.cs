@@ -119,11 +119,8 @@ namespace SmallEngine
         /// <param name="pDirection">Direction to apply the multiplication</param>
         public void MultiplyInDirection(float pScalar, Vector2 pDirection)
         {
-            pDirection.Normalize();
-            var f = pDirection * pScalar;
-
-            X += pDirection.X;
-            Y += pDirection.Y;
+            X += pDirection.X * pScalar;
+            Y += pDirection.Y * pScalar;
         }
 
         /// <summary>
@@ -183,7 +180,7 @@ namespace SmallEngine
         {
             float d = DistanceSqrd(pVectorFrom, pVectorTo);
             Vector2 direction = pVectorFrom + Normalize(pVectorTo - pVectorFrom) * pAmount;
-            if(Vector2.DistanceSqrd(pVectorFrom, direction) >= d)
+            if(DistanceSqrd(pVectorFrom, direction) >= d)
             {
                 direction = pVectorTo;
             }
@@ -239,7 +236,7 @@ namespace SmallEngine
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float DotProduct(Vector2 pV1, Vector2 pV2)
         {
-            return (pV1.X * pV2.X + pV1.Y * pV2.Y);
+            return pV1.X * pV2.X + pV1.Y * pV2.Y;
         }
 
         /// <summary>
@@ -249,9 +246,19 @@ namespace SmallEngine
         /// <param name="pV2">Second vector to calculate the cross product</param>
         /// <returns>Cross product of pV1 and pV2</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Vector2 CrossProduct(Vector2 pV1, Vector2 pV2)
+        public static float CrossProduct(Vector2 pV1, Vector2 pV2)
         {
-            return new Vector2(pV1.Y - pV2.Y, pV2.X - pV1.X);
+            return pV1.X * pV2.Y - pV1.Y * pV2.X;
+        }
+
+        public static Vector2 CrossProduct(Vector2 pV, float pScalar)
+        {
+            return new Vector2(pScalar * pV.Y, -pScalar * pV.X);
+        }
+
+        public static Vector2 CrossProduct(float pScalar, Vector2 pV)
+        {
+            return new Vector2(-pScalar * pV.Y, pScalar * pV.X);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -394,7 +401,6 @@ namespace SmallEngine
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector2 MultiplyInDirection(float pScalar, Vector2 pV1, Vector2 pDirection)
         {
-            pDirection.Normalize();
             return pV1 + (pDirection * pScalar);
         }
         #endregion
@@ -402,9 +408,9 @@ namespace SmallEngine
         #region Operators
         public override bool Equals(object obj)
         {
-            if (obj is Vector2)
+            if (obj is Vector2 v)
             {
-                return X.Equals(this.X) && Y.Equals(this.Y);
+                return X == v.X && Y == v.Y;
             }
 
             return false;
@@ -468,6 +474,11 @@ namespace SmallEngine
         public static Vector2 operator -(float pScalar, Vector2 pV1)
         {
             return new Vector2(pV1.X - pScalar, pV1.Y - pScalar);
+        }
+
+        public static Vector2 operator -(Vector2 pV1)
+        {
+            return new Vector2(-pV1.X, -pV1.Y);
         }
 
         public static Vector2 operator *(Vector2 pV1, float pScalar)

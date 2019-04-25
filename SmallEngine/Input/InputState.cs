@@ -9,8 +9,8 @@ namespace SmallEngine.Input
 {
     public class InputState
     {
-        private byte[] _keys;
-        private byte[] _mouse;
+        readonly byte[] _keys;
+        readonly byte[] _mouse;
 
         internal InputState(byte[] pKeys, byte[] pMouse)
         {

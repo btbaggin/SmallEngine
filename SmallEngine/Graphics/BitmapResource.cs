@@ -16,7 +16,7 @@ namespace SmallEngine.Graphics
 
         internal override void Create()
         {
-            if(Game.Render == Game.RenderSystem.DirectX)
+            if(Game.Render == Game.RenderTypes.DirectX)
             {
                 DirectXBitmap = ((DirectXGraphicSystem)Game.Graphics).LoadBitmap(Path, out int width, out int height);
                 Width = width;
@@ -24,7 +24,7 @@ namespace SmallEngine.Graphics
             }
             else
             {
-
+                throw new NotImplementedException();
             }
         }
 

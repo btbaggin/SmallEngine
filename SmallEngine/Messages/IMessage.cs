@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SmallEngine
+namespace SmallEngine.Messages
 {
-    public interface IMessageReceiver
+    public interface IMessage
     {
-        void ReceiveMessage(GameMessage pMessage);
+        string Type { get; }
+        T GetData<T>();
     }
 }

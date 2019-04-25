@@ -4,12 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SmallEngine;
+using SmallEngine.Messages;
 
 namespace Evolusim
 {
     class EnemySpawnerComponent : Component
     {
-        private int _spawnCount = 3;
+        const int _spawnCount = 3;
         private Timer _spawnTimer = new Timer(60);
 
         public override void Update(float pDeltaTime)
@@ -20,7 +21,7 @@ namespace Evolusim
                 {
                     Enemy.Create(GameObject.Position);
                 }
-                MessageBus.SendMessage(new GameMessage("EnemySpawn", GameObject.Position));
+                Game.Messages.SendMessage(new GameMessage("EnemySpawn", GameObject.Position));
             }
         }
     }

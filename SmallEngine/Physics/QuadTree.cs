@@ -5,26 +5,18 @@ using System.Drawing;
 using System.Text;
 using System.Threading.Tasks;
 
-using SmallEngine.Physics;
-
-namespace SmallEngine
+namespace SmallEngine.Physics
 {
-    public class QuadTree<T> where T : ICollider
+    public class QuadTree<T> where T : IPhysicsBody
     {
-        private const int MAX_LEVELS = 5;
-        private const int MAX_OBJECTS = 10;
-        private readonly int _level;
+        private const int MAX_LEVELS = 8;
+        private const int MAX_OBJECTS = 128;
         private readonly List<T> _entities;
         private Rectangle _bounds;
 
         private readonly QuadTree<T>[] _nodes = new QuadTree<T>[4];
 
-        #region "Properties"
-        public static int MaxLevels
-        {
-            get { return MAX_LEVELS; }
-        }
-
+        #region Properties
         public float Width
         {
             get { return _bounds.Width; }
@@ -45,18 +37,15 @@ namespace SmallEngine
             get { return _nodes.Count((pN) => pN != null); }
         }
 
-        public int Level
-        {
-            get { return _level; }
-        }
+        public int Level { get; private set; }
         #endregion
 
-        #region "Constructor"
+        #region Constructor
         public QuadTree(Rectangle pBounds) : this(0, pBounds) { }
 
         private QuadTree(int pLevel, Rectangle pBounds)
         {
-            _level = pLevel;
+            Level = pLevel;
             _entities = new List<T>();
             _bounds = pBounds;
 
@@ -108,7 +97,7 @@ namespace SmallEngine
 
             _entities.Add(pEntity);
 
-            if (_entities.Count > MAX_OBJECTS && _level < MAX_LEVELS)
+            if (_entities.Count > MAX_OBJECTS && Level < MAX_LEVELS)
             {
                 if (_nodes[0] == null)
                 {
@@ -142,7 +131,7 @@ namespace SmallEngine
         {
             //recurse until we cannot fit the rectangle in a smaller node
             var i = GetIndex(pEntity);
-            if (i != -1 && _level <= MAX_LEVELS)
+            if (i != -1 && Level <= MAX_LEVELS)
             {
                 if (_nodes[i] == null)
                 {
@@ -160,15 +149,6 @@ namespace SmallEngine
             return true;
         }
 
-        public void Update(IEnumerable<T> pEntities)
-        {
-            Clear();
-            foreach(var e in pEntities)
-            {
-                Insert(e);
-            }
-        }
-
         /// <summary>
         /// Retrieves all objects currently colliding with the given point
         /// </summary>
@@ -177,7 +157,7 @@ namespace SmallEngine
         public IEnumerable<T> Retrieve(Vector2 pPoint)
         {
             var l = new List<T>();
-            return Retrieve(ref l, new Rectangle(pPoint, 1, 1));
+            return Retrieve(ref l, new AxisAlignedBoundingBox(pPoint, Vector2.Unit));
         }
 
         /// <summary>
@@ -188,7 +168,7 @@ namespace SmallEngine
         public IEnumerable<T> Retrieve(T pEntitiy)
         {
             var l = new List<T>();
-            return Retrieve(ref l, pEntitiy.Bounds);
+            return Retrieve(ref l, pEntitiy.AABB);
         }
 
         public void Resize(Rectangle pBounds)
@@ -209,7 +189,7 @@ namespace SmallEngine
         #endregion
 
         #region "Private Functions"
-        private List<T> Retrieve(ref List<T> pReturnObjects, Rectangle pRect)
+        private List<T> Retrieve(ref List<T> pReturnObjects, AxisAlignedBoundingBox pRect)
         {
             int index = GetIndex(pRect);
             if (index != -1 && _nodes[0] != null)
@@ -217,7 +197,7 @@ namespace SmallEngine
                 _nodes[index].Retrieve(ref pReturnObjects, pRect);
             }
 
-            pReturnObjects.AddRange(_entities);
+            pReturnObjects.AddRange(_entities); //TODO check layer
 
             return pReturnObjects;
         }
@@ -227,18 +207,18 @@ namespace SmallEngine
             var subWidth = _bounds.Width / 2;
             var subHeight = _bounds.Height / 2;
 
-            _nodes[0] = new QuadTree<T>(_level + 1, new Rectangle(_bounds.X, _bounds.Y, subWidth, subHeight));
-            _nodes[1] = new QuadTree<T>(_level + 1, new Rectangle(_bounds.X + subWidth, _bounds.Y, subWidth, subHeight));
-            _nodes[2] = new QuadTree<T>(_level + 1, new Rectangle(_bounds.X, _bounds.Y + subHeight, subWidth, subHeight));
-            _nodes[3] = new QuadTree<T>(_level + 1, new Rectangle(_bounds.X + subWidth, _bounds.Y + subHeight, subWidth, subHeight));
+            _nodes[0] = new QuadTree<T>(Level + 1, new Rectangle(_bounds.X, _bounds.Y, subWidth, subHeight));
+            _nodes[1] = new QuadTree<T>(Level + 1, new Rectangle(_bounds.X + subWidth, _bounds.Y, subWidth, subHeight));
+            _nodes[2] = new QuadTree<T>(Level + 1, new Rectangle(_bounds.X, _bounds.Y + subHeight, subWidth, subHeight));
+            _nodes[3] = new QuadTree<T>(Level + 1, new Rectangle(_bounds.X + subWidth, _bounds.Y + subHeight, subWidth, subHeight));
         }
 
         private int GetIndex(T pEntity)
         {
-            return GetIndex(pEntity.Bounds);
+            return GetIndex(pEntity.AABB);
         }
 
-        private int GetIndex(Rectangle pRect)
+        private int GetIndex(AxisAlignedBoundingBox pRect)
         {
             var i = -1;
             double verticalMidpoint = _bounds.X + (_bounds.Width / 2);
@@ -252,7 +232,7 @@ namespace SmallEngine
             //Object can completely fit within the left quadrants
             if (pRect.Right < verticalMidpoint)
             {
-                if ((topQuadrant))
+                if (topQuadrant)
                 {
                     i = 0;
                 }

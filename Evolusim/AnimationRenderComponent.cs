@@ -32,7 +32,7 @@ namespace Evolusim
             _evaluator = pEvaluator;
         }
 
-        protected override void DoDraw(IGraphicsSystem pSystem)
+        protected override void DoDraw(IGraphicsAdapter pSystem)
         {
             pSystem.DrawBitmap(Bitmap, 
                                Opacity, 
@@ -41,21 +41,9 @@ namespace Evolusim
                                new Rectangle(_currentFrame * _frameSize.X, AnimationNum * _frameSize.Y, _frameSize.X, _frameSize.Y));
         }
 
-        protected override void DoDraw(IGraphicsSystem pSystem, Effect pEffect)
+        protected override void DoDraw(IGraphicsAdapter pSystem, Effect pEffect)
         {
             throw new NotImplementedException();
-        }
-
-        public override void OnAdded(IGameObject pGameObject)
-        {
-            base.OnAdded(pGameObject);
-            SceneManager.Current.AddUpdatable(this);
-        }
-
-        public override void OnRemoved()
-        {
-            base.OnRemoved();
-            SceneManager.Current.RemoveUpdatable(this);//TODO i don't like this. Use weak references?
         }
 
         public override void Update(float pDeltaTime)

@@ -12,7 +12,7 @@ namespace Evolusim.UI
 {
     class ToggleButton : UIElement
     {
-        Brush _highlightBrush;
+        readonly Brush _highlightBrush;
 
         public bool IsSelected { get; internal set; }
 
@@ -31,7 +31,7 @@ namespace Evolusim.UI
             SetLayout();
         }
 
-        public override void Draw(IGraphicsSystem pSystem)
+        public override void Draw(IGraphicsAdapter pSystem)
         {
             base.Draw(pSystem);
             if(IsSelected)

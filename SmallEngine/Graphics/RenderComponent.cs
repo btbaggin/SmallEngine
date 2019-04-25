@@ -7,14 +7,14 @@ using SmallEngine.Input;
 
 namespace SmallEngine.Graphics
 {
-    public class RenderComparer : IComparer<IDrawable>
+    public class RenderComparer : IComparer<RenderComponent>
     {
-        public int Compare(IDrawable c1, IDrawable c2)
+        public int Compare(RenderComponent x, RenderComponent y)
         {
-            return c1.Order.CompareTo(c2.Order);
+            return x.Order.CompareTo(y.Order);
         }
     }
-    public abstract class RenderComponent : Component, IDrawable
+    public abstract class RenderComponent : Component
     {
         public static RenderComparer Comparer => new RenderComparer();
 
@@ -24,60 +24,34 @@ namespace SmallEngine.Graphics
 
         public int Order { get; set; }
 
-        public void Draw(IGraphicsSystem pSystem)
-        {
-            if (!IsVisible()) return;
-            DoDraw(pSystem);
-        }
+        public abstract void Draw(IGraphicsAdapter pSystem, float pDeltaTime);
 
-        public void Draw(IGraphicsSystem pSystem, Effect pEffect)
-        {
-            if (!IsVisible()) return;
-            DoDraw(pSystem, pEffect);
-        }
-
-        protected abstract void DoDraw(IGraphicsSystem pSystem);
-
-        protected abstract void DoDraw(IGraphicsSystem pSystem, Effect pEffect);
-
-        public RenderComponent()
+        protected RenderComponent()
         {
             Visible = true;
             Opacity = 1f;
         }
 
-        public override void OnAdded(IGameObject pGameObject)
-        {
-            GameObject = pGameObject;
-            SceneManager.Current.AddDrawable(this);
-            Added?.Invoke(this, new EventArgs());
-        }
+        //TODO
+        //public IDrawable GetFocusElement(Vector2 pPosition)
+        //{
+        //    if (GameObject != null && Visible && Opacity > 0f)
+        //    {
+        //        var s = GameObject.Scale * Game.ActiveCamera.Zoom;
+        //        var sp = Game.ActiveCamera.ToCameraSpace(GameObject.Position);
+        //        if (pPosition.X >= sp.X &&
+        //            pPosition.X <= sp.X + s.X &&
+        //            pPosition.Y >= sp.Y &&
+        //            pPosition.Y <= sp.Y + s.Y)
+        //        {
+        //            return this;
+        //        }
+        //    }
 
-        public override void OnRemoved()
-        {
-            base.OnRemoved();
-            SceneManager.Current.RemoveDrawable(this);
-        }
+        //    return null;
+        //}
 
-        public IDrawable GetFocusElement(Vector2 pPoint)
-        {
-            if (GameObject != null && IsVisible())
-            {
-                var s = GameObject.Scale * Game.ActiveCamera.Zoom;
-                var sp = GameObject.ScreenPosition;
-                if (pPoint.X >= sp.X &&
-                    pPoint.X <= sp.X + s.X &&
-                    pPoint.Y >= sp.Y &&
-                    pPoint.Y <= sp.Y + s.Y)
-                {
-                    return this;
-                }
-            }
-
-            return null;
-        }
-
-        private bool IsVisible()
+        public bool IsVisible()
         {
             var onScreen = Game.ActiveCamera.IsVisible(GameObject);
             return onScreen && Visible && Opacity > 0f;

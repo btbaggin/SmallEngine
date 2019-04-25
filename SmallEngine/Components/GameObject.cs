@@ -4,8 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using SmallEngine.Graphics;
-using SmallEngine.Input;
+using SmallEngine.Messages;
 
 namespace SmallEngine
 {
@@ -16,11 +15,6 @@ namespace SmallEngine
 
         public Vector2 Position { get; set; }
 
-        public Vector2 ScreenPosition
-        {
-            get { return Game.ActiveCamera.ToCameraSpace(Position); }
-        }
-
         public Vector2 Scale { get; set; }
 
         public float Rotation { get; set; }
@@ -30,8 +24,6 @@ namespace SmallEngine
             get { return new Rectangle(Position, Scale); }
         }
 
-        protected Game Game { get; private set; }
-
         public bool MarkedForDestroy { get; private set; }
 
         public string Tag { get; set; }
@@ -39,14 +31,13 @@ namespace SmallEngine
         public virtual int Order => 0;
         #endregion  
 
-        private Dictionary<Type, IComponent> _components;
+        readonly Dictionary<Type, IComponent> _components = new Dictionary<Type, IComponent>();
 
         public GameObject() : this(null) { }
 
         public GameObject(string pName)
         {
             Name = pName;
-            _components = new Dictionary<Type, IComponent>();
         }
 
         public T GetComponent<T>()
@@ -61,11 +52,21 @@ namespace SmallEngine
 
         public IComponent GetComponent(Type pType)
         {
-            if (Component.IsComponent(pType))
+            if (_components.ContainsKey(pType))
             {
-                if (_components.ContainsKey(pType))
+                return _components[pType];
+            }
+
+            return null;
+        }
+
+        public IComponent GetComponentOfType(Type pType)
+        {
+            foreach(var kv in _components)
+            {
+                if(pType.IsAssignableFrom(kv.Key))
                 {
-                    return _components[pType];
+                    return kv.Value;
                 }
             }
 
@@ -100,19 +101,16 @@ namespace SmallEngine
             _components.Remove(pComponent);
         }
 
-        public void SetGame(Game pGame)
-        {
-            Game = pGame;
-        }
-
         public virtual void Initialize() { }
 
-        public virtual void ReceiveMessage(GameMessage pM) { }
+        public virtual void Update(float pDeltaTime) { }
+
+        public virtual void ReceiveMessage(IMessage pMessage) { }
 
         public void Destroy()
         {
             MarkedForDestroy = true;
-            Game.Destroy(this);
+            Scene.Current.Destroy(this);
         }
 
         public virtual void Dispose()

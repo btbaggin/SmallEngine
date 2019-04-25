@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Drawing;
+using SmallEngine;
 using SharpDX.DirectWrite;
 
 namespace SmallEngine.Graphics
@@ -33,8 +33,6 @@ namespace SmallEngine.Graphics
             {
                 switch (Format.TextAlignment)
                 {
-                    case TextAlignment.Center:
-                        return Alignment.Center;
 
                     case TextAlignment.Justified:
                         return Alignment.Justified;
@@ -46,7 +44,7 @@ namespace SmallEngine.Graphics
                         return Alignment.Trailing;
 
                     default:
-                        throw new Exception();
+                        return Alignment.Center;
                 }
             }
             set
@@ -73,7 +71,7 @@ namespace SmallEngine.Graphics
         }
         #endregion
 
-        private Factory _factory;
+        readonly Factory _factory;
 
         #region Constructor
         private Font(Factory pFactory, SharpDX.Direct2D1.SolidColorBrush pBrush, string pFamily, float pSize)
@@ -89,11 +87,11 @@ namespace SmallEngine.Graphics
         }
         #endregion  
 
-        public SizeF MeasureString(string pText, float pWidth)
+        public System.Drawing.SizeF MeasureString(string pText, float pWidth)
         {
             using (TextLayout l = new TextLayout(_factory, pText, Format, pWidth, Format.FontSize))
             {
-                return new SizeF(l.Metrics.Width, l.Metrics.Height);
+                return new System.Drawing.SizeF(l.Metrics.Width, l.Metrics.Height);
             }
         }
 

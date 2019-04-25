@@ -29,7 +29,7 @@ namespace SmallEngine.UI
             Elements.Remove(pElement);
         }
 
-        internal void Draw(IGraphicsSystem pSystem)
+        internal void Draw(IGraphicsAdapter pSystem)
         {
             foreach (var e in Elements)
             {

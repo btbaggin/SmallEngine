@@ -9,7 +9,7 @@ namespace SmallEngine.Threading
 {
     public class Pool<T> where T : new()
     {
-        private ConcurrentStack<T> stack;
+        readonly ConcurrentStack<T> stack;
 
         public Pool()
         {
@@ -28,8 +28,7 @@ namespace SmallEngine.Threading
 
         public T Get()
         {
-            T freeObj;
-            if (!stack.TryPop(out freeObj))
+            if (!stack.TryPop(out T freeObj))
             {
                 freeObj = Activator.CreateInstance<T>();
             }

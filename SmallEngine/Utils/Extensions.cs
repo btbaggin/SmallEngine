@@ -18,6 +18,11 @@ namespace SmallEngine
             return min + r.NextFloat() * (max - min);
         }
 
+        public static double Range(this Random r, double min, double max)
+        {
+            return min + r.NextFloat() * (max - min);
+        }
+
         public static IEnumerable<IGameObject> WithinDistance(this IEnumerable<IGameObject> pGameObjects, IGameObject pGameObject, float pDistance, string pTag)
         {
             return pGameObjects.Where(pGo => pGo.Tag == pTag && 

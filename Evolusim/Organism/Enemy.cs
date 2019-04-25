@@ -16,13 +16,13 @@ namespace Evolusim
 
         static Enemy()
         {
-            SceneManager.Define("enemy", typeof(AnimationRenderComponent),
+            Scene.Define("enemy", typeof(AnimationRenderComponent),
                                          typeof(EnemyMovementComponent));
         }
 
         public static Enemy Create(Vector2 pPosition)
         {
-            var go = SceneManager.Current.CreateGameObject<Enemy>("enemy");
+            var go = Scene.Current.CreateGameObject<Enemy>("enemy");
             go.Position = pPosition;
             return go;
         }

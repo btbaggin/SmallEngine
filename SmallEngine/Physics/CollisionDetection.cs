@@ -4,258 +4,430 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using SmallEngine.Threading;
-
 namespace SmallEngine.Physics
 {
-    class CollisionDetection
+    static class CollisionDetection
     {
-        #region BroadphasePair class
-        protected class BroadphasePair
+        //https://gamedevelopment.tutsplus.com/tutorials/how-to-create-a-custom-2d-physics-engine-the-basics-and-impulse-resolution--gamedev-6331
+        //https://github.com/tutsplus/ImpulseEngine/blob/master/Collision.cpp
+
+        public static bool CircleVsCircle(ref Manifold pM)
         {
-            /// <summary>
-            /// The first body.
-            /// </summary>
-            public RigidBodyComponent Entity1;
-            /// <summary>
-            /// The second body.
-            /// </summary>
-            public RigidBodyComponent Entity2;
+            RigidBodyComponent A = pM.BodyA;
+            RigidBodyComponent B = pM.BodyB;
 
-            /// <summary>
-            /// A resource pool of Pairs.
-            /// </summary>
-            public static Pool<BroadphasePair> Pool = new Pool<BroadphasePair>();
-        }
-        #endregion
+            Vector2 n = B.AABB.Center - A.AABB.Center;
+            float aRadius = ((CircleMesh)A.Mesh).Radius;
+            float bRadius = ((CircleMesh)B.Mesh).Radius;
 
-        #region SweepPoint class
-        private class SweepPoint
-        {
-            public RigidBodyComponent Body;
-            public bool Begin;
-            public int Axis;
+            float radius = aRadius + bRadius;
 
-            public SweepPoint(RigidBodyComponent body, bool begin, int axis)
+            if (n.LengthSqrd > radius * radius) return false;
+
+            float distance = n.Length;
+            if(distance != 0)
             {
-                this.Body = body;
-                this.Begin = begin;
-                this.Axis = axis;
+                pM.Penetration = radius - distance;
+                pM.Normal = n / distance;
+                pM.Contacts = new Vector2[] { pM.Normal * aRadius + A.AABB.Center };
             }
-
-            public float Value
+            else
             {
-                get
-                {
-                    if (Begin)
-                    {
-                        if (Axis == 0) return Body.Bounds.Left;
-                        else return Body.Bounds.Top;
-                    }
-                    else
-                    {
-                        if (Axis == 0) return Body.Bounds.Right;
-                        else return Body.Bounds.Bottom;
-                    }
-                }
+                pM.Penetration = aRadius;
+                pM.Normal = Vector2.UnitX;
+                pM.Contacts = new Vector2[] { A.Position };
             }
-
-
-        }
-        #endregion
-
-        #region OverlapPair class
-        private struct OverlapPair
-        {
-            // internal values for faster access within the engine
-            public RigidBodyComponent Entity1, Entity2;
-
-            /// <summary>
-            /// Initializes a new instance of the BodyPair class.
-            /// </summary>
-            /// <param name="entity1"></param>
-            /// <param name="entity2"></param>
-            public OverlapPair(RigidBodyComponent entity1, RigidBodyComponent entity2)
-            {
-                this.Entity1 = entity1;
-                this.Entity2 = entity2;
-            }
-
-            /// <summary>
-            /// Don't call this, while the key is used in the arbitermap.
-            /// It changes the hashcode of this object.
-            /// </summary>
-            /// <param name="entity1">The first body.</param>
-            /// <param name="entity2">The second body.</param>
-            internal void SetBodies(RigidBodyComponent entity1, RigidBodyComponent entity2)
-            {
-                this.Entity1 = entity1;
-                this.Entity2 = entity2;
-            }
-
-            /// <summary>
-            /// Checks if two objects are equal.
-            /// </summary>
-            /// <param name="obj">The object to check against.</param>
-            /// <returns>Returns true if they are equal, otherwise false.</returns>
-            public override bool Equals(object obj)
-            {
-                OverlapPair other = (OverlapPair)obj;
-                return (other.Entity1.Equals(Entity1) && other.Entity2.Equals(Entity2) ||
-                    other.Entity1.Equals(Entity2) && other.Entity2.Equals(Entity1));
-            }
-
-            /// <summary>
-            /// Returns the hashcode of the BodyPair.
-            /// The hashcode is the same if an BodyPair contains the same bodies.
-            /// </summary>
-            /// <returns></returns>
-            public override int GetHashCode()
-            {
-                return Entity1.GetHashCode() + Entity2.GetHashCode();
-            }
-        }
-        #endregion
-
-        private List<SweepPoint> axis1 = new List<SweepPoint>();
-        private List<SweepPoint> axis2 = new List<SweepPoint>();
-
-        private HashSet<OverlapPair> fullOverlaps = new HashSet<OverlapPair>();
-
-        public CollisionDetection()
-        {
-        }
-
-        #region Coherent Update - Insertionsort
-        private void SortAxis(object pAxis)
-        {
-            var axis = (List<SweepPoint>)pAxis;
-            for (int j = 1; j < axis.Count; j++)
-            {
-                SweepPoint keyelement = axis[j];
-                float key = keyelement.Value;
-
-                int i = j - 1;
-
-                while (i >= 0 && axis[i].Value > key)
-                {
-                    SweepPoint swapper = axis[i];
-
-                    if (keyelement.Begin && !swapper.Begin)
-                    {
-                        if (swapper.Body.Bounds.IntersectsWith(keyelement.Body.Bounds))
-                        {
-                            lock (fullOverlaps)
-                            {
-                                fullOverlaps.Add(new OverlapPair(swapper.Body, keyelement.Body));
-                            }
-                        }
-                    }
-
-                    if (!keyelement.Begin && swapper.Begin)
-                    {
-                        lock (fullOverlaps)
-                        {
-                            fullOverlaps.Remove(new OverlapPair(swapper.Body, keyelement.Body));
-                        }
-                    }
-
-                    axis[i + 1] = swapper;
-                    i--;
-                }
-                axis[i + 1] = keyelement;
-            }
-        }
-        #endregion
-
-        public void AddEntity(RigidBodyComponent body)
-        {
-            axis1.Add(new SweepPoint(body, true, 0));
-            axis1.Add(new SweepPoint(body, false, 0));
-            axis2.Add(new SweepPoint(body, true, 1));
-            axis2.Add(new SweepPoint(body, false, 1));
-        }
-
-        Stack<OverlapPair> depricated = new Stack<OverlapPair>();
-        public bool RemoveEntity(RigidBodyComponent body)
-        {
-            int count;
-
-            count = 0;
-            for (int i = 0; i < axis1.Count; i++)
-            {
-                if (axis1[i].Body == body)
-                {
-                    count++;
-                    axis1.RemoveAt(i);
-                    if (count == 2) { break; }
-                    i--;
-                }
-            }
-
-            count = 0;
-            for (int i = 0; i < axis2.Count; i++)
-            { if (axis2[i].Body == body) { count++; axis2.RemoveAt(i); if (count == 2) break; i--; } }
-
-            foreach (var pair in fullOverlaps) if (pair.Entity1 == body || pair.Entity2 == body) depricated.Push(pair);
-            while (depricated.Count > 0) fullOverlaps.Remove(depricated.Pop());
 
             return true;
         }
 
-        bool swapOrder = false;
-
-        /// <summary>
-        /// Tells the collisionsystem to check all bodies for collisions. Hook into the
-        /// <see cref="CollisionSystem.PassedBroadphase"/>
-        /// and <see cref="CollisionSystem.CollisionDetected"/> events to get the results.
-        /// </summary>
-        /// <param name="multiThreaded">If true internal multithreading is used.</param>
-        public void Detect()
+        public static bool CirclevsPolygon(ref Manifold pM)
         {
-            //Broadphase
-            Threading.JobManager.Instance.BeginBatch();
-            Threading.JobManager.Instance.Queue(SortAxis, axis1);
-            Threading.JobManager.Instance.Queue(SortAxis, axis2);
-            Threading.JobManager.Instance.ExecuteBatch();
+            RigidBodyComponent A = pM.BodyA;
+            RigidBodyComponent B = pM.BodyB;
+            CircleMesh c = (CircleMesh)A.Mesh;
+            PolygonMesh p = (PolygonMesh)B.Mesh;
 
-            Threading.JobManager.Instance.BeginBatch();
-            foreach (OverlapPair key in fullOverlaps)
+            Vector2 center = A.AABB.Center;
+            center = B.OrientationMatrix.Transpose() * (center - B.AABB.Center);
+
+            float maxSeparation = float.MinValue;
+            int faceNormal = 0;
+            for(int i = 0; i < p.Verticies.Length; i++)
             {
-                if (!key.Entity1.Active || !key.Entity2.Active) { continue; }
+                float sep = Vector2.DotProduct(p.Normals[i], center - p.Verticies[i]);
+                if (sep > c.Radius) return false;
 
-                BroadphasePair pair = BroadphasePair.Pool.Get();
-                if (swapOrder)
+                if(sep > maxSeparation)
                 {
-                    pair.Entity1 = key.Entity1;
-                    pair.Entity2 = key.Entity2;
+                    maxSeparation = sep;
+                    faceNormal = i;
                 }
-                else
-                {
-                    pair.Entity2 = key.Entity2;
-                    pair.Entity1 = key.Entity1;
-                }
-                Threading.JobManager.Instance.Queue(DetectCallback, pair);
-
-                swapOrder = !swapOrder;
             }
-            Threading.JobManager.Instance.ExecuteBatch();
+
+            Vector2 v1 = p.Verticies[faceNormal];
+            int nextFace = faceNormal + 1 < p.Verticies.Length ? faceNormal + 1 : 0;
+            Vector2 v2 = p.Verticies[nextFace];
+
+            if (maxSeparation < .00005f)
+            {
+                pM.Normal = -(B.OrientationMatrix * p.Normals[faceNormal]);
+                pM.Contacts = new Vector2[] { pM.Normal * c.Radius + A.AABB.Center };
+                pM.Penetration = c.Radius;
+                return true;
+            }
+
+            float dot1 = Vector2.DotProduct(center - v1, v2 - v1);
+            float dot2 = Vector2.DotProduct(center - v2, v1 - v2);
+            pM.Penetration = c.Radius - maxSeparation;
+
+            if(dot1 <= 0)
+            {
+                if (Vector2.DistanceSqrd(center, v1) > c.Radius * c.Radius) return false; 
+
+                Vector2 n = v1 - center;
+                n = B.OrientationMatrix * n;
+                n.Normalize();
+                pM.Normal = n;
+
+                v1 = B.OrientationMatrix * v1 + B.AABB.Center;
+                pM.Contacts = new Vector2[] { v1 };
+            }
+            else if(dot2 <= 0)
+            {
+                if (Vector2.DistanceSqrd(center, v2) > c.Radius * c.Radius) return false;
+
+                Vector2 n = v2 - center;
+                n = B.OrientationMatrix * n;
+                n.Normalize();
+                pM.Normal = n;
+
+                v2 = B.OrientationMatrix * v2 + B.AABB.Center;
+                pM.Contacts = new Vector2[] { v2 };
+            }
+            else
+            {
+                Vector2 n = p.Normals[faceNormal];
+                if (Vector2.DotProduct(center - v1, n) > c.Radius) return false;
+
+                n = B.OrientationMatrix * n;
+                pM.Normal = -n;
+                pM.Contacts = new Vector2[] { pM.Normal * c.Radius + A.AABB.Center };
+            }
+
+            return true;
         }
 
-        private void DetectCallback(object obj)
+        public static bool PolygonvsCircle(ref Manifold pM)
         {
-            BroadphasePair pair = obj as BroadphasePair;
-            NarrowPhase(pair.Entity1, pair.Entity2);
-            BroadphasePair.Pool.Give(pair);
+            pM = new Manifold(pM.BodyB, pM.BodyA);
+            return CirclevsPolygon(ref pM);
         }
 
-        public void NarrowPhase(RigidBodyComponent pCollider1, RigidBodyComponent pCollider2)
+        public static bool PolygonvsPolygon(ref Manifold pM)
         {
-            //if(false)
-            //{
-            //    pCollider1.OnCollisionOccurred(pCollider2);
-            //    pCollider2.OnCollisionOccurred(pCollider1);
-            //}
+            PolygonMesh A = (PolygonMesh)pM.BodyA.Mesh;
+            PolygonMesh B = (PolygonMesh)pM.BodyB.Mesh;
+
+            float penetrationA = FindAxisLeastPenetration(out int faceA, A, B);
+            if (penetrationA >= 0) return false;
+
+            float penetrationB = FindAxisLeastPenetration(out int faceB, B, A);
+            if (penetrationB >= 0) return false;
+
+            int referenceIndex;
+            bool flip;
+
+            PolygonMesh reference;
+            PolygonMesh incident;
+
+            if(penetrationA >= penetrationB * .95f + penetrationA * .01f)
+            {
+                reference = A;
+                incident = B;
+                referenceIndex = faceA;
+                flip = false;
+            }
+            else
+            {
+                reference = B;
+                incident = A;
+                referenceIndex = faceB;
+                flip = true;
+            }
+
+            FindIncidentFace(out Vector2[] incidentFace, reference, incident, referenceIndex);
+
+            Vector2 v1 = reference.Verticies[referenceIndex];
+            referenceIndex = referenceIndex + 1 == reference.Verticies.Length ? 0 : referenceIndex + 1;
+            Vector2 v2 = reference.Verticies[referenceIndex];
+
+            v1 = reference.Body.OrientationMatrix * v1 + reference.Body.AABB.Center;
+            v2 = reference.Body.OrientationMatrix * v2 + reference.Body.AABB.Center;
+
+            Vector2 sidePlaneNormal = v2 - v1;
+            sidePlaneNormal.Normalize();
+
+            Vector2 refFaceNormal = new Vector2(sidePlaneNormal.Y, -sidePlaneNormal.X);
+
+            float refC = Vector2.DotProduct(refFaceNormal, v1);
+            float negSide = -Vector2.DotProduct(sidePlaneNormal, v1);
+            float posSide = Vector2.DotProduct(sidePlaneNormal, v2);
+
+            if (Clip(-sidePlaneNormal, negSide, ref incidentFace) < 2) return false;
+            if (Clip(sidePlaneNormal, posSide, ref incidentFace) < 2) return false;
+
+            pM.Normal = flip ? -refFaceNormal : refFaceNormal;
+
+            float separation = Vector2.DotProduct(refFaceNormal, incidentFace[0]) - refC;
+            List<Vector2> contacts = new List<Vector2>();
+            if (separation <= 0)
+            {
+                contacts.Add(incidentFace[0]);
+                pM.Penetration = -separation;
+            }
+
+            separation = Vector2.DotProduct(refFaceNormal, incidentFace[1]) - refC;
+            if (separation <= 0)
+            {
+                contacts.Add(incidentFace[1]);
+                pM.Penetration += -separation;
+
+                pM.Penetration /= contacts.Count;
+            }
+
+            pM.Contacts = contacts.ToArray();
+            return pM.Contacts.Length > 0;
         }
+        
+        private static float FindAxisLeastPenetration(out int pIndex, PolygonMesh pA, PolygonMesh pB)
+        {
+            float best = float.MinValue;
+            pIndex = 0;
+
+            for(int i = 0; i < pA.Verticies.Length; i++)
+            {
+                Vector2 normal = pA.Normals[i];
+                Vector2 orientedNormal = pA.Body.OrientationMatrix * normal;
+
+                Matrix2X2 buT = pB.Body.OrientationMatrix.Transpose();
+                normal = buT * orientedNormal;
+
+                Vector2 support = pB.GetSupport(-normal);
+
+                Vector2 vertex = pA.Verticies[i];
+                vertex = pA.Body.OrientationMatrix * vertex + pA.Body.AABB.Center;
+                vertex -= pB.Body.AABB.Center;
+                vertex = buT * vertex;
+
+                float d = Vector2.DotProduct(normal, support - vertex);
+
+                if(d > best)
+                {
+                    best = d;
+                    pIndex = i;
+                }
+            }
+
+            return best;
+        }
+
+        private static void FindIncidentFace(out Vector2[] pV, PolygonMesh pRef, PolygonMesh pInc, int pIndex)
+        {
+            Vector2 referenceNormal = pRef.Normals[pIndex];
+
+            referenceNormal = pRef.Body.OrientationMatrix * referenceNormal;
+            referenceNormal = pInc.Body.OrientationMatrix.Transpose() * referenceNormal;
+
+            int incidentFace = 0;
+            float min = float.MaxValue;
+            for(int i = 0; i < pInc.Verticies.Length; i++)
+            {
+                float dot = Vector2.DotProduct(referenceNormal, pInc.Normals[i]);
+                if(dot < min)
+                {
+                    min = dot;
+                    incidentFace = i;
+                }
+            }
+
+            pV = new Vector2[2];
+            pV[0] = pInc.Body.OrientationMatrix * pInc.Verticies[incidentFace] + pInc.Body.AABB.Center;
+
+            incidentFace = incidentFace + 1 >= pInc.Verticies.Length ? 0 : incidentFace + 1;
+            pV[1] = pInc.Body.OrientationMatrix * pInc.Verticies[incidentFace] + pInc.Body.AABB.Center;
+        }
+
+        private static int Clip(Vector2 n, float c, ref Vector2[] pFace)
+        {
+            int sp = 0;
+            Vector2[] outV = new Vector2[] { pFace[0], pFace[1] };
+
+            float d1 = Vector2.DotProduct(n, pFace[0]) - c;
+            float d2 = Vector2.DotProduct(n, pFace[1]) - c;
+
+            if (d1 <= 0) outV[sp++] = pFace[0];
+            if (d2 <= 0) outV[sp++] = pFace[1];
+
+            if(d1 * d2 < 0)
+            {
+                float alpha = d1 / (d1 - d2);
+                outV[sp] = pFace[0] + alpha * (pFace[1] - pFace[0]);
+                sp++;
+            }
+
+            pFace = outV;
+
+            System.Diagnostics.Debug.Assert(sp != 3);
+            return sp;
+        }
+
+        //public static bool AABBvsAABB(ref Manifold pM)
+        //{
+        //    RigidBodyComponent A = pM.BodyA;
+        //    RigidBodyComponent B = pM.BodyB;
+
+        //    Vector2 n = B.AABB.Center - A.AABB.Center;
+
+        //    AxisAlignedBoundingBox ABounds = A.AABB;
+        //    AxisAlignedBoundingBox BBounds = B.AABB;
+
+        //    float aExtent = (ABounds.Right - ABounds.Left) / 2;
+        //    float bExtent = (BBounds.Right - BBounds.Left) / 2;
+
+        //    float xOverlap = Math.Abs(n.X) - aExtent - bExtent;
+
+        //    //Check if X axis is overlapping
+        //    if(xOverlap < 0)
+        //    {
+        //        aExtent = (ABounds.Bottom - ABounds.Top) / 2;
+        //        bExtent = (BBounds.Bottom - BBounds.Top) / 2;
+
+        //        float yOverlap = Math.Abs(n.Y) - aExtent - bExtent;
+        //        //Check if Y axis is overlapping
+        //        if(yOverlap < 0)
+        //        {
+        //            //Apply force in the direction that is least overlapping
+        //            if(xOverlap > yOverlap)
+        //            {
+        //                if (n.X < 0) pM.Normal = new Vector2(-1, 0);
+        //                else pM.Normal = new Vector2(1, 0);
+        //                pM.Penetration = -xOverlap * 2;
+
+        //                return true;
+        //            }
+        //            else
+        //            {
+        //                if (n.Y < 0) pM.Normal = new Vector2(0, -1);
+        //                else pM.Normal = new Vector2(0, 1);
+        //                pM.Penetration = -yOverlap * 2;
+
+        //                return true;
+        //            }
+        //        }
+        //    }
+
+        //    return false;
+        //}
+
+        //public static bool AABBvsCircle(ref Manifold pM)
+        //{
+        //    RigidBodyComponent A = pM.BodyA;
+        //    RigidBodyComponent B = pM.BodyB;
+
+        //    Vector2 n = B.AABB.Center - A.AABB.Center;
+
+        //    //Find point on A that is closest to the center of B
+        //    Vector2 closest = n;
+
+        //    float xExtent = (A.AABB.Right - A.AABB.Left) / 2;
+        //    float yExtent = (A.AABB.Bottom - A.AABB.Top) / 2;
+
+        //    closest.X = MathF.Clamp(closest.X, -xExtent, xExtent);
+        //    closest.Y = MathF.Clamp(closest.Y, -yExtent, yExtent);
+
+        //    bool inside = false;
+
+        //    //If we are inside the rectangle pretend we are just on teh edge
+        //    if (n == closest)
+        //    {
+        //        inside = true;
+
+        //        if (Math.Abs(n.X) > Math.Abs(n.Y))
+        //        {
+        //            if (closest.X > 0) closest.X = xExtent;
+        //            else closest.X = -xExtent;
+        //        }
+        //        else
+        //        {
+        //            if (closest.Y > 0) closest.Y = yExtent;
+        //            closest.Y = -yExtent;
+        //        }
+        //    }
+
+        //    Vector2 normal = n - closest;
+        //    double distance = normal.LengthSqrd;
+        //    double radius = ((RigidCircle)B.Shape).Radius;
+
+        //    // Circle not colliding the AABB
+        //     if (distance > radius * radius && !inside) return false; 
+
+        //    distance = Math.Sqrt(distance);
+
+        //    pM.Normal = inside ? -normal : normal;
+        //    pM.Penetration = (float)(radius - distance);
+
+        //    return true;
+        //}
+
+        //public static bool CirclevsAABB(ref Manifold pM)
+        //{
+        //    RigidBodyComponent A = pM.BodyB;//First difference between this and AABBvsCircle
+        //    RigidBodyComponent B = pM.BodyA;
+
+        //    Vector2 n = B.AABB.Center - A.AABB.Center;
+
+        //    //Find point on A that is closest to the center of B
+        //    Vector2 closest = n;
+
+        //    float xExtent = (A.AABB.Right - A.AABB.Left) / 2;
+        //    float yExtent = (A.AABB.Bottom - A.AABB.Top) / 2;
+
+        //    closest.X = MathF.Clamp(closest.X, -xExtent, xExtent);
+        //    closest.Y = MathF.Clamp(closest.Y, -yExtent, yExtent);
+
+        //    bool inside = false;
+
+        //    //If we are inside the rectangle pretend we are just on teh edge
+        //    if (n == closest)
+        //    {
+        //        inside = true;
+
+        //        if (Math.Abs(n.X) > Math.Abs(n.Y))
+        //        {
+        //            if (closest.X > 0) closest.X = xExtent;
+        //            else closest.X = -xExtent;
+        //        }
+        //        else
+        //        {
+        //            if (closest.Y > 0) closest.Y = yExtent;
+        //            closest.Y = -yExtent;
+        //        }
+        //    }
+
+        //    Vector2 normal = -(n - closest); //Second difference between this and AABBvsCircle
+        //    double distance = normal.LengthSqrd;
+        //    double radius = ((RigidCircle)B.Shape).Radius;
+
+        //    // Circle not colliding the AABB
+        //    if (distance > radius * radius && !inside) return false;
+
+        //    distance = Math.Sqrt(distance);
+
+        //    pM.Normal = inside ? -normal : normal;
+        //    pM.Penetration = (float)(radius - distance);
+
+        //    return true;
+        //}
     }
 }

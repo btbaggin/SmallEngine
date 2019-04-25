@@ -40,7 +40,6 @@ namespace Evolusim.Terrain
                 else if (LifeTime <= 0)
                 {
                     GameObject.Destroy();
-                    return;
                 }
             }
         }
@@ -49,8 +48,8 @@ namespace Evolusim.Terrain
         {
             for (int i = 0; i < SpreadCount; i++)
             {
-                var dx = RandomGenerator.RandomInt(_gameObject.X - 1, _gameObject.X + 1);
-                var dy = RandomGenerator.RandomInt(_gameObject.Y - 1, _gameObject.Y + 1);
+                var dx = Generator.Random.Next(_gameObject.X - 1, _gameObject.X + 1);
+                var dy = Generator.Random.Next(_gameObject.Y - 1, _gameObject.Y + 1);
                 dx = (int)MathF.Clamp(dx, 0, TerrainMap.Size);
                 dy = (int)MathF.Clamp(dy, 0, TerrainMap.Size);
 

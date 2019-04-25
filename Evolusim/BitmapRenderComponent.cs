@@ -29,19 +29,19 @@ namespace Evolusim
             Bitmap = pBitmap;
         }
 
-        protected override void DoDraw(IGraphicsSystem pSystem)
+        protected override void DoDraw(IGraphicsAdapter pSystem)
         {
             pSystem.DrawBitmap(Bitmap, 1, GameObject.ScreenPosition, GameObject.Scale * Game.ActiveCamera.Zoom);
         }
 
-        protected override void DoDraw(IGraphicsSystem pSystem, Effect pEffect)
+        protected override void DoDraw(IGraphicsAdapter pSystem, Effect pEffect)
         {
             pSystem.DrawImage(Bitmap, pEffect, GameObject.ScreenPosition);
         }
 
         public override void Dispose()
         {
-            ResourceManager.Dispose<BitmapResource>(Bitmap.Alias);
+            ResourceManager.DisposeResource(Bitmap.Alias);
         }
     }
 }

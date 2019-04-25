@@ -20,20 +20,8 @@
 
         public void Play()
         {
-            if(Game.ActiveCamera.IsVisible(GameObject))
-            {
-                _sound.Play();
-            }
+            AudioPlayer.Play(_sound);
         }
-
-        public void PlayImmediate()
-        {
-            if(Game.ActiveCamera.IsVisible(GameObject))
-            {
-                _sound.PlayImmediate();
-            }
-        }
-
         public override void Dispose()
         {
             base.Dispose();

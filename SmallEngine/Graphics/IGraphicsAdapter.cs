@@ -1,9 +1,9 @@
-﻿using System;
-using System.Drawing;
+﻿using SharpDX;
+using System;
 
 namespace SmallEngine.Graphics
 {
-    public interface IGraphicsSystem : IDisposable
+    public interface IGraphicsAdapter : IDisposable
     {
         bool Initialize(GameForm pForm, bool pFullScreen);
         void BeginDraw();
@@ -20,7 +20,7 @@ namespace SmallEngine.Graphics
         void DrawRect(Rectangle pRect, Brush pBrush, float pStroke);
         void DrawElipse(Vector2 pPoint, float pRadius, Brush pBrush);
         void SetFullScreen(bool pFullScreen);
-        void SetTransform(float pRotation, Vector2 pCenter);
+        void SetTransform(Transform pTransform);
         void ResetTransform();
 
         Font CreateFont(string pFamily, float pSize, Color pColor);

@@ -7,33 +7,22 @@ using SharpDX.D3DCompiler;
 using SharpDX.DXGI;
 using Device = SharpDX.Direct3D11.Device;
 using Factory = SharpDX.DXGI.Factory;
-using FeatureLevel = SharpDX.Direct3D.FeatureLevel;
-using Resource = SharpDX.Direct3D11.Resource;
-using DeviceContext = SharpDX.Direct3D11.DeviceContext;
 using SharpDX.Direct2D1;
 using SharpDX.Mathematics.Interop;
 
 namespace SmallEngine.Graphics
 {
-    public class DirectXGraphicSystem : IGraphicsSystem
+    public class DirectXGraphicSystem : IGraphicsAdapter
     {
         private Image _renderTarget;
         private SwapChain _swapChain;
-        private SharpDX.Direct3D11.Device1 _device;
         private SharpDX.Direct3D11.DeviceContext1 _d3Context;
         private Surface _backBuffer;
 
-        private SharpDX.DXGI.Device2 _dxgiDevice2;
-        private SharpDX.DXGI.Adapter _dxgiAdapter;
-        private SharpDX.DXGI.Factory2 _dxgiFactory2;
-
-        public SharpDX.Direct2D1.Device _2dDevice;
+        private SharpDX.Direct2D1.Device _2dDevice;
 
         #region Properties
-        public SharpDX.Direct3D11.Device1 Device
-        {
-            get { return _device; }
-        }
+        public SharpDX.Direct3D11.Device1 Device { get; private set; }
 
         public SharpDX.Direct2D1.DeviceContext Context { get; private set; }
 
@@ -45,20 +34,19 @@ namespace SmallEngine.Graphics
         #region Creation functions
         //https://www.gamedev.net/forums/topic/648058-sharpdx-direct2d-example-with-devicecontext-and-hwnd/
         private GameForm _form;
-        public bool Initialize(GameForm pWindow, bool pFullScreen)
+        public bool Initialize(GameForm pForm, bool pFullScreen)
         {
-            _form = pWindow;
+            _form = pForm;
             _form.WindowSizeChanged += Resize;
             try
             {
                 var defaultDevice = new SharpDX.Direct3D11.Device(DriverType.Hardware, DeviceCreationFlags.Debug | DeviceCreationFlags.BgraSupport);
 
-                _device = defaultDevice.QueryInterface<SharpDX.Direct3D11.Device1>();
-                _d3Context = _device.ImmediateContext.QueryInterface<SharpDX.Direct3D11.DeviceContext1>();
+                Device = defaultDevice.QueryInterface<SharpDX.Direct3D11.Device1>();
+                _d3Context = Device.ImmediateContext.QueryInterface<SharpDX.Direct3D11.DeviceContext1>();
 
-                _dxgiDevice2 = Device.QueryInterface<SharpDX.DXGI.Device2>();
-                _dxgiAdapter = _dxgiDevice2.Adapter;
-                _dxgiFactory2 = _dxgiAdapter.GetParent<SharpDX.DXGI.Factory2>();
+                var dxgiDevice2 = Device.QueryInterface<SharpDX.DXGI.Device2>();
+                var dxgiFactory2 = dxgiDevice2.Adapter.GetParent<SharpDX.DXGI.Factory2>();
 
                 // SwapChain description
                 var desc = new SwapChainDescription1()
@@ -74,8 +62,8 @@ namespace SmallEngine.Graphics
                     Usage = Usage.RenderTargetOutput
                 };
 
-                _swapChain = new SharpDX.DXGI.SwapChain1(_dxgiFactory2, _device, pWindow.Handle, ref desc, null);
-                _2dDevice = new SharpDX.Direct2D1.Device(_dxgiDevice2);
+                _swapChain = new SharpDX.DXGI.SwapChain1(dxgiFactory2, Device, pForm.Handle, ref desc, null);
+                _2dDevice = new SharpDX.Direct2D1.Device(dxgiDevice2);
                 Context = new SharpDX.Direct2D1.DeviceContext(_2dDevice, DeviceContextOptions.None);
                 Factory2D = new SharpDX.Direct2D1.Factory(FactoryType.SingleThreaded);
                 var dpi = Factory2D.DesktopDpi;
@@ -87,7 +75,7 @@ namespace SmallEngine.Graphics
                 // Ignore all windows events
                 using (Factory factory = _swapChain.GetParent<Factory>())
                 {
-                    factory.MakeWindowAssociation(pWindow.Handle, WindowAssociationFlags.IgnoreAll);
+                    factory.MakeWindowAssociation(pForm.Handle, WindowAssociationFlags.IgnoreAll);
                 }
 
                 FactoryDWrite = new SharpDX.DirectWrite.Factory();
@@ -125,7 +113,7 @@ namespace SmallEngine.Graphics
 
         public void Dispose()
         {
-            _device.Dispose();
+            Device.Dispose();
             _swapChain.Dispose();
             _backBuffer.Dispose();
             _renderTarget.Dispose();
@@ -241,14 +229,14 @@ namespace SmallEngine.Graphics
             Context.DrawEllipse(new Ellipse(pPoint, pRadius, pRadius), pBrush.ColorBrush);
         }
 
-        public void SetTransform(float pRotation, Vector2 pCenter)
+        public void SetTransform(Transform pTransform)
         {
-            Context.Transform = Matrix3x2.Rotation(pRotation, new SharpDX.Vector2(pCenter.X, pCenter.Y));
+            Context.Transform = pTransform.Rotation;
         }
 
         public void ResetTransform()
         {
-            Context.Transform = Matrix3x2.Identity;
+            SetTransform(Transform.Identity);
         }
 
         public void BeginDraw()
@@ -268,12 +256,12 @@ namespace SmallEngine.Graphics
             _swapChain.SetFullscreenState(pFullScreen, null);
         }
 
-        public Font CreateFont(string pFamily, float pSize, System.Drawing.Color pColor)
+        public Font CreateFont(string pFamily, float pSize, Color pColor)
         {
             return Font.Create(FactoryDWrite, Context, pFamily, pSize, pColor);
         }
 
-        public Brush CreateBrush(System.Drawing.Color pColor)
+        public Brush CreateBrush(Color pColor)
         {
             return Brush.Create(pColor, Context);
         }

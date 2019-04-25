@@ -7,6 +7,7 @@ using SmallEngine;
 using SmallEngine.Audio;
 using SmallEngine.Graphics;
 using SmallEngine.Input;
+using SmallEngine.Messages;
 
 using Evolusim.Terrain;
 
@@ -25,11 +26,11 @@ namespace Evolusim
             }
         }
 
-        private AudioComponent _audio;
-        private MovementComponent _movement;
-        private StatusComponent _status;
+        AudioComponent _audio;
+        MovementComponent _movement;
+        StatusComponent _status;
 
-        private TerrainType _preferredTerrain;
+        readonly TerrainType _preferredTerrain;
 
         public static Organism SelectedOrganism { get; set; }
 
@@ -38,7 +39,7 @@ namespace Evolusim
         #region Constructors
         static Organism()
         {
-            SceneManager.Define("organism", typeof(AnimationRenderComponent),
+            Scene.Define("organism", typeof(AnimationRenderComponent),
                                             typeof(AudioComponent),
                                             typeof(TraitComponent),
                                             typeof(MovementComponent),
@@ -48,14 +49,14 @@ namespace Evolusim
 
         public static Organism Create()
         {
-            var go = SceneManager.Current.CreateGameObject<Organism>("organism");
+            var go = Scene.Current.CreateGameObject<Organism>("organism");
             go.Tag = "Organism";
             return go;
         }
 
         public static Organism CreateFrom(Organism pOrgansihm, Organism pOrganism)
         {
-            var go = SceneManager.Current.CreateGameObject<Organism>("organism");
+            var go = Scene.Current.CreateGameObject<Organism>("organism");
             go.Tag = "Organism";
             go.Position = pOrganism.Position;
             return go;
@@ -63,7 +64,7 @@ namespace Evolusim
 
         public Organism()
         {
-            Position = new Vector2(RandomGenerator.RandomInt(0, Evolusim.WorldSize), RandomGenerator.RandomInt(0, Evolusim.WorldSize));
+            Position = new Vector2(Generator.Random.Next(0, Evolusim.WorldSize), Generator.Random.Next(0, Evolusim.WorldSize));
             Scale = new Vector2(TerrainMap.BitmapSize);
             _preferredTerrain = TerrainMap.GetTerrainTypeAt(Position);
         }
@@ -81,15 +82,15 @@ namespace Evolusim
             _movement = GetComponent<MovementComponent>();
             _status = GetComponent<StatusComponent>();
 
-            MessageBus.Register(this);
+            Game.Messages.Register(this);
         }
 
-        public override void ReceiveMessage(GameMessage pM)
+        public override void ReceiveMessage(IMessage pMessage)
         {
-            switch(pM.MessageType)
+            switch(pMessage.Type)
             {
                 case "EnemySpawn":
-                    var p = pM.GetValue<Vector2>();
+                    var p = pMessage.GetData<Vector2>();
                     if(Vector2.DistanceSqrd(p, Position) < (15 * 64) * (15 * 64))
                     {
                         _status.AddStatus(StatusComponent.Status.Scared);
@@ -101,7 +102,7 @@ namespace Evolusim
 
         private IEnumerator<WaitEvent> RunScared(object pState)
         {
-            var m = Vector2.MultiplyInDirection(100, Position, Position - (Vector2)pState);
+            var m = Vector2.MultiplyInDirection(100, Position, Vector2.Normalize(Position - (Vector2)pState));
             _movement.MoveTo(m, false);
 
             yield return new WaitForSeconds(2);//Run for 2 seconds
@@ -114,7 +115,7 @@ namespace Evolusim
             _movement.Stop(1f);
             _status.Eat(pFood);
             pFood.Destroy();
-            _audio.PlayImmediate();
+            _audio.Play();
         }
 
         public void Mate(Organism pMate)

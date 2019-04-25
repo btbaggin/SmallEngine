@@ -12,83 +12,65 @@ namespace SmallEngine
         public float X
         {
             get { return Location.X; }
-            set { _location.X = value; }
         }
 
         public float Y
         {
             get { return Location.Y; }
-            set { _location.Y = value; }
         }
 
         public float Width
         {
             get { return Size.X; }
-            set { _size.X = value; }
         }
 
         public float Height
         {
             get { return Size.Y; }
-            set { _size.Y = value; }
         }
 
         public float Left
         {
             get { return X; }
-            set { X = value; }
         }
 
         public float Top
         {
             get { return Location.Y; }
-            set { Y = value; }
         }
         
         public float Right
         {
             get { return X + Width; }
-            set { X = value - Width; }
         }
 
         public float Bottom
         {
             get { return Y + Height; }
-            set { Y = value - Height; }
         }
 
-        private Vector2 _location;
-        public Vector2 Location
-        {
-            get { return _location; }
-            set { _location = value; }
-        }
+        public Vector2 Location { get; set; }
 
-        private Vector2 _size;
-        public Vector2 Size
-        {
-            get { return _size; }
-            set { _size = value; }
-        }
+        public Vector2 Size { get; set; }
         #endregion
 
         #region Constructors
         public Rectangle(Vector2 pLocation, Vector2 pSize)
         {
-            _location = pLocation;
-            _size = pSize;
+            Location = pLocation;
+            Size = pSize;
         }
 
         public Rectangle(Vector2 pLocation, float pWidth, float pHeight)
         {
-            _location = pLocation;
-            _size = new Vector2(pWidth, pHeight);
+            Location = pLocation;
+            Size = new Vector2(pWidth, pHeight);
         }
 
         public Rectangle(float pX, float pY, float pWdith, float pHeight)
         {
-            _location = new Vector2(pX, pY);
-            _size = new Vector2(pWdith, pHeight);
+            Location = new Vector2(pX, pY);
+            Size = new Vector2(pWdith, pHeight);
         }
         #endregion
 
@@ -112,15 +94,14 @@ namespace SmallEngine
             return Contains(pRect.Location) || Contains(pRect.Right, pRect.Bottom);
         }
 
-        public void Grow(Vector2 pAmount)
+        public Rectangle Grow(Vector2 pAmount)
         {
-            _size += pAmount;
+            return Grow(pAmount.X, pAmount.Y);
         }
 
-        public void Grow(float pX, float pY)
+        public Rectangle Grow(float pX, float pY)
         {
-            _size.X += pX;
-            _size.Y += pY;
+            return new Rectangle(Location, Size.X + pX, Size.Y + pY);
         }
 
         #region Operators

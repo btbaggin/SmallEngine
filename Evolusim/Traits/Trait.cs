@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SmallEngine;
 
 namespace Evolusim.Traits
 {
@@ -18,7 +19,7 @@ namespace Evolusim.Traits
         {
             Min = pMin;
             Max = pMax;
-            Value = SmallEngine.RandomGenerator.RandomFloat(Min, Max);
+            Value = SmallEngine.Generator.Random.Range(Min, Max);
         }
     }
 }

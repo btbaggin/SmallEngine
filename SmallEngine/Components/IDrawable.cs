@@ -10,7 +10,7 @@ namespace SmallEngine
     public interface IDrawable
     {
         int Order { get; }
-        void Draw(IGraphicsSystem pSystem);
+        void Draw(IGraphicsAdapter pSystem);
         IDrawable GetFocusElement(Vector2 pPosition);
     }
 }
