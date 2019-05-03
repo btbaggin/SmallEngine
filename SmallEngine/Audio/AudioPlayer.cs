@@ -44,13 +44,16 @@ namespace SmallEngine.Audio
         static List<SourceVoice> _freeVoices = new List<SourceVoice>();
         static MasteringVoice _mv = new MasteringVoice(Device);
 
+        static AudioPlayer _instance = new AudioPlayer();
         static int _soundid;
+        static object _idLock = new object();
         static Dictionary<int, SourceVoice> _playingSounds = new Dictionary<int, SourceVoice>(32);
 
-        public AudioPlayer()
+        static AudioPlayer()
         {
             _mv.SetVolume(MaxVolume);
-            _messages.Register(this);
+
+            _messages.Register(_instance);
             _messages.Start();
         }
 
@@ -135,7 +138,10 @@ namespace SmallEngine.Audio
         {
             unchecked
             {
-                return System.Threading.Interlocked.Increment(ref _soundid);
+                lock (_idLock)
+                {
+                    return _soundid++;
+                }
             }
         }
 
@@ -150,13 +156,14 @@ namespace SmallEngine.Audio
                 if (_freeVoices.Count == 0)
                 {
                     pVoice = new SourceVoice(Device, pSound.Stream, true);
-                    pVoice.BufferEnd += new SoundCompleteCallback(pVoice, pId).OnSoundFinished;
                 }
                 else
                 {
                     pVoice = _freeVoices[_freeVoices.Count - 1];
                     _freeVoices.RemoveAt(_freeVoices.Count - 1);
                 }
+
+                new SoundCompleteCallback(pVoice, pId);
             }
         }
 
@@ -190,7 +197,7 @@ namespace SmallEngine.Audio
         #endregion
 
         #region Callback
-        protected struct SoundCompleteCallback
+        private class SoundCompleteCallback
         {
             SourceVoice _voice;
             readonly int _id;
@@ -198,6 +205,7 @@ namespace SmallEngine.Audio
             {
                 _voice = pVoice;
                 _id = pId;
+                _voice.BufferEnd += OnSoundFinished;
             }
             public void OnSoundFinished(IntPtr arg)
             {

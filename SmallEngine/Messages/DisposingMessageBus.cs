@@ -41,7 +41,7 @@ namespace SmallEngine.Messages
                 return true;
             }
 
-            pMessage = default(GameMessage);
+            pMessage = default(IMessage);
             return false;
         }
     }

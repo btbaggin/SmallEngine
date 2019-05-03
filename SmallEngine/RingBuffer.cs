@@ -37,7 +37,9 @@ namespace SmallEngine
         {
             if (IsEmpty) throw new InvalidOperationException("Unable to Pop with no elements");
 
-            return _data[_head++];
+            var t = _data[_head];
+            _head = (_head + 1) % _capacity;
+            return t;
         }
     }
 }

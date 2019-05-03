@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,7 +19,7 @@ namespace SmallEngine
     public class Scene : IUpdatable
     {
         readonly Dictionary<string, IGameObject> _namedObjects;
-        readonly List<IGameObject> _toRemove = new List<IGameObject>();
+        readonly ConcurrentBag<IGameObject> _toRemove = new ConcurrentBag<IGameObject>();
 
         static List<ComponentSystem> _systems = new List<ComponentSystem>();
         static Stack<Scene> _scenes = new Stack<Scene>();
@@ -211,10 +212,10 @@ namespace SmallEngine
 
         internal void DisposeGameObjects()
         {
-            foreach(var go in _toRemove)
+            while(_toRemove.TryTake(out IGameObject go))
             {
                 GameObjects.Remove(go);
-                foreach(var s in _systems)
+                foreach (var s in _systems)
                 {
                     s.GameObjectRemoved(go);
                 }
@@ -225,8 +226,6 @@ namespace SmallEngine
                 }
                 go.Dispose();
             }
-
-            _toRemove.Clear();
         }
     }
 }

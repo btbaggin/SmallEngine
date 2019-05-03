@@ -9,7 +9,7 @@ namespace SmallEngine.Physics
 {
     public class RigidBodyComponent : Component, IPhysicsBody
     {
-        public EventHandler<EventArgs> CollisionOccurred { get; set; }
+        public EventHandler<CollisionEventArgs> CollisionOccurred { get; set; }
 
         #region "Properties"
         internal float InverseMass;
@@ -139,9 +139,9 @@ namespace SmallEngine.Physics
             return OrientationMatrix.ToTransform(AABB.Center);
         }
 
-        internal void OnCollisionOccurred(RigidBodyComponent pCollider)
+        internal void OnCollisionOccurred(RigidBodyComponent pCollider, bool pSource)
         {
-            CollisionOccurred?.Invoke(this, new EventArgs());
+            CollisionOccurred?.Invoke(this, new CollisionEventArgs(pCollider, pSource));
         }
     }
 }

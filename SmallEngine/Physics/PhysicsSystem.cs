@@ -57,8 +57,8 @@ namespace SmallEngine.Physics
                             m.Resolve();
                             m.CorrectPositions();
 
-                            m.BodyA.OnCollisionOccurred(m.BodyB);
-                            m.BodyB.OnCollisionOccurred(m.BodyA);
+                            m.BodyA.OnCollisionOccurred(m.BodyB ,true);
+                            m.BodyB.OnCollisionOccurred(m.BodyA, false);
                         }
                     }
                 }
