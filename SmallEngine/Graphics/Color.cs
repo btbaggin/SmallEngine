@@ -165,5 +165,10 @@ namespace SmallEngine.Graphics
             _color |= pG << 8;
             _color |= pB << 0;
         }
+
+        public static implicit operator SharpDX.Mathematics.Interop.RawColor4(Color pColor)
+        {
+            return new SharpDX.Mathematics.Interop.RawColor4(pColor.R, pColor.G, pColor.B, pColor.A);
+        }
     }
 }

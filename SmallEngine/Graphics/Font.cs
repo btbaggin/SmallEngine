@@ -83,7 +83,7 @@ namespace SmallEngine.Graphics
 
         internal static Font Create(Factory pFactory, SharpDX.Direct2D1.RenderTarget pTarget, string pFamily, float pSize, Color pColor)
         {
-            return new Font(pFactory, new SharpDX.Direct2D1.SolidColorBrush(pTarget, new SharpDX.Mathematics.Interop.RawColor4(pColor.R, pColor.G, pColor.B, pColor.A)), pFamily, pSize);
+            return new Font(pFactory, new SharpDX.Direct2D1.SolidColorBrush(pTarget, pColor), pFamily, pSize);
         }
         #endregion  
 

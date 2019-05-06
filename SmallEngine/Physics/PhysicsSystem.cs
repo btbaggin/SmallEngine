@@ -9,15 +9,20 @@ namespace SmallEngine.Physics
 {
     class PhysicsSystem : ComponentSystem
     {
-        public static int WorldSize { get; set; } = Int16.MaxValue;
-
         public delegate bool CollisionResolutionDelegate(ref Manifold pM);
 
         readonly CollisionResolutionDelegate[,] _resolvers = { { CollisionDetection.CircleVsCircle, CollisionDetection.CirclevsPolygon },
                                                                { CollisionDetection.PolygonvsCircle, CollisionDetection.PolygonvsPolygon } };
+
+        QuadTree<RigidBodyComponent> _quadTree;
         public PhysicsSystem()
         {
             Scene.Register(this);
+        }
+
+        public void CreateQuadTree()
+        {
+            _quadTree = new QuadTree<RigidBodyComponent>(PhysicsParameters.WorldBounds);
         }
 
         protected override List<IComponent> DiscoverComponents(string pTemplate, IGameObject pObject)
@@ -36,13 +41,15 @@ namespace SmallEngine.Physics
 
         public override void Update(float pDeltaTime)
         {
-            var qt = new QuadTree<RigidBodyComponent>(new Rectangle(0, 0, WorldSize, WorldSize));
+            _quadTree.Clear();
+
             foreach(var component in Components)
             {
                 var r = (RigidBodyComponent)component;
+                bool collided = false;
 
                 //Find all intersections before we insert our new entity
-                foreach (var colliders in qt.Retrieve(r))
+                foreach (var colliders in _quadTree.Retrieve(r))
                 {
                     if(r.Layer == colliders.Layer)
                     {
@@ -57,15 +64,16 @@ namespace SmallEngine.Physics
                             m.Resolve();
                             m.CorrectPositions();
 
-                            m.BodyA.OnCollisionOccurred(m.BodyB ,true);
+                            collided = true;
+                            m.BodyA.OnCollisionOccurred(m.BodyB, true);
                             m.BodyB.OnCollisionOccurred(m.BodyA, false);
                         }
                     }
                 }
                 
-                qt.Insert(r);
+                _quadTree.Insert(r);
                 r.Update(pDeltaTime);
-
+                r.Collided = collided;
             }
         }
     }

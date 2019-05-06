@@ -44,9 +44,8 @@ namespace SmallEngine.Audio
         static List<SourceVoice> _freeVoices = new List<SourceVoice>();
         static MasteringVoice _mv = new MasteringVoice(Device);
 
-        static AudioPlayer _instance = new AudioPlayer();
+        readonly static AudioPlayer _instance = new AudioPlayer();
         static int _soundid;
-        static object _idLock = new object();
         static Dictionary<int, SourceVoice> _playingSounds = new Dictionary<int, SourceVoice>(32);
 
         static AudioPlayer()
@@ -138,10 +137,7 @@ namespace SmallEngine.Audio
         {
             unchecked
             {
-                lock (_idLock)
-                {
-                    return _soundid++;
-                }
+                return System.Threading.Interlocked.Increment(ref _soundid);
             }
         }
 

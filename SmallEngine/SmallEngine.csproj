@@ -127,6 +127,7 @@
     <Compile Include="Physics\CollisionEventArgs.cs" />
     <Compile Include="Physics\IPhysicsBody.cs" />
     <Compile Include="Physics\Manifold.cs" />
+    <Compile Include="Physics\PhysicsParameters.cs" />
     <Compile Include="Physics\PhysicsSystem.cs" />
     <Compile Include="Physics\CollisionMesh.cs" />
     <Compile Include="Rectangle.cs" />

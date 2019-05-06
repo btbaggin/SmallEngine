@@ -14,22 +14,39 @@ namespace SmallEngine.Graphics
             return x.Order.CompareTo(y.Order);
         }
     }
-    public abstract class RenderComponent : Component
+    public class RenderComponent : DependencyComponent
     {
         public static RenderComparer Comparer => new RenderComparer();
 
-        public bool Visible { get; set; }
+        [ImportComponent]
+        private Physics.RigidBodyComponent _body;
 
-        public float Opacity { get; set; }
+        public bool Visible { get; set; } = true;
+
+        public float Opacity { get; set; } = 1f;
 
         public int Order { get; set; }
 
-        public abstract void Draw(IGraphicsAdapter pSystem, float pDeltaTime);
+        public BitmapResource Bitmap { get; set; }
 
-        protected RenderComponent()
+        public Color Color { get; set; }
+
+        public Vector2[] Verticies { get; set; }
+
+        public virtual void Draw(IGraphicsAdapter pSystem, float pDeltaTime)
         {
-            Visible = true;
-            Opacity = 1f;
+            BitmapResource bitmap;
+            if(_body != null)
+            {
+                pSystem.SetTransform(_body.CreateTransform());
+                bitmap = _body.Mesh.Material.Bitmap; //TODO assign this to Bitmap at some point?
+            }
+            else
+            {
+                pSystem.ResetTransform();
+                bitmap = Bitmap;
+            }
+            pSystem.DrawBitmap(bitmap, Opacity, GameObject.Position, GameObject.Scale);
         }
 
         //TODO

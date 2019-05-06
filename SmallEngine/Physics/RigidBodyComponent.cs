@@ -12,6 +12,7 @@ namespace SmallEngine.Physics
         public EventHandler<CollisionEventArgs> CollisionOccurred { get; set; }
 
         #region "Properties"
+        internal bool Collided;
         internal float InverseMass;
         internal float InverseInertia;
 
@@ -94,7 +95,7 @@ namespace SmallEngine.Physics
                 Orientation += AngularVelocity * pDeltaTime;
                 OrientationMatrix = new Matrix2X2(Orientation);
 
-                Velocity += InverseMass * Force * (pDeltaTime / 2);
+                Velocity += (InverseMass * Force + PhysicsParameters.Gravity) * (pDeltaTime / 2);
                 AngularVelocity += Torque * InverseInertia * (pDeltaTime / 2);
                 Force = Vector2.Zero;
                 Torque = 0;
@@ -129,11 +130,6 @@ namespace SmallEngine.Physics
             Torque += pTorque;
         }
 
-        public void ApplyAcceleration(Vector2 pVector)
-        {
-            Force += pVector * Mass;
-        }
-
         public Graphics.Transform CreateTransform()
         {
             return OrientationMatrix.ToTransform(AABB.Center);
@@ -141,7 +137,10 @@ namespace SmallEngine.Physics
 
         internal void OnCollisionOccurred(RigidBodyComponent pCollider, bool pSource)
         {
-            CollisionOccurred?.Invoke(this, new CollisionEventArgs(pCollider, pSource));
+            if(!Collided)
+            {
+                CollisionOccurred?.Invoke(this, new CollisionEventArgs(pCollider, pSource));
+            }
         }
     }
 }

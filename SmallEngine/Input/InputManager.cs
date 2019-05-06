@@ -83,12 +83,7 @@ namespace SmallEngine.Input
             }
         }
 
-        private static int _mouseWheelDelta;
-        public static int MouseWheelDelta
-        {
-            get { return _mouseWheelDelta; }
-            internal set { _mouseWheelDelta = value; }
-        }
+        public static int MouseWheelDelta { get; private set; }
 
         private static long _holdDelay;
         public static int HoldDelay
@@ -110,6 +105,8 @@ namespace SmallEngine.Input
 
         internal static void ProcessInput()
         {
+            MouseWheelDelta = 0;
+
             var keyInput = new byte[256];
             GetKeyboardState(keyInput);
 

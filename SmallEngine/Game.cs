@@ -132,6 +132,7 @@ namespace SmallEngine
             IsPlaying = true;
             LoadContent();
             Initialize();
+            _physics.CreateQuadTree();
             Messages.Start();
             GameTime.Reset();
 
@@ -197,8 +198,7 @@ namespace SmallEngine
                 Update(GameTime.DeltaTime);
 
                 _physicsStep += GameTime.DeltaTime;
-                if (_physicsStep > .02f)
-                    _physicsStep = .02f;
+                if (_physicsStep > .02f) _physicsStep = .02f;
 
                 while (_physicsStep > _physicsStepTime)
                 {
@@ -206,7 +206,6 @@ namespace SmallEngine
                     _physics.Update(_physicsStepTime);
                     _physicsStep -= _physicsStepTime;
                 }
-                InputManager.MouseWheelDelta = 0;
 
                 Graphics.BeginDraw();
                 Draw(_physicsStep / _physicsStepTime);

@@ -16,6 +16,10 @@ namespace SmallEngine.Physics
 
         public float DynamicFriction { get; private set; }
 
+        public Graphics.BitmapResource Bitmap { get; set; }
+
+        public Graphics.Color Color { get; set; }
+
         public Material(float pRestitution, float pDensity, float pStaticFriction, float pDynamicFriction)
         {
             System.Diagnostics.Debug.Assert(pStaticFriction >= pDynamicFriction, "Static friction must be greater than dynamic friction");

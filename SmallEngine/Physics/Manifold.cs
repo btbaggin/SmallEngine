@@ -81,6 +81,8 @@ namespace SmallEngine.Physics
                 var sfA = BodyA.Mesh.Material.StaticFriction;
                 var sfB = BodyB.Mesh.Material.StaticFriction;
                 var staticFriction = Math.Sqrt(sfA * sfA + sfB * sfB);
+
+                //If we aren't moving fast enough, using the static friction, otherwise dynamic
                 Vector2 tangent;
                 if (Math.Abs(jt) < j * staticFriction)
                     tangent = t * jt;
