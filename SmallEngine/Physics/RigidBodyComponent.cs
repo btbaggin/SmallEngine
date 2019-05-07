@@ -95,7 +95,7 @@ namespace SmallEngine.Physics
                 Orientation += AngularVelocity * pDeltaTime;
                 OrientationMatrix = new Matrix2X2(Orientation);
 
-                Velocity += (InverseMass * Force + PhysicsParameters.Gravity) * (pDeltaTime / 2);
+                Velocity += (InverseMass * Force + PhysicsHelper.Gravity) * (pDeltaTime / 2);
                 AngularVelocity += Torque * InverseInertia * (pDeltaTime / 2);
                 Force = Vector2.Zero;
                 Torque = 0;

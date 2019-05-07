@@ -173,7 +173,8 @@ namespace SmallEngine
         public static T RequestFromGroup<T>(string pGroup) where T : Resource, new()
         {
             System.Diagnostics.Debug.Assert(_groups.ContainsKey(pGroup));
-            return Request<T>(_groups[pGroup][Generator.Random.Next(0, _groups[pGroup].Length)]);
+            var r = new Random();
+            return Request<T>(_groups[pGroup][r.Next(0, _groups[pGroup].Length)]);
         }
 
         /// <summary>

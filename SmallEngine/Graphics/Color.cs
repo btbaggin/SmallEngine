@@ -166,9 +166,24 @@ namespace SmallEngine.Graphics
             _color |= pB << 0;
         }
 
+        public static Color FromArgb(byte pA, byte pR, byte pG, byte pB)
+        {
+            return new Color(pA, pR, pG, pB);
+        }
+
+        public static Color FromArgb(int pA, int pR, int pG, int pB)
+        {
+            return new Color((byte)pA, (byte)pR, (byte)pG, (byte)pB);
+        }
+
         public static implicit operator SharpDX.Mathematics.Interop.RawColor4(Color pColor)
         {
-            return new SharpDX.Mathematics.Interop.RawColor4(pColor.R, pColor.G, pColor.B, pColor.A);
+            return new SharpDX.Mathematics.Interop.RawColor4(pColor.R / 255f, pColor.G / 255f, pColor.B / 255f, pColor.A / 255f);
+        }
+
+        public static implicit operator Color(SharpDX.Mathematics.Interop.RawColor4 pColor)
+        {
+            return new Color((byte)(pColor.R * 255), (byte)(pColor.G * 255), (byte)(pColor.B * 255), (byte)(pColor.A * 255));
         }
     }
 }

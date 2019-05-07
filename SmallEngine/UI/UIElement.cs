@@ -9,7 +9,7 @@ using SmallEngine.Input;
 
 namespace SmallEngine.UI
 {
-    public abstract class UIElement : IUpdatable, IDrawable, IComparable
+    public abstract class UIElement : IUpdatable, IDrawable, IComparable, IDisposable
     {
         #region Properties
         private Vector2 _position;
@@ -57,9 +57,9 @@ namespace SmallEngine.UI
 
         public int TotalHeight { get { return Height + (int)(Margin.Y * 2); } }
 
-        public float HeightPercent { get; set; }
+        public float HeightPercent { get; set; } = 1f;
 
-        public float WidthPercent { get; set; }
+        public float WidthPercent { get; set; } = 1f;
 
         public bool Visible { get; set; }
 
@@ -96,6 +96,16 @@ namespace SmallEngine.UI
         {
             if (Parent != null) { Measure(new SizeF(Parent.Width, Parent.Height), 0, 0); }
             else { Measure(new SizeF(Game.Form.Width, Game.Form.Height), 0, 0); }
+        }
+
+        public void Place()
+        {
+            UIManager.Register(this);
+        }
+
+        public void Remove()
+        {
+            UIManager.Unregister(this);
         }
 
         public virtual void Update(float pDeltaTime)
@@ -195,6 +205,11 @@ namespace SmallEngine.UI
         public int CompareTo(object obj)
         {
             return Order.CompareTo(((UIElement)obj).Order);
+        }
+
+        public void Dispose()
+        {
+            UIManager.Unregister(this);
         }
     }
 }

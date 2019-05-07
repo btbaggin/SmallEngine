@@ -31,13 +31,14 @@ namespace SmallEngine
 
         public PerlinNoise(int pSize)
         {
+            var rand = new Random();
             _size = pSize;
 
             for (int i = 0; i < GradientSizeTable; i++)
             {
-                float z = 1f - 2f * Generator.Random.NextFloat();
+                float z = 1f - 2f * rand.NextFloat();
                 float r = MathF.Sqrt(1f - z * z);
-                float theta = 2 * MathF.PI * Generator.Random.NextFloat();
+                float theta = 2 * MathF.PI * rand.NextFloat();
                 _gradients[i * 3] = r * MathF.Cos(theta);
                 _gradients[i * 3 + 1] = r * MathF.Sin(theta);
                 _gradients[i * 3 + 2] = z;

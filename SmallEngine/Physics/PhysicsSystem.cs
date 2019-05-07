@@ -22,7 +22,7 @@ namespace SmallEngine.Physics
 
         public void CreateQuadTree()
         {
-            _quadTree = new QuadTree<RigidBodyComponent>(PhysicsParameters.WorldBounds);
+            _quadTree = new QuadTree<RigidBodyComponent>(PhysicsHelper.WorldBounds);
         }
 
         protected override List<IComponent> DiscoverComponents(string pTemplate, IGameObject pObject)
@@ -75,6 +75,16 @@ namespace SmallEngine.Physics
                 r.Update(pDeltaTime);
                 r.Collided = collided;
             }
+        }
+
+        internal RigidBodyComponent HitTest(Vector2 pPoint)
+        {
+            foreach(var c in _quadTree.Retrieve(pPoint))
+            {
+                if (c.Mesh.Contains(pPoint - c.AABB.Center)) return c;
+            }
+
+            return null;
         }
     }
 }

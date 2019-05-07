@@ -23,7 +23,6 @@ namespace SmallEngine.Messages
 
         protected sealed override void ProcessMessage(IMessage pMessage)
         {
-            //TODO group things?
             foreach (var l in _receivers)
             {
                 if (l.TryGetTarget(out IMessageReceiver receiver))

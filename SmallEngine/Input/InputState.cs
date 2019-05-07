@@ -31,13 +31,13 @@ namespace SmallEngine.Input
             return (_mouse[code] & 0x80) != 0;
         }
 
-        private static byte GetVirtualKeyCode(Keys pKey)
+        internal static byte GetVirtualKeyCode(Keys pKey)
         {
             int value = (int)pKey;
             return (byte)(value & 0xFF);
         }
 
-        private static byte GetVirtualKeyCode(Mouse pMouse)
+        internal static byte GetVirtualKeyCode(Mouse pMouse)
         {
             int value = (int)pMouse;
             return (byte)(value & 0xFF);

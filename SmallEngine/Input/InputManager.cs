@@ -110,12 +110,12 @@ namespace SmallEngine.Input
             var keyInput = new byte[256];
             GetKeyboardState(keyInput);
 
-            var mouseInput = new byte[5];
-            mouseInput[0] = IsKeyPressed((int)Mouse.Left) ? (byte)0xff : (byte)0x00;
-            mouseInput[1] = IsKeyPressed((int)Mouse.Right) ? (byte)0xff : (byte)0x00;
-            mouseInput[2] = IsKeyPressed((int)Mouse.Middle) ? (byte)0xff : (byte)0x00;
-            mouseInput[3] = IsKeyPressed((int)Mouse.X1) ? (byte)0xff : (byte)0x00;
-            mouseInput[4] = IsKeyPressed((int)Mouse.X2) ? (byte)0xff : (byte)0x00;
+            var mouseInput = new byte[7];
+            mouseInput[1] = IsKeyPressed((int)Mouse.Left) ? (byte)0xff : (byte)0x00;
+            mouseInput[2] = IsKeyPressed((int)Mouse.Right) ? (byte)0xff : (byte)0x00;
+            mouseInput[4] = IsKeyPressed((int)Mouse.Middle) ? (byte)0xff : (byte)0x00;
+            mouseInput[5] = IsKeyPressed((int)Mouse.X1) ? (byte)0xff : (byte)0x00;
+            mouseInput[6] = IsKeyPressed((int)Mouse.X2) ? (byte)0xff : (byte)0x00;
 
             _previousState = _inputState;
             _inputState = new InputState(keyInput, mouseInput);
@@ -125,7 +125,6 @@ namespace SmallEngine.Input
             ScreenToClient(_handle, ref p);
             _mousePos = new Vector2(p.X, p.Y);
             CheckDrag();
-            CheckMouseFocus();
         }
 
         private static Vector2 _dragStart;
@@ -158,24 +157,6 @@ namespace SmallEngine.Input
             {
                 _mode = Mode.Normal;
             }
-        }
-
-        private static IDrawable _focus;
-        private static void CheckMouseFocus()
-        {
-            _focus = null;
-            foreach(var ui in UI.UIManager.Elements)
-            {
-                _focus = ui.GetFocusElement(MousePosition);
-                if (_focus != null) return;
-            }
-
-            //TODO this is shit
-            //foreach (var go in Scene.Current._drawable)
-            //{
-            //    _focus = go.GetFocusElement(MousePosition);
-            //    if (_focus != null) return;
-            //}
         }
 
         #region Public functions
@@ -227,16 +208,6 @@ namespace SmallEngine.Input
         public static bool IsDragging(Mouse pMouse)
         {
             return _mode == Mode.Drag;
-        }
-
-        public static bool IsFocused(IDrawable pElement)
-        {
-            return pElement == _focus;
-        }
-
-        public static bool HasFocus()
-        {
-            return _focus != null;
         }
 
         public static void Listen(Keys pKey)

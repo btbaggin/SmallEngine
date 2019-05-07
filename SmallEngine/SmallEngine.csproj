@@ -127,7 +127,7 @@
     <Compile Include="Physics\CollisionEventArgs.cs" />
     <Compile Include="Physics\IPhysicsBody.cs" />
     <Compile Include="Physics\Manifold.cs" />
-    <Compile Include="Physics\PhysicsParameters.cs" />
+    <Compile Include="Physics\PhysicsHelper.cs" />
     <Compile Include="Physics\PhysicsSystem.cs" />
     <Compile Include="Physics\CollisionMesh.cs" />
     <Compile Include="Rectangle.cs" />
@@ -151,7 +151,6 @@
     <Compile Include="Audio\AudioComponent.cs" />
     <Compile Include="Physics\RigidBodyComponent.cs" />
     <Compile Include="Utils\PerlinNoise.cs" />
-    <Compile Include="Utils\RandomGenerator.cs" />
     <Compile Include="Utils\Timer.cs" />
     <Compile Include="Utils\UnknownEnumException.cs" />
     <Compile Include="Vector2.cs" />

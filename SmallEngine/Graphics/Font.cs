@@ -8,7 +8,7 @@ using SharpDX.DirectWrite;
 
 namespace SmallEngine.Graphics
 {
-    public enum Alignment
+    public enum Alignments
     {
         Center,
         Justified,
@@ -21,49 +21,54 @@ namespace SmallEngine.Graphics
         #region Properties
         internal SharpDX.Direct2D1.SolidColorBrush Brush { get; private set; }
 
+        public Color Color
+        {
+            get { return Brush.Color; }
+            set { Brush.Color = value; }
+        }
+
         public TextFormat Format { get; private set; }
 
         public string Family { get { return Format.FontFamilyName; } }
 
         public float Size { get { return Format.FontSize; } }
 
-        public Alignment Alignment
+        public Alignments Alignment
         {
             get
             {
                 switch (Format.TextAlignment)
                 {
-
                     case TextAlignment.Justified:
-                        return Alignment.Justified;
+                        return Alignments.Justified;
 
                     case TextAlignment.Leading:
-                        return Alignment.Leading;
+                        return Alignments.Leading;
 
                     case TextAlignment.Trailing:
-                        return Alignment.Trailing;
+                        return Alignments.Trailing;
 
                     default:
-                        return Alignment.Center;
+                        return Alignments.Center;
                 }
             }
             set
             {
                 switch(value)
                 {
-                    case Alignment.Center:
+                    case Alignments.Center:
                         Format.TextAlignment = TextAlignment.Center;
                         break;
 
-                    case Alignment.Justified:
+                    case Alignments.Justified:
                         Format.TextAlignment = TextAlignment.Justified;
                         break;
 
-                    case Alignment.Leading:
+                    case Alignments.Leading:
                         Format.TextAlignment = TextAlignment.Leading;
                         break;
 
-                    case Alignment.Trailing:
+                    case Alignments.Trailing:
                         Format.TextAlignment = TextAlignment.Trailing;
                         break;
                 }

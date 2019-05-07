@@ -29,7 +29,6 @@ namespace SmallEngine
 
         readonly UIManager _uiManager;
         readonly RenderSystem _render;
-        readonly PhysicsSystem _physics;
         float _timeElapsed;
         int _frameCount;
         float _physicsStep;
@@ -94,7 +93,7 @@ namespace SmallEngine
 
             _uiManager = new UIManager();
             _render = new RenderSystem(Graphics);
-            _physics = new PhysicsSystem();
+            PhysicsHelper.Create();
 
             if (MaxFps == 0) MaxFps = 60;
         }
@@ -132,7 +131,7 @@ namespace SmallEngine
             IsPlaying = true;
             LoadContent();
             Initialize();
-            _physics.CreateQuadTree();
+            PhysicsHelper.CreateQuadTree();
             Messages.Start();
             GameTime.Reset();
 
@@ -203,7 +202,7 @@ namespace SmallEngine
                 while (_physicsStep > _physicsStepTime)
                 {
                     //Update physics
-                    _physics.Update(_physicsStepTime);
+                    PhysicsHelper.Update(_physicsStepTime);
                     _physicsStep -= _physicsStepTime;
                 }
 

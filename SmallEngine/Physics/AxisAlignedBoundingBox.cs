@@ -42,6 +42,11 @@ namespace SmallEngine.Physics
             _min = pMin;
             _max = pMax;
             _center = new Vector2((_max.X + _min.X) / 2, (_max.Y + _min.Y) / 2);
+        } 
+
+        public bool Contains(Vector2 pPoint)
+        {
+            return pPoint.X >= Left && pPoint.X <= Right && pPoint.Y >= Top && pPoint.Y <= Bottom;
         }
     }
 }

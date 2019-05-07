@@ -29,6 +29,8 @@ namespace SmallEngine.Physics
         public abstract AxisAlignedBoundingBox CalculateAABB(Vector2 pPosition);
 
         public abstract void CalculateMass(out float pMass, out float pInertia);
+
+        public abstract bool Contains(Vector2 pPoint);
     }
 
     #region CircleMesh
@@ -49,6 +51,11 @@ namespace SmallEngine.Physics
         {
             pMass = Material.Density * MathF.PI * Radius * Radius;
             pInertia = pMass * Radius * Radius;
+        }
+
+        public override bool Contains(Vector2 pPoint)
+        {
+            return Vector2.DistanceSqrd(pPoint, Vector2.Zero) < Radius * Radius;
         }
     }
     #endregion
@@ -191,6 +198,28 @@ namespace SmallEngine.Physics
         public override AxisAlignedBoundingBox CalculateAABB(Vector2 pPosition)
         {
             throw new NotImplementedException();
+        }
+
+        public override bool Contains(Vector2 pPoint)
+        {
+            bool result = false;
+            var j = Verticies.Length - 1;
+            for(int i = 0; i < Verticies.Length; i++)
+            {
+                //Count number of sides that intersect with Y coordinate
+                if(Verticies[i].Y < pPoint.Y && Verticies[j].Y >= pPoint.Y || Verticies[j].Y < pPoint.Y && Verticies[i].Y >= pPoint.Y)
+                {
+                    //Check if they are polygon is to left of point
+                    if(Verticies[i].X + (pPoint.Y - Verticies[i].Y) / (Verticies[j].Y - Verticies[i].Y) * (Verticies[j].X - Verticies[i].X) < pPoint.X)
+                    {
+                        //An odd amount means point is inside polygon
+                        result = !result;
+                    }
+                }
+                j = i;
+            }
+
+            return result;
         }
 
         public override void CalculateMass(out float pMass, out float pInertia)

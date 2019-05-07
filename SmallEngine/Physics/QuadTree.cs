@@ -197,7 +197,7 @@ namespace SmallEngine.Physics
                 _nodes[index].Retrieve(ref pReturnObjects, pRect);
             }
 
-            pReturnObjects.AddRange(_entities); //TODO check layer
+            pReturnObjects.AddRange(_entities);
 
             return pReturnObjects;
         }

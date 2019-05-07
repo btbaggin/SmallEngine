@@ -14,7 +14,7 @@ namespace SmallEngine.UI
 
         static UIManager()
         {
-            Elements = new List<UI.UIElement>();
+            Elements = new List<UIElement>();
         }
 
         public static void Register(UIElement pElement)
@@ -26,6 +26,7 @@ namespace SmallEngine.UI
 
         public static void Unregister(UIElement pElement)
         {
+            //TODO what to do with this?
             Elements.Remove(pElement);
         }
 

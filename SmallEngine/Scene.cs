@@ -100,7 +100,6 @@ namespace SmallEngine
         }
         #endregion
 
-        //TODO use pooling of GO
         #region CreateGameObject
         public IGameObject CreateGameObject(params IComponent[] pComponents)
         {
