@@ -251,16 +251,24 @@ namespace SmallEngine
             return pV1.X * pV2.Y - pV1.Y * pV2.X;
         }
 
-        public static Vector2 CrossProduct(Vector2 pV, float pScalar)
-        {
-            return new Vector2(pScalar * pV.Y, -pScalar * pV.X);
-        }
-
+        /// <summary>
+        /// Calculates the cross product of a vector against a scalar value
+        /// </summary>
+        /// <param name="pScalar">Scalar to compute the cross product</param>
+        /// <param name="pV">Vector to computer the cross product</param>
+        /// <returns></returns>
         public static Vector2 CrossProduct(float pScalar, Vector2 pV)
         {
             return new Vector2(-pScalar * pV.Y, pScalar * pV.X);
         }
 
+        /// <summary>
+        /// Ensures the vector is contained within the Min and Max vectors
+        /// </summary>
+        /// <param name="pValue">Value to clamp within Min and Max</param>
+        /// <param name="pMin">The minimum vector that is allowed</param>
+        /// <param name="pMax">The maximum vector that is allowed</param>
+        /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector2 Clamp(Vector2 pValue, Vector2 pMin, Vector2 pMax)
         {
@@ -280,10 +288,10 @@ namespace SmallEngine
         {
             if (pVectors.Length == 0)
             {
-                return Vector2.Zero;
+                return Zero;
             }
 
-            Vector2 max = Vector2.Zero;
+            Vector2 max = Zero;
             for (int i = 0; i < pVectors.Length; i++)
             {
                 if (pVectors[i].X > max.X && pVectors[i].Y > max.Y)
@@ -304,7 +312,7 @@ namespace SmallEngine
         {
             if (pVectors.Length == 0)
             {
-                return Vector2.Zero;
+                return Zero;
             }
 
             var maxX = 0f;
@@ -334,10 +342,10 @@ namespace SmallEngine
         {
             if (pVectors.Length == 0)
             {
-                return Vector2.Zero;
+                return Zero;
             }
 
-            Vector2 min = Vector2.Zero;
+            Vector2 min = Zero;
             for (int i = 0; i < pVectors.Length; i++)
             {
                 if (pVectors[i].X > min.X && pVectors[i].Y > min.Y)
@@ -358,7 +366,7 @@ namespace SmallEngine
         {
             if (pVectors.Length == 0)
             {
-                return Vector2.Zero;
+                return Zero;
             }
 
             var minX = 0f;

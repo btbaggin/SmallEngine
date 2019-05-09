@@ -32,11 +32,6 @@ namespace SmallEngine.Physics
             get { return _entities.Count; }
         }
 
-        public int SubtreeCount
-        {
-            get { return _nodes.Count((pN) => pN != null); }
-        }
-
         public int Level { get; private set; }
         #endregion
 
@@ -48,11 +43,6 @@ namespace SmallEngine.Physics
             Level = pLevel;
             _entities = new List<T>();
             _bounds = pBounds;
-
-            _nodes[0] = null;
-            _nodes[1] = null;
-            _nodes[2] = null;
-            _nodes[3] = null;
         }
         #endregion
 
@@ -66,9 +56,9 @@ namespace SmallEngine.Physics
             _entities.Clear();
 
             //clear all child nodes
-            foreach (var n in _nodes.Where(pN => pN != null))
+            foreach (var n in _nodes)
             {
-                n.Clear();
+                if(n != null) n.Clear();
             }
 
             _nodes[0] = null;
@@ -192,7 +182,7 @@ namespace SmallEngine.Physics
         private List<T> Retrieve(ref List<T> pReturnObjects, AxisAlignedBoundingBox pRect)
         {
             int index = GetIndex(pRect);
-            if (index != -1 && _nodes[0] != null)
+            if (index != -1 && _nodes[index] != null)
             {
                 _nodes[index].Retrieve(ref pReturnObjects, pRect);
             }

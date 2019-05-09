@@ -10,6 +10,7 @@ namespace SmallEngine.Messages
 {
     public abstract class MessageBus
     {
+        #region MessageThread
         struct MessageThread
         {
             readonly ManualResetEvent _reset;
@@ -37,6 +38,7 @@ namespace SmallEngine.Messages
                 _reset.WaitOne();
             }
         }
+        #endregion
 
         protected readonly ConcurrentBag<WeakReference<IMessageReceiver>> _receivers;
         private volatile bool _processing;
