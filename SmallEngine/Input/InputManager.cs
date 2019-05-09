@@ -209,68 +209,6 @@ namespace SmallEngine.Input
         {
             return _mode == Mode.Drag;
         }
-
-        public static void Listen(Keys pKey)
-        {
-            if (!CheckExists(pKey))
-            {
-                _keys.Add(new InputInfo(pKey, 0));
-            }
-        }
-
-        public static void Listen(Mouse pMouse)
-        {
-            if (!CheckExists(pMouse))
-            {
-                _keys.Add(new InputInfo(pMouse, 0));
-            }
-        }
-
-        private static bool CheckExists(Keys pKey)
-        {
-            foreach (InputInfo k in _keys)
-            {
-                if (k.Value == (int)pKey)
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        private static bool CheckExists(Mouse pMouse)
-        {
-            foreach (InputInfo k in _keys)
-            {
-                if (k.Value == (int)pMouse)
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        public static void StopListening(Keys pKey)
-        {
-            for (int i = 0; i < _keys.Count; i++)
-            {
-                if (_keys[i].Value == (int)pKey)
-                {
-                    _keys.RemoveAt(i);
-                }
-            }
-        }
-
-        public static void StopListening(Mouse pMouse)
-        {
-            for (int i = 0; i < _keys.Count; i++)
-            {
-                if (_keys[i].Value == (int)pMouse)
-                {
-                    _keys.RemoveAt(i);
-                }
-            }
-        }
         #endregion
     }
 }
