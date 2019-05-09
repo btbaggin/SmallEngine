@@ -19,7 +19,7 @@ namespace SmallEngine.Graphics
         public Effect()
         {
             _effects = new List<SharpDX.Direct2D1.Effect>();
-            _context = ((DirectXGraphicSystem)Game.Graphics).Context;
+            _context = ((DirectXAdapter)Game.Graphics).Context;
         }
 
         public void AddSaturation(float pValue)

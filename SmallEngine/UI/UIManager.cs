@@ -32,6 +32,7 @@ namespace SmallEngine.UI
 
         internal void Draw(IGraphicsAdapter pSystem)
         {
+            pSystem.ResetTransform();
             foreach (var e in Elements)
             {
                 if (e.Visible)

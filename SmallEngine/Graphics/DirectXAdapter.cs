@@ -12,7 +12,7 @@ using SharpDX.Mathematics.Interop;
 
 namespace SmallEngine.Graphics
 {
-    public class DirectXGraphicSystem : IGraphicsAdapter
+    public class DirectXAdapter : IGraphicsAdapter
     {
         private Image _renderTarget;
         private SwapChain _swapChain;

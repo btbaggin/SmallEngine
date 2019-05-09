@@ -18,7 +18,7 @@ namespace SmallEngine
     {
         /*TODO
          * Generic render component?
-         * make my own system.drawing.color
+         * Create a MessageBusPool so I can have many threads responding to things?
          */
 
         public enum RenderTypes
@@ -60,8 +60,6 @@ namespace SmallEngine
 
         public bool IsPlaying { get; set; }
 
-        protected Scene Scene { get { return Scene.Current; } }
-
         public bool PlayInBackground { get; set; }
         
         public bool Paused
@@ -88,7 +86,7 @@ namespace SmallEngine
             Form.WindowDestory += WindowDestroyed;
             Form.WindowSizeChanged += WindowSizeChanged;
 
-            Graphics = Render == RenderTypes.DirectX ? new DirectXGraphicSystem() : null;
+            Graphics = Render == RenderTypes.DirectX ? new DirectXAdapter() : null;
             Graphics.Initialize(Form, false);
 
             _uiManager = new UIManager();
@@ -116,7 +114,7 @@ namespace SmallEngine
             _uiManager.Update(pDeltaTime);
             ActiveCamera.Update(pDeltaTime);
 
-            Scene.Update(pDeltaTime);
+            Scene.UpdateAll(pDeltaTime);
         }
 
         private void Draw(float pDeltaTime)
@@ -180,13 +178,13 @@ namespace SmallEngine
                 if (!IsPlaying)
                 {
                     Messages.Stop();
-                    Scene.EndScene();
+                    Scene.EndSceneAll();
                     UnloadContent();
                     Application.Exit();
                     return;
                 }
 
-                Scene.DisposeGameObjects();
+                Scene.DisposeGameObjectsAll();
                 GameTime.Tick();
 
                 //Cache pressed keys

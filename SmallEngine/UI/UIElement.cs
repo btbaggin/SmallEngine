@@ -73,9 +73,9 @@ namespace SmallEngine.UI
 
         protected List<UIElement> Children { get; private set; }
 
-        protected AnchorDirection Anchor { get; set; }
+        public AnchorDirection Anchor { get; set; }
 
-        protected Vector2 AnchorPoint { get; set; }
+        public Vector2 AnchorPoint { get; set; }
 
         public ElementOrientation Orientation { get; set; }
 
@@ -98,7 +98,7 @@ namespace SmallEngine.UI
             else { Measure(new SizeF(Game.Form.Width, Game.Form.Height), 0, 0); }
         }
 
-        public void Place()
+        public void Display()
         {
             UIManager.Register(this);
         }

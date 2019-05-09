@@ -9,35 +9,66 @@ using SmallEngine.Components;
 
 namespace SmallEngine
 {
-
-    public enum SceneLoadMode
-    {
-        Replace,
-        Additive
-    }
-
     public class Scene : IUpdatable
     {
+        //https://gamedevelopment.tutsplus.com/tutorials/spaces-useful-game-object-containers--gamedev-14091
+
         readonly Dictionary<string, IGameObject> _namedObjects;
         readonly ConcurrentBag<IGameObject> _toRemove = new ConcurrentBag<IGameObject>();
 
         static List<ComponentSystem> _systems = new List<ComponentSystem>();
-        static Stack<Scene> _scenes = new Stack<Scene>();
+        static List<Scene> _scenes = new List<Scene>();
         internal readonly static Dictionary<string, List<Type>> _definitions = new Dictionary<string, List<Type>>();
 
         #region Properties
         public List<IGameObject> GameObjects { get; }
 
-        public static Scene Current { get; private set; }
+        public bool Active { get; set; } = true;
         #endregion  
 
         #region Constructors
-        public Scene()
+        protected Scene()
         {
             GameObjects = new List<IGameObject>();
             _namedObjects = new Dictionary<string, IGameObject>();
         }
+
+        public static T Create<T>() where T : Scene
+        {
+            //TODO allow creating scene that isn't registered to all systems
+            var s = (T)Activator.CreateInstance(typeof(T));
+            _scenes.Add(s);
+            s.Begin();
+            return s;
+        }
         #endregion
+
+        internal static void UpdateAll(float pDeltaTime)
+        {
+            foreach(var s in _scenes)
+            {
+                if(s.Active)
+                {
+                    s.Update(pDeltaTime);
+                }
+            }
+        }
+
+        internal static void DisposeGameObjectsAll()
+        {
+            foreach(var s in _scenes)
+            {
+                s.DisposeGameObjects();
+            }
+        }
+
+        internal static void EndSceneAll()
+        {
+            foreach(var s in _scenes.ToList())
+            {
+                s.Destroy();
+            }
+        }
 
         public virtual void Update(float pDeltaTime)
         {
@@ -47,13 +78,17 @@ namespace SmallEngine
             }
         }
 
-        protected internal virtual void Begin()
-        {
-        }
+        protected internal virtual void Begin() { }
 
         protected internal virtual void End()
         {
             DisposeGameObjects();
+        }
+
+        public void Destroy()
+        {
+            _scenes.Remove(this);
+            End();
         }
 
         #region Static methods
@@ -61,7 +96,9 @@ namespace SmallEngine
         {
             _systems.Add(pSystem);
         }
+        #endregion
 
+        #region GameObject Creation
         public static void Define(string pName, params Type[] pComponents)
         {
             if (!_definitions.ContainsKey(pName))
@@ -74,33 +111,6 @@ namespace SmallEngine
             }
         }
 
-        public static void BeginScene(Scene pScene)
-        {
-            BeginScene(pScene, SceneLoadMode.Replace);
-        }
-
-        public static void BeginScene(Scene pScene, SceneLoadMode pMode)
-        {
-            if (pMode == SceneLoadMode.Additive)
-            {
-                _scenes.Push(Current);
-            }
-
-            Current = pScene;
-            Current.Begin();
-        }
-
-        public static void EndScene()
-        {
-            Current.End();
-            if (_scenes.Count > 0)
-            {
-                Current = _scenes.Pop();
-            }
-        }
-        #endregion
-
-        #region CreateGameObject
         public IGameObject CreateGameObject(params IComponent[] pComponents)
         {
             return CreateGameObject(null, pComponents);
@@ -126,7 +136,8 @@ namespace SmallEngine
 
         public T CreateGameObject<T>(string pName, params IComponent[] pComponents) where T : IGameObject
         {
-            T go = (T)Activator.CreateInstance(typeof(T), new object[] { pName });
+            T go = (T)Activator.CreateInstance(typeof(T));
+            go.Name = pName;
             foreach (IComponent c in pComponents)
             {
                 go.AddComponent(c);
@@ -146,7 +157,8 @@ namespace SmallEngine
         {
             if (_definitions.ContainsKey(pTemplate))
             {
-                T go = (T)Activator.CreateInstance(typeof(T), new object[] { pName });
+                T go = (T)Activator.CreateInstance(typeof(T));
+                go.Name = pName;
                 foreach (Type t in _definitions[pTemplate])
                 {
                     go.AddComponent(Component.Create(t));
@@ -182,18 +194,26 @@ namespace SmallEngine
 
             return null;
         }
-        #endregion  
 
         private void AddGameObject(IGameObject pGameObject, string pName, string pTemplate)
         {
             GameObjects.Add(pGameObject);
             if (pName != null) _namedObjects.Add(pName, pGameObject);
-            foreach(var s in _systems)
+            foreach (var s in _systems)
             {
                 s.GameObjectAdded(pTemplate, pGameObject);
             }
+            Game.Messages.Register(pGameObject);
+            pGameObject.ContainingScene = this;
         }
 
+        public void Destroy(IGameObject pGameObject)
+        {
+            _toRemove.Add(pGameObject);
+        }
+        #endregion
+
+        #region GameObject Queries
         public IGameObject FindGameObject(string pName)
         {
             if(_namedObjects.ContainsKey(pName))
@@ -204,10 +224,14 @@ namespace SmallEngine
             return null;
         }
 
-        public void Destroy(IGameObject pGameObject)
+        public IEnumerable<IGameObject> FindGameObjectsWithTag(string pTag)
         {
-            _toRemove.Add(pGameObject);
+            foreach (var go in GameObjects)
+            {
+                if (go.Tag == pTag) yield return go;
+            }
         }
+        #endregion
 
         internal void DisposeGameObjects()
         {

@@ -11,7 +11,7 @@ namespace SmallEngine
     public class GameObject : IGameObject
     {
         #region Properties
-        public string Name { get; private set; }
+        public string Name { get; set; }
 
         public Vector2 Position { get; set; }
 
@@ -19,16 +19,13 @@ namespace SmallEngine
 
         public float Rotation { get; set; }
 
-        public Rectangle Bounds
-        {
-            get { return new Rectangle(Position, Scale); }
-        }
-
-        public bool MarkedForDestroy { get; private set; }
+        public bool Destroyed { get; private set; }
 
         public string Tag { get; set; }
 
         public virtual int Order => 0;
+
+        public Scene ContainingScene { get; set; }
         #endregion  
 
         readonly Dictionary<Type, IComponent> _components = new Dictionary<Type, IComponent>();
@@ -109,8 +106,8 @@ namespace SmallEngine
 
         public void Destroy()
         {
-            MarkedForDestroy = true;
-            Scene.Current.Destroy(this);
+            Destroyed = true;
+            ContainingScene.Destroy(this);
         }
 
         public virtual void Dispose()

@@ -16,12 +16,12 @@ namespace SmallEngine.Graphics
             Scene.Register(this);
         }
 
-        public override void Update(float pDeltaTime)
+        public override void RunUpdate(float pDeltaTime)
         {
-            foreach(var c in Components)
+            foreach (var c in Components)
             {
                 var r = (RenderComponent)c;
-                if(r.IsVisible())
+                if (r.IsVisible())
                 {
                     r.Draw(_adapter, pDeltaTime);
                 }

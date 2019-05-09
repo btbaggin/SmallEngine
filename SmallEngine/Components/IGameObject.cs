@@ -13,7 +13,7 @@ namespace SmallEngine
     {
         //TODO? http://archive.gamedev.net/archive/reference/programming/features/scenegraph/page2.html
         #region Properties
-        string Name { get; }
+        string Name { get; set; }
 
         Vector2 Position { get; set; }
 
@@ -22,6 +22,10 @@ namespace SmallEngine
         float Rotation { get; set; }
 
         string Tag { get; set; }
+
+        Scene ContainingScene { get; set; }
+
+        bool Destroyed { get; }
         #endregion
 
         IComponent GetComponentOfType(Type pType);

@@ -18,7 +18,7 @@ namespace SmallEngine.Graphics
         {
             if(Game.Render == Game.RenderTypes.DirectX)
             {
-                DirectXBitmap = ((DirectXGraphicSystem)Game.Graphics).LoadBitmap(Path, out int width, out int height);
+                DirectXBitmap = ((DirectXAdapter)Game.Graphics).LoadBitmap(Path, out int width, out int height);
                 Width = width;
                 Height = height;
             }

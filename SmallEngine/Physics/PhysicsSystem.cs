@@ -39,7 +39,7 @@ namespace SmallEngine.Physics
             return components;
         }
 
-        public override void Update(float pDeltaTime)
+        public override void RunUpdate(float pDeltaTime)
         {
             _quadTree.Clear();
 
@@ -51,7 +51,7 @@ namespace SmallEngine.Physics
                 //Find all intersections before we insert our new entity
                 foreach (var colliders in _quadTree.Retrieve(r))
                 {
-                    if(r.Layer == colliders.Layer)
+                    if(r.HasLayer(colliders.Layer))
                     {
                         Manifold m = new Manifold(r, colliders);
 

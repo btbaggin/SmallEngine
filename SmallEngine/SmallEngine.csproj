@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SmallEngine</RootNamespace>
     <AssemblyName>SmallEngine</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
@@ -26,6 +26,7 @@
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -74,6 +75,7 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.ServiceModel" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -102,7 +104,7 @@
     <Compile Include="Graphics\BitmapResource.cs" />
     <Compile Include="Graphics\Brush.cs" />
     <Compile Include="Graphics\Color.cs" />
-    <Compile Include="Graphics\DirectXGraphicSystem.cs" />
+    <Compile Include="Graphics\DirectXAdapter.cs" />
     <Compile Include="Graphics\Effect.cs" />
     <Compile Include="Graphics\Font.cs" />
     <Compile Include="Graphics\IGraphicsAdapter.cs" />

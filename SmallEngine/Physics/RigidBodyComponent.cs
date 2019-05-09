@@ -72,17 +72,20 @@ namespace SmallEngine.Physics
 
         public AxisAlignedBoundingBox AABB { get; private set; }
 
-        public byte Layer { get; private set; }
+        public short Layer { get; private set; }
 
         public Matrix2X2 OrientationMatrix { get; private set; }
+
+        public bool IsKinematic { get; set; }
         #endregion
 
         public RigidBodyComponent()
         {
             OrientationMatrix = Matrix2X2.Identity;
+            Layer = 1;
         }
 
-        internal void MoveBody(Vector2 pAmount)
+        public void MoveBody(Vector2 pAmount)
         {
             GameObject.Position += pAmount;
         }
@@ -92,11 +95,19 @@ namespace SmallEngine.Physics
             if (Mass != 0)
             {
                 MoveBody(Velocity * pDeltaTime);
-                Orientation += AngularVelocity * pDeltaTime;
-                OrientationMatrix = new Matrix2X2(Orientation);
 
-                Velocity += (InverseMass * Force + PhysicsHelper.Gravity) * (pDeltaTime / 2);
-                AngularVelocity += Torque * InverseInertia * (pDeltaTime / 2);
+                if(IsKinematic)
+                {
+                    Velocity += PhysicsHelper.Gravity * (pDeltaTime / 2);
+                }
+                else
+                {
+                    Velocity += (InverseMass * Force + PhysicsHelper.Gravity) * (pDeltaTime / 2);
+                    AngularVelocity += Torque * InverseInertia * (pDeltaTime / 2);
+                    Orientation += AngularVelocity * pDeltaTime;
+                    OrientationMatrix = new Matrix2X2(Orientation);
+                }
+
                 Force = Vector2.Zero;
                 Torque = 0;
             }
@@ -104,14 +115,19 @@ namespace SmallEngine.Physics
             AABB = Mesh.CalculateAABB(Position);
         }
 
-        public void AddToLayer(byte pLayer)
+        public void AddToLayer(short pLayer)
         {
             Layer |= pLayer;
         }
 
-        public void RemoveFromLayer(byte pLayer)
+        public void RemoveFromLayer(short pLayer)
         {
-            Layer &= (byte)~(int)pLayer;
+            Layer &= (short)~(int)pLayer;
+        }
+
+        public bool HasLayer(short pLayer)
+        {
+            return (Layer & pLayer) != 0;
         }
 
         public void ApplyImpulse(Vector2 pImpulse, Vector2 pContact)

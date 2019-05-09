@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,16 +17,22 @@ namespace SmallEngine.Components
         {
             if(!string.IsNullOrEmpty(pTemplate) && _cache.ContainsKey(pTemplate))
             {
-                foreach(var t in _cache[pTemplate])
+                lock(Components)
                 {
-                    Components.Add(pObject.GetComponent(t));
+                    foreach (var t in _cache[pTemplate])
+                    {
+                        Components.Add(pObject.GetComponent(t));
+                    }
                 }
                 return;
             }
 
-            foreach(var c in DiscoverComponents(pTemplate, pObject))
+            lock(Components)
             {
-                Components.Add(c);
+                foreach (var c in DiscoverComponents(pTemplate, pObject))
+                {
+                    Components.Add(c);
+                }
             }
         }
 
@@ -51,6 +58,13 @@ namespace SmallEngine.Components
             _cache.Add(pTemplate, pType);
         }
 
-        public abstract void Update(float pDeltaTime);
+        public void Update(float pDeltaTime)
+        {
+            lock(Components)
+            {
+                RunUpdate(pDeltaTime);
+            }
+        }
+        public abstract void RunUpdate(float pDeltaTime);
     }
 }
