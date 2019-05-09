@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,17 +8,17 @@ namespace SmallEngine.Messages
 {
     public sealed class QueueingMessageBus : MessageBus
     {
-        readonly Queue<IMessage> _messages;
+        readonly ConcurrentQueue<IMessage> _messages;
 
-        public QueueingMessageBus() : base()
+        public QueueingMessageBus(int pThreads) : base(pThreads)
         {
-            _messages = new Queue<IMessage>();
+            _messages = new ConcurrentQueue<IMessage>();
         }
 
         public sealed override void SendMessage(IMessage pM)
         {
             _messages.Enqueue(pM);
-            ResumeProcessing();
+            base.SendMessage(pM);
         }
 
         protected sealed override void ProcessMessage(IMessage pMessage)
@@ -41,14 +41,7 @@ namespace SmallEngine.Messages
 
         protected sealed override bool TryGetNextMessage(out IMessage pMessage)
         {
-            if(_messages.Count > 0)
-            {
-                pMessage = _messages.Dequeue();
-                return true;
-            }
-
-            pMessage = default(GameMessage);
-            return false;
+            return _messages.TryDequeue(out pMessage);
         }
     }
 }

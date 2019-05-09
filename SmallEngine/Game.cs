@@ -21,12 +21,6 @@ namespace SmallEngine
          * Create a MessageBusPool so I can have many threads responding to things?
          */
 
-        public enum RenderTypes
-        {
-            DirectX,
-            OpenGL
-        }
-
         readonly UIManager _uiManager;
         readonly RenderSystem _render;
         float _timeElapsed;
@@ -41,7 +35,7 @@ namespace SmallEngine
 
         public static GameForm Form { get; private set; }
 
-        public static RenderTypes Render { get; set; }
+        public static Graphics.RenderMethods RenderMethod { get; set; }
 
         public static MessageBus Messages { get; private set; }
 
@@ -80,13 +74,15 @@ namespace SmallEngine
             Form = new GameForm();
 
             InputManager.Initialize(Form.Handle);
-            Messages = new QueueingMessageBus();
+
+            var availableThreads = Math.Max(1, System.Environment.ProcessorCount - 1); //reserve dedicated thread for audio
+            Messages = new QueueingMessageBus(availableThreads); 
 
             Form.WindowActivateChanged += WindowActivateChanged;
             Form.WindowDestory += WindowDestroyed;
             Form.WindowSizeChanged += WindowSizeChanged;
 
-            Graphics = Render == RenderTypes.DirectX ? new DirectXAdapter() : null;
+            Graphics = RenderMethod == RenderMethods.DirectX ? new DirectXAdapter() : null;
             Graphics.Initialize(Form, false);
 
             _uiManager = new UIManager();
@@ -127,11 +123,13 @@ namespace SmallEngine
         public void Run()
         {
             IsPlaying = true;
-            LoadContent();
-            Initialize();
-            PhysicsHelper.CreateQuadTree();
             Messages.Start();
             GameTime.Reset();
+
+            LoadContent();
+            Initialize();
+
+            PhysicsHelper.CreateQuadTree();
 
             Application.Idle += OnIdle;
             Application.Run(Form);

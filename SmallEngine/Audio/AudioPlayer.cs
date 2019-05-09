@@ -40,7 +40,7 @@ namespace SmallEngine.Audio
         }
         #endregion
 
-        static DisposingMessageBus _messages = new DisposingMessageBus(64);
+        static DisposingMessageBus _messages = new DisposingMessageBus(64, 1);
         static List<SourceVoice> _freeVoices = new List<SourceVoice>();
         static MasteringVoice _mv = new MasteringVoice(Device);
 

@@ -10,7 +10,7 @@ namespace SmallEngine.Messages
     {
         readonly RingBuffer<IMessage> _messages;
 
-        public DisposingMessageBus(int pCapacity) : base()
+        public DisposingMessageBus(int pCapacity, int pThreads) : base(pThreads)
         {
             _messages = new RingBuffer<IMessage>(pCapacity);
         }
@@ -18,7 +18,7 @@ namespace SmallEngine.Messages
         public sealed override void SendMessage(IMessage pM)
         {
             _messages.Push(pM);
-            ResumeProcessing();
+            base.SendMessage(pM);
         }
 
         protected sealed override void ProcessMessage(IMessage pMessage)
@@ -41,10 +41,13 @@ namespace SmallEngine.Messages
 
         protected sealed override bool TryGetNextMessage(out IMessage pMessage)
         {
-            if(!_messages.IsEmpty)
+            lock(_messages)
             {
-                pMessage = _messages.Pop();
-                return true;
+                if (!_messages.IsEmpty)
+                {
+                    pMessage = _messages.Pop();
+                    return true;
+                }
             }
 
             pMessage = default(IMessage);

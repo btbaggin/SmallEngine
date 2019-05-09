@@ -10,16 +10,45 @@ namespace SmallEngine.Messages
 {
     public abstract class MessageBus
     {
+        struct MessageThread
+        {
+            readonly ManualResetEvent _reset;
+            readonly Thread _thread;
+
+            public MessageThread(ParameterizedThreadStart pThread)
+            {
+                _reset = new ManualResetEvent(false);
+                _thread = new Thread(pThread);
+            }
+
+            public void Start()
+            {
+                _thread.Start(this);
+            }
+
+            public void Resume()
+            {
+                _reset.Set();
+            }
+
+            public void Wait()
+            {
+                _reset.Reset();
+                _reset.WaitOne();
+            }
+        }
+
         protected readonly ConcurrentBag<WeakReference<IMessageReceiver>> _receivers;
-        private readonly ManualResetEvent _mre;
         private volatile bool _processing;
+        private readonly MessageThread[] _threads;
 
         public bool Suspended { get; private set; }
 
-        protected MessageBus()
+        protected MessageBus(int pThreads)
         {
             _receivers = new ConcurrentBag<WeakReference<IMessageReceiver>>();
-            _mre = new ManualResetEvent(false);
+            _threads = new MessageThread[pThreads];
+
         }
 
         public void Register(IMessageReceiver pReceiver)
@@ -27,24 +56,23 @@ namespace SmallEngine.Messages
             _receivers.Add(new WeakReference<IMessageReceiver>(pReceiver));
         }
 
-        public abstract void SendMessage(IMessage pM);
-
-        protected void ResumeProcessing()
-        {
-            if(!Suspended) _mre.Set();
-        }
-
         public void Start()
         {
             _processing = true;
-            var thread = new Thread(ProcessMessages);
-            thread.Start();
+            for (int i = 0; i < _threads.Length; i++)
+            {
+                _threads[i] = new MessageThread(ProcessMessages);
+                _threads[i].Start();
+            }
         }
 
         public void Stop()
         {
             _processing = false;
-            _mre.Set();
+            for(int i= 0; i < _threads.Length; i++)
+            {
+                _threads[i].Resume();
+            }
         }
 
         public void Suspend()
@@ -55,11 +83,15 @@ namespace SmallEngine.Messages
         public void Resume()
         {
             Suspended = false;
-            _mre.Set();
+            for (int i = 0; i < _threads.Length; i++)
+            {
+                _threads[i].Resume();
+            }
         }
 
-        private void ProcessMessages()
+        private void ProcessMessages(object pThread)
         {
+            var thread = (MessageThread)pThread;
             while(_processing)
             {
                 if (!Suspended && TryGetNextMessage(out IMessage m))
@@ -68,12 +100,21 @@ namespace SmallEngine.Messages
                 }
                 else
                 {
-                    _mre.Reset();
-                    _mre.WaitOne();
+                    thread.Wait();
                 }
             }
         }
 
+        public virtual void SendMessage(IMessage pM)
+        {
+            if (!Suspended)
+            {
+                for (int i = 0; i < _threads.Length; i++)
+                {
+                    _threads[i].Resume();
+                }
+            }
+        }
         protected abstract bool TryGetNextMessage(out IMessage pMessage);
         protected abstract void ProcessMessage(IMessage pMessage);
     }

@@ -3,6 +3,12 @@ using System;
 
 namespace SmallEngine.Graphics
 {
+    public enum RenderMethods
+    {
+        DirectX,
+        OpenGL
+    }
+
     public interface IGraphicsAdapter : IDisposable
     {
         bool Initialize(GameForm pForm, bool pFullScreen);
