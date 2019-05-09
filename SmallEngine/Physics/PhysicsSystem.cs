@@ -46,7 +46,6 @@ namespace SmallEngine.Physics
             foreach(var component in Components)
             {
                 var r = (RigidBodyComponent)component;
-                bool collided = false;
 
                 //Find all intersections before we insert our new entity
                 foreach (var colliders in _quadTree.Retrieve(r))
@@ -64,16 +63,19 @@ namespace SmallEngine.Physics
                             m.Resolve();
                             m.CorrectPositions();
 
-                            collided = true;
-                            m.BodyA.OnCollisionOccurred(m.BodyB, true);
-                            m.BodyB.OnCollisionOccurred(m.BodyA, false);
+                            m.BodyA.OnCollisionEnter(m.BodyB, true);
+                            m.BodyB.OnCollisionEnter(m.BodyA, false);
+                        }
+                        else
+                        {
+                            m.BodyA.OnCollisionExit(m.BodyB, true);
+                            m.BodyB.OnCollisionExit(m.BodyA, false);
                         }
                     }
                 }
                 
                 _quadTree.Insert(r);
                 r.Update(pDeltaTime);
-                r.Collided = collided;
             }
         }
 

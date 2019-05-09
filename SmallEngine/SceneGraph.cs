@@ -35,8 +35,6 @@ namespace SmallEngine
         #endregion
 
         #region Constructor
-        public SceneGraph(Rectangle pBounds) : this(0, pBounds) { }
-
         private SceneGraph(int pLevel, Rectangle pBounds)
         {
             Level = pLevel;
@@ -46,7 +44,7 @@ namespace SmallEngine
 
         public static SceneGraph CreateFrom(Scene pScene)
         {
-            var g = new SceneGraph(Physics.PhysicsHelper.WorldBounds);
+            var g = new SceneGraph(0, Physics.PhysicsHelper.WorldBounds);
             foreach(var go in pScene.GameObjects)
             {
                 g.Insert(go);
@@ -55,7 +53,7 @@ namespace SmallEngine
         }
         #endregion
 
-        #region "Public Functions"
+        #region Public Functions
         /// <summary>
         /// Removes all objects from the QuadTree
         /// </summary>
@@ -121,7 +119,7 @@ namespace SmallEngine
         }
         #endregion
 
-        #region "Private Functions"
+        #region Private Functions
         private List<IGameObject> Retrieve(ref List<IGameObject> pReturnObjects, Vector2 pPoint, float pDistance)
         {
             var distanceSqrd = pDistance * pDistance;
