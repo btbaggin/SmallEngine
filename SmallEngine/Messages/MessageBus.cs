@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -9,7 +10,7 @@ namespace SmallEngine.Messages
 {
     public abstract class MessageBus
     {
-        protected readonly List<WeakReference<IMessageReceiver>> _receivers;
+        protected readonly ConcurrentBag<WeakReference<IMessageReceiver>> _receivers;
         private readonly ManualResetEvent _mre;
         private volatile bool _processing;
 
@@ -17,7 +18,7 @@ namespace SmallEngine.Messages
 
         protected MessageBus()
         {
-            _receivers = new List<WeakReference<IMessageReceiver>>();
+            _receivers = new ConcurrentBag<WeakReference<IMessageReceiver>>();
             _mre = new ManualResetEvent(false);
         }
 

@@ -8,6 +8,8 @@ namespace SmallEngine.Messages
 {
     public interface IMessage
     {
+        IMessageReceiver Recipient { get; }
+        IMessageReceiver Sender { get; }
         string Type { get; }
         T GetData<T>();
     }

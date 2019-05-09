@@ -23,12 +23,19 @@ namespace SmallEngine.Messages
 
         protected sealed override void ProcessMessage(IMessage pMessage)
         {
-            foreach (var l in _receivers)
+            if(pMessage.Recipient == null)
             {
-                if (l.TryGetTarget(out IMessageReceiver receiver))
+                foreach (var l in _receivers)
                 {
-                    receiver.ReceiveMessage(pMessage);
+                    if (l.TryGetTarget(out IMessageReceiver receiver))
+                    {
+                        receiver.ReceiveMessage(pMessage);
+                    }
                 }
+            }
+            else
+            {
+                pMessage.Recipient.ReceiveMessage(pMessage);
             }
         }
 

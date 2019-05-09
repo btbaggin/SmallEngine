@@ -8,6 +8,10 @@ namespace SmallEngine.Audio
 {
     struct AudioMessage : Messages.IMessage
     {
+        public Messages.IMessageReceiver Recipient { get; private set; }
+
+        public Messages.IMessageReceiver Sender { get; private set; }
+
         public string Type { get; private set; }
 
         public AudioResource Resource { get; private set; }
@@ -22,6 +26,8 @@ namespace SmallEngine.Audio
             Id = pId;
             Resource = null;
             Volume = 0f;
+            Sender = null;
+            Recipient = null;
         }
 
         public AudioMessage(string pType, AudioResource pResource, float pVolume, int pId)
@@ -30,6 +36,8 @@ namespace SmallEngine.Audio
             Resource = pResource;
             Volume = pVolume;
             Id = pId;
+            Sender = null;
+            Recipient = null;
         }
 
         public T GetData<T>()
