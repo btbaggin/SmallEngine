@@ -30,13 +30,11 @@ namespace SmallEngine
         #region Properties
         public static Game Instance { get; private set; }
 
-        public static IGraphicsAdapter Graphics { get; private set; }
-
         public static GameForm Form { get; private set; }
 
-        public static RenderMethods RenderMethod { get; set; }
+        public static IGraphicsAdapter Graphics { get; private set; }
 
-        public static MessageBus Messages { get; private set; }
+        public static RenderMethods RenderMethod { get; set; }
 
         private int _maxFps;
         public int MaxFps
@@ -74,7 +72,7 @@ namespace SmallEngine
 
             InputManager.Initialize(Form.Handle);
 
-            var availableThreads = Math.Max(1, System.Environment.ProcessorCount - 1); //reserve dedicated thread for audio
+            var availableThreads = MessageThreads;
             Messages = new QueueingMessageBus(availableThreads); 
 
             Form.WindowActivateChanged += WindowActivateChanged;
@@ -92,17 +90,11 @@ namespace SmallEngine
         }
 
         #region Overridable game functions
-        public virtual void Initialize()
-        {
-        }
+        public virtual void Initialize() { }
 
-        public virtual void LoadContent()
-        {
-        }
+        public virtual void LoadContent() { }
 
-        public virtual void UnloadContent()
-        {
-        }
+        public virtual void UnloadContent() { }
 
         public virtual void Update(float pDeltaTime)
         {
@@ -148,6 +140,19 @@ namespace SmallEngine
             AudioPlayer.DisposePlayer();
         }
 
+        #region Messages
+        public static int MessageThreads { get; private set; } = System.Environment.ProcessorCount - 1; //reserve dedicated thread for audio
+
+        public static MessageBus Messages { get; private set; }
+
+        public static void SetMessageThreads(int pThreads)
+        {
+            if (pThreads <= 0) throw new ArgumentException(nameof(pThreads));
+            MessageThreads = pThreads;
+        }
+        #endregion
+
+        #region Event Handlers
         private void WindowDestroyed(object sender, WindowEventArgs e)
         {
             Exit();
@@ -227,9 +232,10 @@ namespace SmallEngine
                     }
                 }
             }
-        }      
+        }
+        #endregion
 
-#region PeekMessage PInvoke
+        #region PeekMessage PInvoke
         [System.Runtime.InteropServices.DllImport("User32.dll", CharSet = System.Runtime.InteropServices.CharSet.Auto)]
         private static extern bool PeekMessage(out NativeMessage pMsg, IntPtr pHWnd, uint pMessageFilterMin, uint pMessageFilterMax, uint pFlags);
 

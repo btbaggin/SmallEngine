@@ -37,6 +37,7 @@ namespace SmallEngine
             Name = pName;
         }
 
+        #region Components
         public T GetComponent<T>()
         {
             if (_components.ContainsKey(typeof(T)))
@@ -97,12 +98,25 @@ namespace SmallEngine
             _components[pComponent].OnRemoved();
             _components.Remove(pComponent);
         }
+        #endregion
 
+        #region Overridable Methods
         public virtual void Initialize() { }
 
         public virtual void Update(float pDeltaTime) { }
 
         public virtual void ReceiveMessage(IMessage pMessage) { }
+        #endregion
+
+        protected void SendMessage(string pType, object pData)
+        {
+            SendMessage(pType, pData, null);
+        }
+
+        protected void SendMessage(string pType, object pData, IMessageReceiver pRecipient)
+        {
+            Game.Messages.SendMessage(new GameMessage(pType, pData, this, pRecipient));
+        }
 
         public void Destroy()
         {

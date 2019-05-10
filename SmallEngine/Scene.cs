@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using SmallEngine.Graphics;
 using SmallEngine.Components;
+using SmallEngine.Messages;
 
 namespace SmallEngine
 {
@@ -19,6 +20,8 @@ namespace SmallEngine
         static List<ComponentSystem> _systems = new List<ComponentSystem>();
         static List<Scene> _scenes = new List<Scene>();
         internal readonly static Dictionary<string, List<Type>> _definitions = new Dictionary<string, List<Type>>();
+
+        private bool _started;
 
         #region Properties
         public List<IGameObject> GameObjects { get; }
@@ -36,40 +39,25 @@ namespace SmallEngine
         public static T Create<T>() where T : Scene
         {
             //TODO allow creating scene that isn't registered to all systems
-            var s = (T)Activator.CreateInstance(typeof(T));
-            _scenes.Add(s);
-            s.Begin();
-            return s;
+            return (T)Activator.CreateInstance(typeof(T));
         }
         #endregion
 
-        internal static void UpdateAll(float pDeltaTime)
+        public void Start()
         {
-            foreach(var s in _scenes)
-            {
-                if(s.Active)
-                {
-                    s.Update(pDeltaTime);
-                }
-            }
+            if (_started) throw new InvalidOperationException("Scene has already started");
+            _scenes.Add(this);
+            _started = true;
+            Begin();
         }
 
-        internal static void DisposeGameObjectsAll()
+        public void Stop()
         {
-            foreach(var s in _scenes)
-            {
-                s.DisposeGameObjects();
-            }
+            _scenes.Remove(this);
+            End();
         }
 
-        internal static void EndSceneAll()
-        {
-            foreach(var s in _scenes.ToList())
-            {
-                s.Destroy();
-            }
-        }
-
+        #region Overridable Methods
         public virtual void Update(float pDeltaTime)
         {
             foreach(var go in GameObjects)
@@ -84,17 +72,39 @@ namespace SmallEngine
         {
             DisposeGameObjects();
         }
-
-        public void Destroy()
-        {
-            _scenes.Remove(this);
-            End();
-        }
+        #endregion
 
         #region Static methods
         public static void Register(ComponentSystem pSystem)
         {
             _systems.Add(pSystem);
+        }
+
+        internal static void UpdateAll(float pDeltaTime)
+        {
+            foreach (var s in _scenes)
+            {
+                if (s.Active)
+                {
+                    s.Update(pDeltaTime);
+                }
+            }
+        }
+
+        internal static void DisposeGameObjectsAll()
+        {
+            foreach (var s in _scenes)
+            {
+                s.DisposeGameObjects();
+            }
+        }
+
+        internal static void EndSceneAll()
+        {
+            foreach (var s in _scenes.ToList())
+            {
+                s.Stop();
+            }
         }
         #endregion
 

@@ -19,18 +19,10 @@ namespace SmallEngine
         /// </summary>
         public string Alias { get; internal set; }
 
-        /// <summary>
-        /// Number of references to this resource
-        /// </summary>
-        internal int RefCount { get; set; }
-
-        /// <summary>
-        /// Whether to keep a refernce to this resource after it has been disposed
-        /// </summary>
-        internal bool KeepReference { get; set; }
+        public bool Disposed { get; private set; }
         #endregion
 
-        private bool _disposed;
+        private int _refCount;
 
         /// <summary>
         /// Increment the reference count and return the resource.
@@ -38,11 +30,11 @@ namespace SmallEngine
         /// <returns></returns>
         internal Resource Request()
         {
-            RefCount += 1;
-            if (_disposed)
+            _refCount += 1;
+            if (Disposed)
             {
                 Create();
-                _disposed = false;
+                Disposed = false;
             }
             return this;
         }
@@ -66,16 +58,23 @@ namespace SmallEngine
         /// <summary>
         /// Decrement the reference count and if nothing is referencing it, dispose of the resource.
         /// </summary>
-        internal void DisposeResource(bool pForce)
+        protected abstract void DisposeResource();
+
+        internal void ForceDispose()
         {
-            RefCount -= 1;
-            if ((RefCount <= 0 && !KeepReference) || pForce)
-            {
-                Dispose();
-                _disposed = true;
-            }
+            _refCount = 0;
+            DisposeResource();
+            Disposed = true;
         }
 
-        public abstract void Dispose();
+        public void Dispose()
+        {
+            _refCount -= 1;
+            if (_refCount <= 0)
+            {
+                DisposeResource();
+                Disposed = true;
+            }
+        }
     }
 }
