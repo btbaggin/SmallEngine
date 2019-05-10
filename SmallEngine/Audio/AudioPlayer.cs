@@ -58,8 +58,31 @@ namespace SmallEngine.Audio
 
         public static int Play(AudioResource pResource)
         {
+            return Play(pResource, MaxVolume);
+        }
+
+        public static int Play(AudioResource pResource, float pVolume)
+        {
+            System.Diagnostics.Debug.Assert(pVolume >= MinVolume);
+            System.Diagnostics.Debug.Assert(pVolume <= MaxVolume);
+
             var id = GetSoundId();
-            _messages.SendMessage(new AudioMessage("Play", pResource, 1f, id));
+            _messages.SendMessage(new AudioMessage("Play", pResource, pVolume, id));
+            return id;
+        }
+
+        public static int Loop(AudioResource pResource)
+        {
+            return Loop(pResource, MaxVolume);
+        }
+
+        public static int Loop(AudioResource pResource, float pVolume)
+        {
+            System.Diagnostics.Debug.Assert(pVolume >= MinVolume);
+            System.Diagnostics.Debug.Assert(pVolume <= MaxVolume);
+
+            var id = GetSoundId();
+            _messages.SendMessage(new AudioMessage("Loop", pResource, pVolume, id));
             return id;
         }
 
@@ -83,15 +106,13 @@ namespace SmallEngine.Audio
         {
             var m = (AudioMessage)pMessage;
             AudioResource resource = m.Resource;
+            float volume = m.Volume;
             SourceVoice voice;
-            switch(pMessage.Type)
+            switch (pMessage.Type)
             {
                 case "Play":
-                    float volume = m.Volume;
-                    System.Diagnostics.Debug.Assert(volume >= MinVolume);
-                    System.Diagnostics.Debug.Assert(volume <= MaxVolume);
-
-                    GetVoice(resource, m.Id, out voice);
+                case "Loop":
+                    GetVoice(resource, m.Id, pMessage.Type == "Loop", out voice);
                     if (voice.Volume != volume)
                     {
                         voice.SetVolume(volume);
@@ -110,9 +131,6 @@ namespace SmallEngine.Audio
                         _playingSounds.Remove(m.Id);
                     }
                     break;
-
-                case "Loop":
-                    //TODO
 
                 case "Pause":
                     if(_playingSounds.ContainsKey(m.Id))
@@ -145,7 +163,7 @@ namespace SmallEngine.Audio
         /// Gets a free voice from the voice pool.  If none are available a new one is created
         /// </summary>
         /// <param name="pSound">Sound to play with the voice</param>
-        private static void GetVoice(AudioResource pSound, int pId, out SourceVoice pVoice)
+        private static void GetVoice(AudioResource pSound, int pId, bool pLoop, out SourceVoice pVoice)
         {
             lock (_freeVoices)
             {
@@ -159,21 +177,9 @@ namespace SmallEngine.Audio
                     _freeVoices.RemoveAt(_freeVoices.Count - 1);
                 }
 
-                new SoundCompleteCallback(pVoice, pId);
+                var cb = new SoundCompleteCallback(pVoice, pId, pSound);
+                cb.AddCallback(pLoop);
             }
-        }
-
-        /// <summary>
-        /// Puts the voice back into the pool of eligible free voices
-        /// </summary>
-        /// <param name="pVoice">Voice to mark for reuse</param>
-        private static void ReuseVoice(int pId, ref SourceVoice pVoice)
-        {
-            lock (_freeVoices)
-            {
-                _freeVoices.Add(pVoice);
-            }
-            _playingSounds.Remove(pId);
         }
 
         #region Disposable support
@@ -196,18 +202,49 @@ namespace SmallEngine.Audio
         private class SoundCompleteCallback
         {
             SourceVoice _voice;
+            readonly AudioResource _resource;
             readonly int _id;
-            public SoundCompleteCallback(SourceVoice pVoice, int pId)
+            public SoundCompleteCallback(SourceVoice pVoice, int pId, AudioResource pResources)
             {
                 _voice = pVoice;
+                _resource = pResources;
                 _id = pId;
-                _voice.BufferEnd += OnSoundFinished;
             }
-            public void OnSoundFinished(IntPtr arg)
+
+            public void AddCallback(bool pLoop)
+            {
+                if (pLoop) _voice.BufferEnd += OnLoopRestart;
+                else _voice.BufferEnd += OnSoundFinished;
+            }
+
+            private void OnLoopRestart(IntPtr arg)
+            {
+                if(_playingSounds.ContainsKey(_id)) _resource.Play(_voice);
+                else
+                {
+                    _voice.BufferEnd -= OnLoopRestart;
+                    ReuseVoice(_id, ref _voice);
+                }
+            }
+
+            private void OnSoundFinished(IntPtr arg)
             {
                 _voice.BufferEnd -= OnSoundFinished;
                 ReuseVoice(_id, ref _voice);
             }
+        }
+
+        /// <summary>
+        /// Puts the voice back into the pool of eligible free voices
+        /// </summary>
+        /// <param name="pVoice">Voice to mark for reuse</param>
+        private static void ReuseVoice(int pId, ref SourceVoice pVoice)
+        {
+            lock (_freeVoices)
+            {
+                _freeVoices.Add(pVoice);
+            }
+            _playingSounds.Remove(pId);
         }
         #endregion
     }
