@@ -28,9 +28,10 @@ namespace SmallEngine.Audio
             Initialize(pPath);
         }
 
-        public override void Dispose()
+        protected override void DisposeResource()
         {
             _buffer.Stream.Dispose();
+            Stream = null;
         }
         #endregion
 

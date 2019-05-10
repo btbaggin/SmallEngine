@@ -112,6 +112,8 @@ namespace SmallEngine.Audio
             {
                 case "Play":
                 case "Loop":
+                    System.Diagnostics.Debug.Assert(!resource.Disposed, "Audio resource has been disposed");
+
                     GetVoice(resource, m.Id, pMessage.Type == "Loop", out voice);
                     if (voice.Volume != volume)
                     {

@@ -19,22 +19,9 @@ namespace SmallEngine
         /// <typeparam name="T">Type of the resource to load</typeparam>
         /// <param name="pAlias">Name to give to the resource</param>
         /// <param name="pPath">Path to the resource</param>
-        /// <returns>Handle to the resource</returns>
-        public static T Add<T>(string pAlias, string pPath) where T : Resource, new()
-        {
-            return Add<T>(pAlias, pPath, false);
-        }
-
-        /// <summary>
-        /// Synchronously loads the resource
-        /// Will return if the resource is already loaded
-        /// </summary>
-        /// <typeparam name="T">Type of the resource to load</typeparam>
-        /// <param name="pAlias">Name to give to the resource</param>
-        /// <param name="pPath">Path to the resource</param>
         /// <param name="pKeepReference">Whether or not to keep a reference if resource has been disposed so it can be reloaded.</param>
         /// <returns>Handle to the resource</returns>
-        public static T Add<T>(string pAlias, string pPath, bool pKeepReference) where T : Resource, new()
+        public static T Add<T>(string pAlias, string pPath) where T : Resource, new()
         {
             if (_resources.ContainsKey(pAlias))
             {
@@ -47,7 +34,6 @@ namespace SmallEngine
             {
                 Path = pPath,
                 Alias = pAlias,
-                KeepReference = pKeepReference
             };            
             _resources.Add(pAlias, r);
             //Begin sync load
@@ -55,7 +41,7 @@ namespace SmallEngine
             return r;
         }
 
-        public static T Add<T>(string pAlias, T pResource, bool pKeepReference) where T : Resource, new()
+        public static T Add<T>(string pAlias, T pResource) where T : Resource, new()
         {
             if(_resources.ContainsKey(pAlias))
             {
@@ -63,7 +49,6 @@ namespace SmallEngine
             }
 
             pResource.Alias = pAlias;
-            pResource.KeepReference = pKeepReference;
             _resources.Add(pAlias, pResource);
             return pResource;
         }
@@ -139,7 +124,6 @@ namespace SmallEngine
             {
                 Path = pPath,
                 Alias = pAlias,
-                KeepReference = pKeepReference
             };
             _resources.Add(pAlias, r);
 
@@ -182,36 +166,16 @@ namespace SmallEngine
         /// </summary>
         /// <typeparam name="T">Type of the resource to dispose</typeparam>
         /// <param name="pAlias">Name of the resource to dispose</param>
-        public static void DisposeResource(string pAlias)
+        public static void DisposeResource(string pAlias, bool pForce)
         {
             if (_resources.ContainsKey(pAlias))
             {
                 var r = _resources[pAlias];
-                r.DisposeResource(false);
+                if (!pForce) r.Dispose();
+                else r.ForceDispose();
 
                 //If we don't want to keep a reference to it, remove it from the dictionary so we can't reload it.
-                if (!r.KeepReference)
-                {
-                    _resources.Remove(pAlias);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Forces disposal of a resource even if the resource is set to keep a reference
-        /// </summary>
-        /// <typeparam name="T">Type of the resource to dispose</typeparam>
-        /// <param name="pAlias">Name of the resource to dispose</param>
-        /// <param name="pForce">Whether or not to force collection of the resource</param>
-        public static void ForceDispose(string pAlias)
-        {
-            if (_resources.ContainsKey(pAlias))
-            {
-                var r = _resources[pAlias];
-                r.DisposeResource(true);
-
-                //Remove reference to class so GC takes care of it
-                _resources.Remove(pAlias);
+                if (pForce) _resources.Remove(pAlias);
             }
         }
 
@@ -251,7 +215,7 @@ namespace SmallEngine
         {
             foreach (Resource r in _resources.Values)
             {
-                r.DisposeResource(true);
+                r.ForceDispose();
             }
             _resources = null;
         }

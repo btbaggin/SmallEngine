@@ -33,7 +33,7 @@ namespace SmallEngine.Graphics
             return Task.Run(() => Create());
         }
 
-        public override void Dispose()
+        protected override void DisposeResource()
         {
             DirectXBitmap.Dispose();
         }
