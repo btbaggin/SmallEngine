@@ -8,14 +8,19 @@ namespace SmallEngine.Physics
 {
     public class CollisionEventArgs : EventArgs
     {
-        public bool Source { get; private set; }
-
         public RigidBodyComponent Collider { get; private set; }
 
-        public CollisionEventArgs(RigidBodyComponent pCollider, bool pSource)
+        public Manifold Collision { get; private set; }
+
+        public CollisionEventArgs(RigidBodyComponent pCollider, Manifold pCollision)
         {
             Collider = pCollider;
-            Source = pSource;
+            Collision = pCollision;
+        }
+
+        public bool IsSource()
+        {
+            return Collision.BodyA == Collider;
         }
     }
 }

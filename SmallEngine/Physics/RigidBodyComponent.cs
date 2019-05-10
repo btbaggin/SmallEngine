@@ -152,22 +152,22 @@ namespace SmallEngine.Physics
             return OrientationMatrix.ToTransform(AABB.Center);
         }
 
-        internal void OnCollisionEnter(RigidBodyComponent pCollider, bool pSource)
+        internal void OnCollisionEnter(RigidBodyComponent pCollider, Manifold pManifold)
         {
             var ce = CollisionEnter;
             if(ce != null && !Colliders.Contains(pCollider))
             {
                 Colliders.Add(pCollider);
-                ce.Invoke(this, new CollisionEventArgs(pCollider, pSource));
+                ce.Invoke(this, new CollisionEventArgs(pCollider, pManifold));
             }
         }
 
-        internal void OnCollisionExit(RigidBodyComponent pCollider, bool pSource)
+        internal void OnCollisionExit(RigidBodyComponent pCollider, Manifold pManifold)
         {
             var ce = CollisionExit;
             if(ce != null && Colliders.Remove(pCollider))
             {
-                ce.Invoke(this, new CollisionEventArgs(pCollider, pSource));
+                ce.Invoke(this, new CollisionEventArgs(pCollider, pManifold));
             }
         }
     }

@@ -63,13 +63,13 @@ namespace SmallEngine.Physics
                             m.Resolve();
                             m.CorrectPositions();
 
-                            m.BodyA.OnCollisionEnter(m.BodyB, true);
-                            m.BodyB.OnCollisionEnter(m.BodyA, false);
+                            m.BodyA.OnCollisionEnter(m.BodyB, m);
+                            m.BodyB.OnCollisionEnter(m.BodyA, m);
                         }
                         else
                         {
-                            m.BodyA.OnCollisionExit(m.BodyB, true);
-                            m.BodyB.OnCollisionExit(m.BodyA, false);
+                            m.BodyA.OnCollisionExit(m.BodyB, m);
+                            m.BodyB.OnCollisionExit(m.BodyA, m);
                         }
                     }
                 }

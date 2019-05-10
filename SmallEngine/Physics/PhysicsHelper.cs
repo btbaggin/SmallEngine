@@ -14,7 +14,6 @@ namespace SmallEngine.Physics
 
         public static RigidBodyComponent HitTest(Vector2 pPoint)
         {
-            //TODO I might need to change RigidBodyComponent to something else if you want to test hit against something without physics
             return _physics.HitTest(pPoint);
         }
 

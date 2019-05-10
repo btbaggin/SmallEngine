@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SmallEngine.Physics
 {
-    struct Manifold
+    public struct Manifold
     {
         public RigidBodyComponent BodyA { get; private set; }
         public RigidBodyComponent BodyB { get; private set; }

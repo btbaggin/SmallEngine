@@ -18,7 +18,6 @@ namespace SmallEngine
     {
         /*TODO
          * Generic render component?
-         * Create a MessageBusPool so I can have many threads responding to things?
          */
 
         readonly UIManager _uiManager;
@@ -35,7 +34,7 @@ namespace SmallEngine
 
         public static GameForm Form { get; private set; }
 
-        public static Graphics.RenderMethods RenderMethod { get; set; }
+        public static RenderMethods RenderMethod { get; set; }
 
         public static MessageBus Messages { get; private set; }
 
