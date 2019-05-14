@@ -126,7 +126,7 @@ namespace SmallEngine.Graphics
         #region Overridden functions
         public void DrawText(string pText, Rectangle pRect, Font pFont)
         {
-            Context.DrawText(pText, pFont.Format, pRect, pFont.Brush);
+            Context.DrawText(pText, pFont.Format, pRect, pFont.Brush, DrawTextOptions.Clip);
         }
 
         public BitmapResource FromByte(byte[] pData, int pWidth, int pHeight)

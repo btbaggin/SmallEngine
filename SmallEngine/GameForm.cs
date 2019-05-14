@@ -32,7 +32,7 @@ namespace SmallEngine
         public EventHandler<WindowEventArgs> WindowMaximizeChanged { get; set; }
         public EventHandler<WindowEventArgs> WindowSizeChanged { get; set; }
 
-        #region "Properties"
+        #region Properties
         public bool Vsync { get; set; }
 
         private bool _fullScreen;
@@ -146,7 +146,7 @@ namespace SmallEngine
         }
         #endregion
 
-        #region "Constuctor"
+        #region Constuctor
         public GameForm() : this("") { }
 
         public GameForm(string pText) : this(pText, 480, 360) { }
@@ -161,25 +161,18 @@ namespace SmallEngine
         }
         #endregion
 
-        #region "Message constants"
+        #region Message constants
         const int WM_DESTROY = 0x2;
         const int WM_SIZE = 0x0005;
         const int WM_ACTIVATE = 0x6;
         const int WM_MOUSEWHEEL = 0x020A;
-        const int WM_MOUSEMOVE = 0x0200;
-        const int WM_LBUTTONDOWN = 0x0201;
-        const int WM_LBUTTONUP = 0x0202;
-        const int WM_MBUTTONDOWN = 0x0207;
-        const int WM_MBUTTONUP = 0x0208;
-        const int WM_RBUTTONDOWN = 0x0204;
-        const int WM_RBUTTONUP = 0x0205;
         const int WM_ENABLE = 0x000A;
 
         const int SIZE_MAXIMIZED = 2;
         const int SIZE_MINIMIZED = 1;
         #endregion
 
-        #region "WndPrc"
+        #region WndPrc
         protected override void WndProc(ref Message m)
         {
             switch (m.Msg)

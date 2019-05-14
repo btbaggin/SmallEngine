@@ -21,7 +21,7 @@ namespace SmallEngine.Graphics
             foreach (var c in Components)
             {
                 var r = (RenderComponent)c;
-                if (r.IsVisible())
+                if (r.IsVisible() && r.GameObject.ContainingScene.Active)
                 {
                     r.Draw(_adapter, pDeltaTime);
                 }

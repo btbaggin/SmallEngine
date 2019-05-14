@@ -32,6 +32,7 @@ namespace SmallEngine.Input
         Insert = 0x2D,
         Delete = 0x2E,
         Help = 0x2F,
+
         Zero = 0x30,
         One = 0x31,
         Two = 0x32,
@@ -42,6 +43,7 @@ namespace SmallEngine.Input
         Seven = 0x37,
         Eight = 0x38,
         Nine = 0x39,
+
         A = 0x41,
         B = 0x42,
         C = 0x43,
@@ -68,6 +70,18 @@ namespace SmallEngine.Input
         X = 0x58,
         Y = 0x59,
         Z = 0x5A,
+
+        Num0 = 0x60,
+        Num1 = 0x61,
+        Num2 = 0x62,
+        Num3 = 0x63,
+        Num4 = 0x64,
+        Num5 = 0x65,
+        Num6 = 0x66,
+        Num7 = 0x67,
+        Num8 = 0x68,
+        Num9 = 0x69,
+
         F1 = 0x70,
         F2 = 0x71,
         F3 = 0x72,
@@ -79,6 +93,25 @@ namespace SmallEngine.Input
         F9 = 0x78,
         F10 = 0x79,
         F11 = 0x7A,
-        F12 = 0x7B
+        F12 = 0x7B,
+
+        NumLock = 0x90,
+        ScrollLock = 0x91,
+        LShift = 0xA0,
+        RShift = 0xA1,
+        LControl = 0xA2,
+        RControl = 0xA3,
+
+        Semicolon = 0xBA,
+        Plus = 0xBB,
+        Comma = 0xBC,
+        Minus = 0xBD,
+        Period = 0xBE,
+        Slash = 0xBF,
+        Tilde = 0xC0,
+        LBracket = 0xDB,
+        Backslash = 0xDC,
+        RBracket = 0xDD,
+        Quote = 0xDE
     }
 }

@@ -31,7 +31,7 @@ namespace SmallEngine.UI
             UIElement focus = null;
             foreach(var e in Elements)
             {
-                focus = e.GetFocusElement(Input.Mouse.Position);
+                focus = e.GetFocusElement();
                 if (focus != null) return focus;
             }
 

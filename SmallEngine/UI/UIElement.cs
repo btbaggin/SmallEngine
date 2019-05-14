@@ -121,14 +121,14 @@ namespace SmallEngine.UI
             Children.Add(pElement);
         }
 
-        public UIElement GetFocusElement(Vector2 pPosition)
+        public UIElement GetFocusElement()
         {
             UIElement focus = null;
-            if(Bounds.Contains(pPosition))
+            if(AllowFocus && Bounds.Contains(Mouse.Position))
             {
                 foreach(var c in Children)
                 {
-                    focus = c.GetFocusElement(pPosition);
+                    focus = c.GetFocusElement();
                     if (focus != null) return focus;
                 }
                 focus = this;

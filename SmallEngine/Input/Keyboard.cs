@@ -15,14 +15,15 @@ namespace SmallEngine.Input
 
         static InputState _inputState = new InputState(new byte[256]);
         static InputState _previousState = new InputState(new byte[256]);
+        static byte[] _keyInput;
 
         internal static void ProcessInput()
         {
-            var keyInput = new byte[256];
-            GetKeyboardState(keyInput);
+            _keyInput = new byte[256];
+            GetKeyboardState(_keyInput);
 
             _previousState = _inputState;
-            _inputState = new InputState(keyInput);
+            _inputState = new InputState(_keyInput);
         }
 
         public static bool KeyPressed(Keys pKey)
@@ -48,6 +49,22 @@ namespace SmallEngine.Input
         public static InputState GetInputState()
         {
             return _inputState;
+        }
+
+        [DllImport("user32.dll")]
+        static extern uint MapVirtualKey(uint uCode, uint uMapType);
+
+        [DllImport("user32.dll")]
+        static extern int ToUnicode(uint wVirtKey, uint wScanCode, byte[] lpKeyState, [Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder pwszBuff, int cchBuff, uint wFlags);
+
+        public static string ToUnicode(Keys pKey)
+        {
+            StringBuilder sb = new StringBuilder();
+            uint lScanCode = MapVirtualKey((uint)pKey, 0);
+            var result = ToUnicode((uint)pKey, lScanCode, _keyInput, sb, 5, 0);
+            if(result == 1) return sb.ToString();
+
+            return "";
         }
     }
 }
