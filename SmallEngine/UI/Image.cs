@@ -7,19 +7,19 @@ using SmallEngine.Graphics;
 
 namespace SmallEngine.UI
 {
-    public class ImageElement : UIElement
+    public class Image : UIElement
     {
         readonly BitmapResource _bitmap;
-        public ImageElement(string pAlias)
+        public Image(string pAlias)
         {
             _bitmap = ResourceManager.Request<BitmapResource>(pAlias);
-            SetLayout();
         }
 
         public override void Draw(IGraphicsAdapter pSystem)
         {
-            base.Draw(pSystem);
             pSystem.DrawBitmap(_bitmap, 1, Position, new Vector2(Width, Height));
         }
+
+        public override void Update(float pDeltaTime) { }
     }
 }

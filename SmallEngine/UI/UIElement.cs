@@ -9,19 +9,10 @@ using SmallEngine.Input;
 
 namespace SmallEngine.UI
 {
-    public abstract class UIElement : IUpdatable, IDrawable, IComparable, IDisposable
+    public abstract class UIElement : IUpdatable, IDisposable
     {
         #region Properties
-        private Vector2 _position;
-        public Vector2 Position
-        {
-            get
-            {
-                if (Parent != null) { return _position + Parent.Position; }
-                else { return _position; }
-            }
-            set { _position = value; }
-        }
+        public Vector2 Position { get; protected set; }
 
         private int _width;
         public int Width
@@ -30,11 +21,7 @@ namespace SmallEngine.UI
             set
             {
                 _width = value;
-                var s = new SizeF(Width, Height);
-                foreach (var c in Children)
-                {
-                    c.Measure(s, Position.X, Position.Y);
-                }
+                UIManager.InvalidateMeasure();
             }
         }
 
@@ -45,62 +32,57 @@ namespace SmallEngine.UI
             set
             {
                 _height = value;
-                var s = new SizeF(Width, Height);
-                foreach (var c in Children)
-                {
-                    c.Measure(s, Position.X, Position.Y);
-                }
+                UIManager.InvalidateMeasure();
             }
         }
 
-        public int TotalWidth { get { return Width + (int)(Margin.X * 2); } }
+        private Thickness _margin;
+        public Thickness Margin
+        {
+            get { return _margin; }
+            set
+            {
+                _margin = value;
+                UIManager.InvalidateMeasure();
+            }
+        }
 
-        public int TotalHeight { get { return Height + (int)(Margin.Y * 2); } }
+        public Visibility Visible { get; set; }
 
-        public float HeightPercent { get; set; } = 1f;
+        public HorizontalAlignments HorizontalAlignment { get; set; }
 
-        public float WidthPercent { get; set; } = 1f;
-
-        public bool Visible { get; set; }
+        public VerticalAlignments VerticalAlignment { get; set; }
 
         public bool Enabled { get; set; }
-
-        public int Order { get; set; }
-
-        public Vector2 Margin { get; set; }
 
         protected UIElement Parent { get; private set; }
 
         protected List<UIElement> Children { get; private set; }
 
-        public AnchorDirection Anchor { get; set; }
+        public Rectangle Bounds { get; private set; }
 
-        public Vector2 AnchorPoint { get; set; }
-
-        public ElementOrientation Orientation { get; set; }
-
-        public Rectangle Bounds
-        {
-            get { return new Rectangle(Position, Width, Height); }
-        }
+        public bool AllowFocus { get; set; }
         #endregion
 
         protected UIElement()
         {
             Children = new List<UIElement>();
-            Visible = true;
+            Margin = new Thickness(5);
+            Visible = Visibility.Visible;
             Enabled = true;
+            AllowFocus = true;
         }
 
         protected void SetLayout()
         {
-            if (Parent != null) { Measure(new SizeF(Parent.Width, Parent.Height), 0, 0); }
-            else { Measure(new SizeF(Game.Form.Width, Game.Form.Height), 0, 0); }
+            if (Parent != null) { Measure(Parent.DesiredSize); }
+            else { Measure(new Size(Game.Form.Width, Game.Form.Height)); }
         }
 
         public void Display()
         {
             UIManager.Register(this);
+            SetLayout();
         }
 
         public void Remove()
@@ -108,39 +90,40 @@ namespace SmallEngine.UI
             UIManager.Unregister(this);
         }
 
-        public virtual void Update(float pDeltaTime)
+        public abstract void Draw(IGraphicsAdapter pSystem);
+
+        public abstract void Update(float pDeltaTime);
+
+        internal void DrawInternal(IGraphicsAdapter pSystem)
         {
+            Draw(pSystem);
             foreach (var e in Children)
             {
-                if (e.Visible && e.Enabled)
+                if (e.Visible == Visibility.Visible)
                 {
-                    e.Update(pDeltaTime);
+                    e.DrawInternal(pSystem);
                 }
             }
         }
 
-        public virtual void Draw(IGraphicsAdapter pSystem)
+        internal void UpdateInternal(float pDeltaTime)
         {
+            Update(pDeltaTime);
             foreach (var e in Children)
             {
-                if (e.Visible)
-                {
-                    e.Draw(pSystem);
-                }
+                e.UpdateInternal(pDeltaTime);
             }
         }
 
-        public void AddChild(UIElement pElement, AnchorDirection pAnchor, Vector2 pAnchorPoint)
+        public void AddChild(UIElement pElement)
         {
-            pElement.Anchor = pAnchor;
-            pElement.AnchorPoint = pAnchorPoint;
             pElement.Parent = this;
             Children.Add(pElement);
         }
 
-        public IDrawable GetFocusElement(Vector2 pPosition)
+        public UIElement GetFocusElement(Vector2 pPosition)
         {
-            IDrawable focus = null;
+            UIElement focus = null;
             if(Bounds.Contains(pPosition))
             {
                 foreach(var c in Children)
@@ -153,59 +136,115 @@ namespace SmallEngine.UI
             return focus;
         }
 
-        public virtual void Measure(SizeF pSize, float pLeft, float pTop)
+        public bool IsMouseOver()
         {
-            if (HeightPercent > 0)
+            if(AllowFocus && Bounds.Contains(Mouse.Position))
             {
-                _height = (int)(pSize.Height * HeightPercent);
-                _height -= (int)(Margin.Y * 2);
+                foreach(var c in Children)
+                {
+                    if (c.IsMouseOver()) return false;
+                }
+
+                return true;
             }
 
-            if (WidthPercent > 0)
-            {
-                _width = (int)(pSize.Width * WidthPercent);
-                _width -= (int)(Margin.X * 2);
-            }
+            return false;
+        }
 
-            _width = (int)Math.Min(pSize.Width - Margin.X, Width);
-            _height = (int)Math.Min(pSize.Height - Margin.Y, Height);
+        #region Layout methods
+        public Size DesiredSize { get; set; }
 
-            if (Anchor.HasFlag(AnchorDirection.Left))
-                Position = new Vector2(AnchorPoint.X, _position.Y);
+        public Size ActualSize { get; set; }
 
-            if (Anchor.HasFlag(AnchorDirection.Top))
-                Position = new Vector2(_position.X, AnchorPoint.Y);
+        public void Measure(Size pSize)
+        {
+            if (Visible == Visibility.Collapsed) return;
 
-            if (Anchor.HasFlag(AnchorDirection.Right))
-                Position = new Vector2(pSize.Width - (AnchorPoint.X + Width), _position.Y);
+            //Measure children
+            var s = MeasureOverride(pSize);
+            DesiredSize = new Size(s.Width + Margin.Left + Margin.Right, s.Height + Margin.Top + Margin.Bottom);
+        }
 
-            if (Anchor.HasFlag(AnchorDirection.Bottom))
-                Position = new Vector2(_position.X, pSize.Height - (AnchorPoint.Y + Height));
-            _position += new Vector2(pLeft, pTop);
+        public virtual Size MeasureOverride(Size pSize)
+        {
+            //Default to taking up minimum space as possible
+            int desiredHeight = Height;
+            int desiredWidth = Width;
 
-            _position.X = Math.Max(Margin.X, _position.X);
-            _position.Y = Math.Max(Margin.Y, _position.Y);
+            //Only auto size if we haven't already set dimensions
+            bool setHeight = Height != 0;
+            bool setWidth = Width != 0;
 
-            pLeft = 0; pTop = 0;
-            pSize = new SizeF(Width, Height);
+            //Measure all children
             foreach (var c in Children)
             {
-                c.Measure(pSize, pLeft, pTop);
-                if (Orientation == ElementOrientation.Horizontal)
-                {
-                    pLeft += c.TotalWidth;
-                }
-                else
-                {
-                    pTop += c.TotalHeight;
-                }
+                c.Measure(pSize);
+
+                var s = c.DesiredSize;
+                if(!setHeight) desiredWidth += s.Width;
+                if(!setWidth) desiredHeight += s.Height;
             }
+
+            return new Size(desiredWidth, desiredHeight);
         }
 
-        public int CompareTo(object obj)
+        public void Arrange(Rectangle pBounds)
         {
-            return Order.CompareTo(((UIElement)obj).Order);
+            var x = Margin.Left + pBounds.Left;
+            var y = Margin.Top + pBounds.Top;
+
+            if (Visible == Visibility.Collapsed)
+            {
+                ActualSize = new Size(0, 0);
+                Bounds = new Rectangle(x, y, 0, 0);
+                return;
+            }
+            
+            //Size will be either how much we want, or the available space left
+            var width = Math.Min(pBounds.Width, DesiredSize.Width);
+            var height = Math.Min(pBounds.Height, DesiredSize.Height);
+
+            //Orient based off alignments
+            if (HorizontalAlignment == HorizontalAlignments.Center)
+            {
+                x += (pBounds.Width - Margin.Left - Margin.Right - width) / 2; 
+            }
+            else if (HorizontalAlignment == HorizontalAlignments.Right)
+            {
+                x = pBounds.Right - Margin.Right - width;
+            }
+
+            if(VerticalAlignment == VerticalAlignments.Center)
+            {
+                y += (pBounds.Height - Margin.Top - Margin.Bottom - height) / 2;
+            }
+            else if(VerticalAlignment == VerticalAlignments.Bottom)
+            {
+                y = pBounds.Bottom - Margin.Bottom - height;
+            }
+
+            //ActualSize includes margins
+            ActualSize = new Size((int)width, (int)height);
+
+            //Space left over does not include margins
+            width -= Margin.Left + Margin.Right;
+            height -= Margin.Top + Margin.Bottom;
+
+            Bounds = new Rectangle(x, y, width, height);
+            Position = pBounds.Location;
+
+            //Arrange children
+            ArrangeOverride(Bounds);
         }
+
+        public virtual void ArrangeOverride(Rectangle pBounds)
+        {
+            foreach(var c in Children)
+            {
+                c.Arrange(pBounds);
+            }
+        }
+        #endregion
 
         public void Dispose()
         {

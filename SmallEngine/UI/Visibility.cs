@@ -6,13 +6,10 @@ using System.Threading.Tasks;
 
 namespace SmallEngine.UI
 {
-    [Flags]
-    public enum AnchorDirection
+    public enum Visibility
     {
-        None = 0,
-        Left = 1,
-        Top = 2,
-        Right = 4,
-        Bottom = 8
+        Visible,
+        Hidden,
+        Collapsed
     }
 }

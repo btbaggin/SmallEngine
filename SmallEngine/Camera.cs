@@ -10,11 +10,9 @@ namespace SmallEngine
             get { return new Rectangle(_position, Width, Height); }
         }
 
-        public Rectangle Bounds { get; set; }
+        public float Width { get; set; }
 
-        public float Width { get; private set; }
-
-        public float Height { get; private set; }
+        public float Height { get; set; }
 
         private Vector2 _position;
         public Vector2 Position
@@ -65,7 +63,7 @@ namespace SmallEngine
 
             if(AllowZoom)
             {
-                var mw = InputManager.MouseWheelDelta;
+                var mw = Mouse.WheelDelta;
                 Zoom += mw * ZoomSpeed * pDeltaTime;
                 Zoom = MathF.Clamp(Zoom, _minZoom, _maxZoom);
                 _inverseZoom = (_maxZoom - _minZoom) / Zoom;
@@ -77,10 +75,11 @@ namespace SmallEngine
                 Position += new Vector2((oldWidth - Width) / 2, (oldHeight - Height) / 2);
             }
 
-            if (_position.X < Bounds.Left) _position.X = Bounds.Left;
-            if (_position.Y < Bounds.Top) _position.Y = Bounds.Top;
-            if (_position.X + Width > Bounds.Right) _position.X = Bounds.Right - Width;
-            if (_position.Y + Height > Bounds.Bottom) _position.Y = Bounds.Bottom - Height;
+            var bounds = Physics.PhysicsHelper.WorldBounds;
+            if (_position.X < bounds.Left) _position.X = bounds.Left;
+            if (_position.Y < bounds.Top) _position.Y = bounds.Top;
+            if (_position.X + Width > bounds.Right) _position.X = bounds.Right - Width;
+            if (_position.Y + Height > bounds.Bottom) _position.Y = bounds.Bottom - Height;
         }
 
         public void MoveLeft()
