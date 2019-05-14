@@ -10,37 +10,35 @@ namespace SmallEngine.Input
     public class InputState
     {
         readonly byte[] _keys;
-        readonly byte[] _mouse;
 
-        internal InputState(byte[] pKeys, byte[] pMouse)
+        internal InputState(byte[] pKeys)
         {
             _keys = pKeys;
-            _mouse = pMouse;
         }
 
         public bool IsPressed(Keys pKey)
         {
 
-            var code = GetVirtualKeyCode(pKey);
+            var code = GetVirtualKeyCode((int)pKey);
             return (_keys[code] & 0x80) != 0;
         }
 
-        public bool IsPressed(Mouse pMouse)
+        public bool IsPressed(MouseButtons pMouse)
         {
-            var code = GetVirtualKeyCode(pMouse);
-            return (_mouse[code] & 0x80) != 0;
+            var code = GetVirtualKeyCode((int)pMouse);
+            return (_keys[code] & 0x80) != 0;
         }
 
-        internal static byte GetVirtualKeyCode(Keys pKey)
+        private static byte GetVirtualKeyCode(int pKey)
         {
-            int value = (int)pKey;
+            int value = pKey;
             return (byte)(value & 0xFF);
         }
 
-        internal static byte GetVirtualKeyCode(Mouse pMouse)
-        {
-            int value = (int)pMouse;
-            return (byte)(value & 0xFF);
-        }
+        //internal static byte GetVirtualKeyCode(MouseButtons pMouse)
+        //{
+        //    int value = (int)pMouse;
+        //    return (byte)(value & 0xFF);
+        //}
     }
 }

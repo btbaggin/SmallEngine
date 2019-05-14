@@ -70,7 +70,7 @@ namespace SmallEngine
             Instance = this;
             Form = new GameForm();
 
-            InputManager.Initialize(Form.Handle);
+            Mouse.SetHandle(Form.Handle);
 
             var availableThreads = MessageThreads;
             Messages = new QueueingMessageBus(availableThreads); 
@@ -170,7 +170,7 @@ namespace SmallEngine
 
         private void WindowSizeChanged(object sender, WindowEventArgs e)
         {
-            _uiManager.Resize();
+            UIManager.InvalidateMeasure();
         }
 
         private void OnIdle(object pSender, EventArgs pEventArgs)
@@ -190,7 +190,8 @@ namespace SmallEngine
                 GameTime.Tick();
 
                 //Cache pressed keys
-                InputManager.ProcessInput();
+                Keyboard.ProcessInput();
+                Mouse.ProcessInput();
 
                 Coroutine.Update(GameTime.DeltaTime);
 

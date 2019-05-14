@@ -189,7 +189,7 @@ namespace SmallEngine
                     return;
 
                 case WM_MOUSEWHEEL:
-                    Input.InputManager.MouseWheel = (short)GetWHighWord(m);
+                    Input.Mouse.WheelAbsolute = (short)GetWHighWord(m);
                     return;
 
                 case WM_ENABLE:
