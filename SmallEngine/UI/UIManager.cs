@@ -4,44 +4,49 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SmallEngine.Graphics;
-using System.Drawing;
 
 namespace SmallEngine.UI
 {
     public class UIManager
     {
-        internal static List<UIElement> Elements { get; private set; } = new List<UIElement>();
+        static List<UIElement> _elements = new List<UIElement>();
+        static Dictionary<string, UIElement> _namedElements = new Dictionary<string, UIElement>();
         private static bool _measureInvalid = true;
+
+        public static string DefaultFontFamily { get; set; } = "Arial";
+        public static int DefaultFontSize { get; set; } = 14;
+        public static Color DefaultFontColor { get; set; } = Color.Black;
 
         public static void Register(UIElement pElement)
         {
-            var i = Elements.BinarySearch(pElement);
-            if (i == -1) Elements.Add(pElement);
-            else Elements.Insert(i, pElement);
+            _elements.AddOrdered(pElement);
+            if(pElement.Name != null)
+            {
+                _namedElements.Add(pElement.Name, pElement);
+            }
         }
 
         public static void Unregister(UIElement pElement)
         {
             //TODO what to do with this?
-            Elements.Remove(pElement);
+            _elements.Remove(pElement);
         }
 
-        public static UIElement GetFocusElement()
+        public static UIElement GetElement(string pName)
         {
-            UIElement focus = null;
-            foreach(var e in Elements)
+            if(_namedElements.ContainsKey(pName))
             {
-                focus = e.GetFocusElement();
-                if (focus != null) return focus;
+                return _namedElements[pName];
             }
 
             return null;
         }
 
+        #region Internal Methods
         internal void Draw(IGraphicsAdapter pSystem)
         {
             pSystem.ResetTransform();
-            foreach (var e in Elements)
+            foreach (var e in _elements)
             {
                 if (e.Visible == Visibility.Visible)
                 {
@@ -53,8 +58,8 @@ namespace SmallEngine.UI
         internal void Update(float pDeltaTime)
         {
             var bounds = new Rectangle(0, 0, Game.Form.Width, Game.Form.Height);
-            var size = new Size(Game.Form.Width, Game.Form.Height);
-            foreach (var e in Elements)
+            var size = new System.Drawing.Size(Game.Form.Width, Game.Form.Height);
+            foreach (var e in _elements)
             {
                 if(_measureInvalid) e.Measure(size);
                 e.Arrange(bounds);
@@ -67,5 +72,6 @@ namespace SmallEngine.UI
         {
             _measureInvalid = true;
         }
+        #endregion
     }
 }

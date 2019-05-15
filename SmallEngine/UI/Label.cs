@@ -13,9 +13,11 @@ namespace SmallEngine.UI
 
         public string Text { get; set; }
 
-        public Label(string pText, string pFamily, float pSize, Color pColor) : base()
+        public Label(string pText) : this(null, pText) { }
+
+        public Label(string pName, string pText) : base(pName)
         {
-            Font = Game.Graphics.CreateFont(pFamily, pSize, pColor);
+            Font = Game.Graphics.CreateFont(UIManager.DefaultFontFamily, UIManager.DefaultFontSize, UIManager.DefaultFontColor);
             Font.Alignment = Alignments.Center;
             Text = pText;
             AllowFocus = false;
@@ -28,7 +30,7 @@ namespace SmallEngine.UI
 
         public override void Update(float pDeltaTime)
         {
-            SetLayout(); 
+            InvalidateMeasure(); 
         }
 
         public override System.Drawing.Size MeasureOverride(System.Drawing.Size pSize)

@@ -16,6 +16,7 @@ namespace SmallEngine.Graphics
         void EndDraw();
 
         void DrawText(string pText, Rectangle pRect, Font pFont);
+        void DrawText(string pText, Rectangle pRect, Font pFont, bool pClip);
 
         void DrawBitmap(BitmapResource pBitmap, float pOpacity, Vector2 pPosition, Vector2 pScale);
         void DrawBitmap(BitmapResource pBitmap, float pOpacity, Vector2 pPosition, Vector2 pScale, Rectangle pSourceRect);

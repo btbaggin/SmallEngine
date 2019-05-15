@@ -137,7 +137,8 @@
     <Compile Include="SceneGraph.cs" />
     <Compile Include="UI\Alignment.cs" />
     <Compile Include="UI\Button.cs" />
-    <Compile Include="UI\ElementOrientation.cs" />
+    <Compile Include="UI\Checkbox.cs" />
+    <Compile Include="UI\Grid.cs" />
     <Compile Include="UI\Image.cs" />
     <Compile Include="UI\Label.cs" />
     <Compile Include="UI\Panel.cs" />

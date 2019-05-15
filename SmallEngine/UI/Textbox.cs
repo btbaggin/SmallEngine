@@ -24,24 +24,54 @@ namespace SmallEngine.UI
             }
         }
 
+        public bool IsFocused { get; private set; }
+
         StringBuilder _text = new StringBuilder();
         int _cursorPos;
-        public Textbox()
+        float _cursorTick;
+        bool _showCursor;
+
+        public Textbox() : this(null) { }
+
+        public Textbox(string pName) : base(pName)
         {
-            Font = Game.Graphics.CreateFont("Arial", 14, Color.White);//TODO default
-            Font.Alignment = Alignments.Center;
+            Font = Game.Graphics.CreateFont(UIManager.DefaultFontFamily, UIManager.DefaultFontSize, UIManager.DefaultFontColor);
+            Font.Alignment = Alignments.Leading;
             Background = Color.Gray;
-            AllowFocus = false;
         }
 
         public override void Draw(IGraphicsAdapter pSystem)
         {
             pSystem.DrawFillRect(Bounds, pSystem.CreateBrush(Background));
-            pSystem.DrawText(Text, Bounds, Font); //TODO clip and navigation around cursor
+
+            pSystem.DrawText(Text, Bounds, Font, true); //TODO clip and navigation around cursor
+
+            if(_showCursor && IsFocused)
+            {
+                var s = Font.MeasureString(Text.Substring(0, _cursorPos), Bounds.Width);
+                var x = Bounds.Left + s.Width + 1;
+                pSystem.DrawLine(new Vector2(x, Bounds.Top + 1), new Vector2(x, Bounds.Bottom - 1), pSystem.CreateBrush(Color.Black));
+            }
         }
 
         public override void Update(float pDeltaTime)
         {
+            //TODO caret navigation using mouse
+            if(Mouse.KeyPressed(MouseButtons.Left))
+            {
+                IsFocused = IsMouseOver();
+            }
+
+            if (!IsFocused) return;
+
+            //Toggle cursor every half second
+            _cursorTick += pDeltaTime;
+            if(_cursorTick >= .5f)
+            {
+                _showCursor = !_showCursor;
+                _cursorTick = 0;
+            }
+
             //Text input
             var keys = Enum.GetValues(typeof(Keys));
             for(int i = 0; i < keys.Length; i++)
@@ -59,8 +89,19 @@ namespace SmallEngine.UI
             }
 
             //Cursor navigation
-            if(_cursorPos > 0 && Keyboard.KeyPressed(Keys.Left)) _cursorPos--;
-            else if (_cursorPos < _text.Length && Keyboard.KeyPressed(Keys.Right)) _cursorPos++;
+            //Always show cursor when navigating
+            if (_cursorPos > 0 && Keyboard.KeyPressed(Keys.Left))
+            {
+                _cursorPos--;
+                _cursorTick = 0;
+                _showCursor = true;
+            }
+            else if (_cursorPos < _text.Length && Keyboard.KeyPressed(Keys.Right))
+            {
+                _cursorPos++;
+                _cursorTick = 0;
+                _showCursor = true;
+            }
 
             //Text deletion
             if(Keyboard.KeyPressed(Keys.Backspace) && _cursorPos > 0)

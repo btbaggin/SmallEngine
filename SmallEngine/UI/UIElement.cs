@@ -9,7 +9,7 @@ using SmallEngine.Input;
 
 namespace SmallEngine.UI
 {
-    public abstract class UIElement : IUpdatable, IDisposable
+    public abstract class UIElement : IUpdatable, IDisposable, IComparable<UIElement>
     {
         #region Properties
         public Vector2 Position { get; protected set; }
@@ -61,19 +61,25 @@ namespace SmallEngine.UI
 
         public Rectangle Bounds { get; private set; }
 
+        public short ZIndex { get; set; }
+
         public bool AllowFocus { get; set; }
+
+        public string Name { get; private set; }
         #endregion
 
-        protected UIElement()
+        readonly List<UIElement> _orderedItems = new List<UIElement>();
+        protected UIElement(string pName)
         {
             Children = new List<UIElement>();
             Margin = new Thickness(5);
             Visible = Visibility.Visible;
             Enabled = true;
             AllowFocus = true;
+            Name = pName;
         }
 
-        protected void SetLayout()
+        protected void InvalidateMeasure()
         {
             if (Parent != null) { Measure(Parent.DesiredSize); }
             else { Measure(new Size(Game.Form.Width, Game.Form.Height)); }
@@ -82,7 +88,7 @@ namespace SmallEngine.UI
         public void Display()
         {
             UIManager.Register(this);
-            SetLayout();
+            InvalidateMeasure();
         }
 
         public void Remove()
@@ -94,46 +100,13 @@ namespace SmallEngine.UI
 
         public abstract void Update(float pDeltaTime);
 
-        internal void DrawInternal(IGraphicsAdapter pSystem)
-        {
-            Draw(pSystem);
-            foreach (var e in Children)
-            {
-                if (e.Visible == Visibility.Visible)
-                {
-                    e.DrawInternal(pSystem);
-                }
-            }
-        }
-
-        internal void UpdateInternal(float pDeltaTime)
-        {
-            Update(pDeltaTime);
-            foreach (var e in Children)
-            {
-                e.UpdateInternal(pDeltaTime);
-            }
-        }
-
-        public void AddChild(UIElement pElement)
+        protected void AddChild(UIElement pElement)
         {
             pElement.Parent = this;
             Children.Add(pElement);
-        }
-
-        public UIElement GetFocusElement()
-        {
-            UIElement focus = null;
-            if(AllowFocus && Bounds.Contains(Mouse.Position))
-            {
-                foreach(var c in Children)
-                {
-                    focus = c.GetFocusElement();
-                    if (focus != null) return focus;
-                }
-                focus = this;
-            }
-            return focus;
+            //Used to draw items by ZIndex
+            //ZIndex shouldn't affect how the children are displayed within container controls so we keep 2 lists
+            _orderedItems.AddOrdered(pElement); 
         }
 
         public bool IsMouseOver()
@@ -246,9 +219,37 @@ namespace SmallEngine.UI
         }
         #endregion
 
+        #region Internal Methods
+        internal void DrawInternal(IGraphicsAdapter pSystem)
+        {
+            Draw(pSystem);
+            foreach (var e in _orderedItems)
+            {
+                if (e.Visible == Visibility.Visible)
+                {
+                    e.DrawInternal(pSystem);
+                }
+            }
+        }
+
+        internal void UpdateInternal(float pDeltaTime)
+        {
+            Update(pDeltaTime);
+            foreach (var e in Children)
+            {
+                e.UpdateInternal(pDeltaTime);
+            }
+        }
+        #endregion  
+
         public void Dispose()
         {
             UIManager.Unregister(this);
+        }
+
+        public int CompareTo(UIElement other)
+        {
+            return ZIndex.CompareTo(other.ZIndex);
         }
     }
 }

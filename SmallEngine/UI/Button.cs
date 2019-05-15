@@ -27,7 +27,9 @@ namespace SmallEngine.UI
         public Color MouseDownColor { get; set; }
 
         ButtonState _state;
-        public Button(UIElement pContent)
+        public Button(UIElement pContent) : this(null, pContent) { }
+
+        public Button(string pName, UIElement pContent) : base(pName)
         {
             AddChild(pContent);
 

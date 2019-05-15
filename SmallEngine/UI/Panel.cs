@@ -8,11 +8,19 @@ using SmallEngine.Graphics;
 
 namespace SmallEngine.UI
 {
+    public enum PanelOrientation
+    {
+        Horizontal,
+        Vertical
+    }
+
     public class Panel : UIElement
     {
-        public ElementOrientation Orientation { get; set; }
+        public PanelOrientation Orientation { get; set; }
 
-        public Panel(ElementOrientation pOrientation) : base()
+        public Panel(PanelOrientation pOrientation) : this(null, pOrientation) { }
+
+        public Panel(string pName, PanelOrientation pOrientation) : base(pName)
         {
             Orientation = pOrientation;
         }
@@ -21,17 +29,22 @@ namespace SmallEngine.UI
 
         public override void Update(float pDeltaTime) { }
 
+        public void AddElement(UIElement pElement)
+        {
+            base.AddChild(pElement);
+        }
+
         public override Size MeasureOverride(Size pSize)
         {
-            int desiredWidth = Orientation == ElementOrientation.Vertical ? pSize.Width : 0;
-            int desiredHeight = Orientation == ElementOrientation.Horizontal ? pSize.Height : 0;
+            int desiredWidth = Orientation == PanelOrientation.Vertical ? pSize.Width : 0;
+            int desiredHeight = Orientation == PanelOrientation.Horizontal ? pSize.Height : 0;
             foreach (var c in Children)
             {
                 c.Measure(pSize);
 
                 var s = c.DesiredSize;
-                if(Orientation == ElementOrientation.Horizontal) desiredWidth += s.Width;
-                else if (Orientation == ElementOrientation.Vertical) desiredHeight += s.Height;
+                if(Orientation == PanelOrientation.Horizontal) desiredWidth += s.Width;
+                else if (Orientation == PanelOrientation.Vertical) desiredHeight += s.Height;
             }
 
             return new Size(desiredWidth, desiredHeight);
@@ -41,12 +54,12 @@ namespace SmallEngine.UI
         {
             int width = 0;
             int height = 0;
-            if(Orientation == ElementOrientation.Horizontal)
+            if(Orientation == PanelOrientation.Horizontal)
             {
                 height = (int)pBounds.Height;
                 width = (int)(DesiredSize.Width < pBounds.Width ? DesiredSize.Width : pBounds.Width);
 
-            } else if (Orientation == ElementOrientation.Vertical)
+            } else if (Orientation == PanelOrientation.Vertical)
             {
                 width = (int)pBounds.Width;
                 height = (int)(DesiredSize.Height < pBounds.Height ? DesiredSize.Height : pBounds.Height);
@@ -56,12 +69,12 @@ namespace SmallEngine.UI
             foreach(var c in Children)
             {
                 c.Arrange(new Rectangle(p, width, height));
-                if(Orientation == ElementOrientation.Horizontal)
+                if(Orientation == PanelOrientation.Horizontal)
                 {
                     p.X += c.ActualSize.Width;
                     width -= c.ActualSize.Width;
                 }
-                else if(Orientation == ElementOrientation.Vertical)
+                else if(Orientation == PanelOrientation.Vertical)
                 {
                     p.Y += c.ActualSize.Height;
                     height -= c.ActualSize.Height;

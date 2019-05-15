@@ -10,7 +10,9 @@ namespace SmallEngine.UI
     public class Image : UIElement
     {
         readonly BitmapResource _bitmap;
-        public Image(string pAlias)
+        public Image(string pAlias) : this(null, pAlias) { }
+
+        public Image(string pName, string pAlias) : base(pName)
         {
             _bitmap = ResourceManager.Request<BitmapResource>(pAlias);
         }
