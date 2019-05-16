@@ -34,11 +34,5 @@ namespace SmallEngine.Input
             int value = pKey;
             return (byte)(value & 0xFF);
         }
-
-        //internal static byte GetVirtualKeyCode(MouseButtons pMouse)
-        //{
-        //    int value = (int)pMouse;
-        //    return (byte)(value & 0xFF);
-        //}
     }
 }

@@ -26,7 +26,7 @@ namespace SmallEngine.UI
             }
         }
 
-        Dictionary<UIElement, GridInfo> _info = new Dictionary<UIElement, GridInfo>();
+        readonly Dictionary<UIElement, GridInfo> _info = new Dictionary<UIElement, GridInfo>();
         int _maxColumn, _maxRow;
         public Grid() : base(null) { }
 
@@ -40,10 +40,10 @@ namespace SmallEngine.UI
         public void AddElement(UIElement pElement, int pRow, int pColumn, int pRowSpan, int pColumnSpan)
         {
             System.Diagnostics.Debug.Assert(pRow >= 0 && pColumn >= 0);
-            System.Diagnostics.Debug.Assert(pRowSpan >= 0 && pColumnSpan >= 0);
+            System.Diagnostics.Debug.Assert(pRowSpan > 0 && pColumnSpan > 0);
 
-            if (pRow > _maxRow) _maxRow = pRow;
-            if (pColumn > _maxColumn) _maxColumn = pColumn;
+            if (pRow + pRowSpan > _maxRow) _maxRow = pRow + pRowSpan;
+            if (pColumn + pColumnSpan > _maxColumn) _maxColumn = pColumn + pColumnSpan;
 
             base.AddChild(pElement);
             _info.Add(pElement, new GridInfo(pRow, pColumn, pRowSpan, pColumnSpan));
@@ -61,16 +61,12 @@ namespace SmallEngine.UI
 
         public override void ArrangeOverride(Rectangle pBounds)
         {
-            int rowHeight = (int)(pBounds.Height / (_maxRow + 1));
-            int columnWidth = (int)(pBounds.Width / (_maxColumn + 1));
+            int rowHeight = (int)(pBounds.Height / _maxRow);
+            int columnWidth = (int)(pBounds.Width / _maxColumn);
 
-            var p = Position;
             foreach (var c in Children)
             {
                 var gi = _info[c];
-
-                System.Diagnostics.Debug.Assert(gi.ColumnSpan <= _maxRow);
-                System.Diagnostics.Debug.Assert(gi.RowSpan <= _maxColumn);
 
                 var pos = new Vector2(columnWidth * gi.Column, rowHeight * gi.Row) + Position;
                 var width = columnWidth * gi.ColumnSpan;

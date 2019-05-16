@@ -61,7 +61,20 @@ namespace SmallEngine.UI
 
         public Rectangle Bounds { get; private set; }
 
-        public short ZIndex { get; set; }
+        short _zindex;
+        public short ZIndex
+        {
+            get { return _zindex; }
+            set
+            {
+                _zindex = value;
+                if(Parent != null)
+                {
+                    Parent._orderedItems.Remove(this);
+                    Parent._orderedItems.AddOrdered(this);
+                }
+            }
+        }
 
         public bool AllowFocus { get; set; }
 
@@ -204,7 +217,7 @@ namespace SmallEngine.UI
             height -= Margin.Top + Margin.Bottom;
 
             Bounds = new Rectangle(x, y, width, height);
-            Position = pBounds.Location;
+            Position = Bounds.Location;
 
             //Arrange children
             ArrangeOverride(Bounds);

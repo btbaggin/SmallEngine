@@ -27,6 +27,7 @@ namespace SmallEngine.UI
         public Color MouseDownColor { get; set; }
 
         ButtonState _state;
+        readonly Brush _brush;
         public Button(UIElement pContent) : this(null, pContent) { }
 
         public Button(string pName, UIElement pContent) : base(pName)
@@ -37,26 +38,26 @@ namespace SmallEngine.UI
             DisabledColor = Color.GhostWhite;
             MouseOverColor = Color.LightGray;
             MouseDownColor = Color.DarkGray;
+            _brush = Brush.CreateFillBrush(Color, Game.Graphics);
         }
 
         public override void Draw(IGraphicsAdapter pSystem)
         {
-            Brush brush;
-            if (!Enabled) brush = pSystem.CreateBrush(DisabledColor);
+            if (!Enabled) _brush.FillColor = DisabledColor;
             else
             {
                 switch(_state)
                 {
                     case ButtonState.Idle:
-                        brush = pSystem.CreateBrush(Color);
+                        _brush.FillColor = Color;
                         break;
 
                     case ButtonState.MouseDown:
-                        brush = pSystem.CreateBrush(MouseDownColor);
+                        _brush.FillColor = MouseDownColor;
                         break;
 
                     case ButtonState.MouseOver:
-                        brush = pSystem.CreateBrush(MouseOverColor);
+                        _brush.FillColor = MouseDownColor;
                         break;
 
                     default:
@@ -64,14 +65,14 @@ namespace SmallEngine.UI
                 }
             }
 
-            pSystem.DrawFillRect(Bounds, brush);
+            pSystem.DrawRect(Bounds, _brush);
         }
 
         public override void Update(float pDeltaTime)
         {
             if(IsMouseOver())
             {
-                if (Input.Mouse.KeyPressed(Input.MouseButtons.Left) && _state == ButtonState.MouseOver)
+                if (Input.Mouse.ButtonPressed(Input.MouseButtons.Left) && _state == ButtonState.MouseOver)
                 {
                     _state = ButtonState.MouseDown;
                 }
@@ -79,7 +80,7 @@ namespace SmallEngine.UI
                 {
                     if (_state == ButtonState.MouseDown)
                     {
-                        if(Input.Mouse.KeyUp(Input.MouseButtons.Left)) Clicked?.Invoke(this, new EventArgs());
+                        if(Input.Mouse.ButtonUp(Input.MouseButtons.Left)) Clicked?.Invoke(this, new EventArgs());
                     }
                     else _state = ButtonState.MouseOver;
                 }

@@ -30,19 +30,23 @@ namespace SmallEngine.UI
         int _cursorPos;
         float _cursorTick;
         bool _showCursor;
+        readonly Brush _backgroundBrush, _cursorBrush;
 
         public Textbox() : this(null) { }
 
         public Textbox(string pName) : base(pName)
         {
-            Font = Game.Graphics.CreateFont(UIManager.DefaultFontFamily, UIManager.DefaultFontSize, UIManager.DefaultFontColor);
+            Font = Font.Create(UIManager.DefaultFontFamily, UIManager.DefaultFontSize, UIManager.DefaultFontColor, Game.Graphics);
             Font.Alignment = Alignments.Leading;
             Background = Color.Gray;
+
+            _backgroundBrush = Brush.CreateFillBrush(Background, Game.Graphics);
+            _cursorBrush = Brush.CreateFillBrush(Color.Black, Game.Graphics);
         }
 
         public override void Draw(IGraphicsAdapter pSystem)
         {
-            pSystem.DrawFillRect(Bounds, pSystem.CreateBrush(Background));
+            pSystem.DrawRect(Bounds, _backgroundBrush);
 
             pSystem.DrawText(Text, Bounds, Font, true); //TODO clip and navigation around cursor
 
@@ -50,14 +54,14 @@ namespace SmallEngine.UI
             {
                 var s = Font.MeasureString(Text.Substring(0, _cursorPos), Bounds.Width);
                 var x = Bounds.Left + s.Width + 1;
-                pSystem.DrawLine(new Vector2(x, Bounds.Top + 1), new Vector2(x, Bounds.Bottom - 1), pSystem.CreateBrush(Color.Black));
+                pSystem.DrawLine(new Vector2(x, Bounds.Top + 1), new Vector2(x, Bounds.Bottom - 1), _cursorBrush);
             }
         }
 
         public override void Update(float pDeltaTime)
         {
             //TODO caret navigation using mouse
-            if(Mouse.KeyPressed(MouseButtons.Left))
+            if(Mouse.ButtonPressed(MouseButtons.Left))
             {
                 IsFocused = IsMouseOver();
             }

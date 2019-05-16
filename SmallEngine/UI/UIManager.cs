@@ -11,7 +11,7 @@ namespace SmallEngine.UI
     {
         static List<UIElement> _elements = new List<UIElement>();
         static Dictionary<string, UIElement> _namedElements = new Dictionary<string, UIElement>();
-        private static bool _measureInvalid = true;
+        static bool _measureInvalid = true;
 
         public static string DefaultFontFamily { get; set; } = "Arial";
         public static int DefaultFontSize { get; set; } = 14;

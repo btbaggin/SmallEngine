@@ -16,7 +16,7 @@ namespace SmallEngine.Input
         #region Win32
         [DllImport("user32.dll")]
         static extern short GetAsyncKeyState(int pKey);
-        public static bool IsKeyPressed(int pKey)
+        static bool IsKeyPressed(int pKey)
         {
             return 0 != (GetAsyncKeyState(pKey) & 0x8000);
         }
@@ -117,13 +117,13 @@ namespace SmallEngine.Input
 
         private static void CheckDrag()
         {
-            if (_mode == Mode.Normal && KeyPressed(MouseButtons.Left))
+            if (_mode == Mode.Normal && ButtonPressed(MouseButtons.Left))
             {
                 _mode = Mode.PossibleDrag;
                 _dragStart = _mousePos;
             }
 
-            if (_mode == Mode.PossibleDrag && KeyDown(MouseButtons.Left))
+            if (_mode == Mode.PossibleDrag && ButtonDown(MouseButtons.Left))
             {
                 var _dragDistance = _mousePos - _dragStart;
                 if (Math.Abs(_dragDistance.X) > System.Windows.SystemParameters.MinimumHorizontalDragDistance ||
@@ -132,7 +132,7 @@ namespace SmallEngine.Input
                     _mode = Mode.Drag;
                 }
             }
-            else if (KeyUp(MouseButtons.Left))
+            else if (ButtonUp(MouseButtons.Left))
             {
                 _mode = Mode.Normal;
             }
@@ -144,22 +144,22 @@ namespace SmallEngine.Input
             return _inputState;
         }
 
-        public static bool KeyPressed(MouseButtons pMouse)
+        public static bool ButtonPressed(MouseButtons pMouse)
         {
             return _inputState.IsPressed(pMouse) && !_previousState.IsPressed(pMouse);
         }
 
-        public static bool KeyReleased(MouseButtons pMouse)
+        public static bool ButtonReleased(MouseButtons pMouse)
         {
             return !_inputState.IsPressed(pMouse) && _previousState.IsPressed(pMouse);
         }
 
-        public static bool KeyDown(MouseButtons pMouse)
+        public static bool ButtonDown(MouseButtons pMouse)
         {
             return _inputState.IsPressed(pMouse);
         }
 
-        public static bool KeyUp(MouseButtons pMouse)
+        public static bool ButtonUp(MouseButtons pMouse)
         {
             return !_inputState.IsPressed(pMouse);
         }

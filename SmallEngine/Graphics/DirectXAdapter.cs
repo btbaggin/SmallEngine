@@ -22,6 +22,11 @@ namespace SmallEngine.Graphics
         private SharpDX.Direct2D1.Device _2dDevice;
 
         #region Properties
+        public RenderMethods Method
+        {
+            get { return RenderMethods.DirectX; }
+        }
+
         public SharpDX.Direct3D11.Device1 Device { get; private set; }
 
         public SharpDX.Direct2D1.DeviceContext Context { get; private set; }
@@ -40,7 +45,7 @@ namespace SmallEngine.Graphics
             _form.WindowSizeChanged += Resize;
             try
             {
-                var defaultDevice = new SharpDX.Direct3D11.Device(DriverType.Hardware, DeviceCreationFlags.Debug | DeviceCreationFlags.BgraSupport);
+                var defaultDevice = new Device(DriverType.Hardware, DeviceCreationFlags.Debug | DeviceCreationFlags.BgraSupport);
 
                 Device = defaultDevice.QueryInterface<SharpDX.Direct3D11.Device1>();
                 _d3Context = Device.ImmediateContext.QueryInterface<SharpDX.Direct3D11.DeviceContext1>();
@@ -62,7 +67,7 @@ namespace SmallEngine.Graphics
                     Usage = Usage.RenderTargetOutput
                 };
 
-                _swapChain = new SharpDX.DXGI.SwapChain1(dxgiFactory2, Device, pForm.Handle, ref desc, null);
+                _swapChain = new SwapChain1(dxgiFactory2, Device, pForm.Handle, ref desc, null);
                 _2dDevice = new SharpDX.Direct2D1.Device(dxgiDevice2);
                 Context = new SharpDX.Direct2D1.DeviceContext(_2dDevice, DeviceContextOptions.None);
                 Factory2D = new SharpDX.Direct2D1.Factory(FactoryType.SingleThreaded);
@@ -169,11 +174,14 @@ namespace SmallEngine.Graphics
                         int offset = bitmapData.Stride * y;
                         for (int x = 0; x < pWidth; x++)
                         {
-                            // Not optimized 
-                            byte B = System.Runtime.InteropServices.Marshal.ReadByte(bitmapData.Scan0, offset++);
-                            byte G = System.Runtime.InteropServices.Marshal.ReadByte(bitmapData.Scan0, offset++);
-                            byte R = System.Runtime.InteropServices.Marshal.ReadByte(bitmapData.Scan0, offset++);
-                            byte A = System.Runtime.InteropServices.Marshal.ReadByte(bitmapData.Scan0, offset++);
+                            //Convert BGRA to RGBA
+                            int bgra = System.Runtime.InteropServices.Marshal.ReadInt32(bitmapData.Scan0, offset);
+                            offset += 4;
+
+                            byte B = (byte)bgra;
+                            byte G = (byte)(bgra >> 8);
+                            byte R = (byte)(bgra >> 16);
+                            byte A = (byte)(bgra >> 24);
                             int rgba = R | (G << 8) | (B << 16) | (A << 24);
                             tempStream.Write(rgba);
                         }
@@ -212,27 +220,25 @@ namespace SmallEngine.Graphics
 
         public void DrawPoint(Vector2 pPoint, Brush pBrush)
         {
-            Context.FillRectangle(new RawRectangleF(pPoint.X - 1, pPoint.Y - 1, pPoint.X + 1, pPoint.Y + 1), pBrush.ColorBrush);
+            Context.FillRectangle(new RawRectangleF(pPoint.X - 1, pPoint.Y - 1, pPoint.X + 1, pPoint.Y + 1), pBrush.FillColorBrush);
         }
 
         public void DrawLine(Vector2 pPoint1, Vector2 pPoint2, Brush pBrush)
         {
-            Context.DrawLine(pPoint1, pPoint2, pBrush.ColorBrush);
+            Context.DrawLine(pPoint1, pPoint2, pBrush.FillColorBrush);
         }
 
-        public void DrawFillRect(Rectangle pRect, Brush pBrush)
+        public void DrawRect(Rectangle pRect, Brush pBrush)
         {
-            Context.FillRectangle(pRect, pBrush.ColorBrush);
-        }
-
-        public void DrawRect(Rectangle pRect, Brush pBrush, float pStroke)
-        {
-            Context.DrawRectangle(pRect, pBrush.ColorBrush, pStroke);
+            if(pBrush.FillColorBrush != null) Context.FillRectangle(pRect, pBrush.FillColorBrush);
+            if(pBrush.OutlineColorBrush != null) Context.DrawRectangle(pRect, pBrush.FillColorBrush, pBrush.OutlineSize);
         }
 
         public void DrawElipse(Vector2 pPoint, float pRadius, Brush pBrush)
         {
-            Context.DrawEllipse(new Ellipse(pPoint, pRadius, pRadius), pBrush.ColorBrush);
+            var e = new Ellipse(pPoint, pRadius, pRadius);
+            if (pBrush.FillColorBrush != null) Context.FillEllipse(e, pBrush.FillColorBrush);
+            if(pBrush.OutlineColorBrush != null) Context.DrawEllipse(e, pBrush.OutlineColorBrush);
         }
 
         public void SetTransform(Transform pTransform)
@@ -260,16 +266,6 @@ namespace SmallEngine.Graphics
         public void SetFullScreen(bool pFullScreen)
         {
             _swapChain.SetFullscreenState(pFullScreen, null);
-        }
-
-        public Font CreateFont(string pFamily, float pSize, Color pColor)
-        {
-            return Font.Create(FactoryDWrite, Context, pFamily, pSize, pColor);
-        }
-
-        public Brush CreateBrush(Color pColor)
-        {
-            return Brush.Create(pColor, Context);
         }
         #endregion
     }

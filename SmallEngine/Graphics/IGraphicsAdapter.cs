@@ -11,6 +11,8 @@ namespace SmallEngine.Graphics
 
     public interface IGraphicsAdapter : IDisposable
     {
+        RenderMethods Method { get; }
+        
         bool Initialize(GameForm pForm, bool pFullScreen);
         void BeginDraw();
         void EndDraw();
@@ -23,15 +25,10 @@ namespace SmallEngine.Graphics
         void DrawImage(BitmapResource pBitmap, Effect pEffect, Vector2 pPosition);
 
         void DrawLine(Vector2 pPoint1, Vector2 pPoint2, Brush pBrush);
-        void DrawFillRect(Rectangle pRect, Brush pBrush);
-        void DrawRect(Rectangle pRect, Brush pBrush, float pStroke);
+        void DrawRect(Rectangle pRect, Brush pBrush);
         void DrawElipse(Vector2 pPoint, float pRadius, Brush pBrush);
         void SetFullScreen(bool pFullScreen);
         void SetTransform(Transform pTransform);
         void ResetTransform();
-
-        Font CreateFont(string pFamily, float pSize, Color pColor);
-        Brush CreateBrush(Color pColor);
-
     }
 }

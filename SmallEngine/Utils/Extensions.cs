@@ -11,8 +11,8 @@ namespace SmallEngine
         internal static void AddOrdered(this List<UI.UIElement> pList, UI.UIElement pElement)
         {
             var i = pList.BinarySearch(pElement);
-            if (i == -1) pList.Add(pElement);
-            else pList.Insert(i, pElement);
+            if (i < 0) i = ~i;
+            pList.Insert(i, pElement);
         }
 
         public static float NextFloat(this Random r)

@@ -176,6 +176,7 @@ namespace SmallEngine.Graphics
             return new Color((byte)pA, (byte)pR, (byte)pG, (byte)pB);
         }
 
+        #region Operators
         public static implicit operator SharpDX.Mathematics.Interop.RawColor4(Color pColor)
         {
             return new SharpDX.Mathematics.Interop.RawColor4(pColor.R / 255f, pColor.G / 255f, pColor.B / 255f, pColor.A / 255f);
@@ -185,5 +186,26 @@ namespace SmallEngine.Graphics
         {
             return new Color((byte)(pColor.R * 255), (byte)(pColor.G * 255), (byte)(pColor.B * 255), (byte)(pColor.A * 255));
         }
+
+        public static bool operator ==(Color pV1, Color pV2)
+        {
+            return pV1._color == pV2._color;
+        }
+
+        public static bool operator !=(Color pV1, Color pV2)
+        {
+            return !(pV1 == pV2);
+        }
+
+        public override int GetHashCode()
+        {
+            return _color.GetHashCode();
+        }
+
+        public override bool Equals(object obj)
+        {
+            return base.Equals(obj);
+        }
+        #endregion
     }
 }

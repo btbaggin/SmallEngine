@@ -12,6 +12,7 @@ namespace SmallEngine
     {
         public static Matrix2X2 Identity { get; } = new Matrix2X2(1, 0, 0, 1);
         readonly float m00, m01, m10, m11;
+        readonly float _r;
 
         public Matrix2X2(float pM00, float pM01, float pM10, float pM11)
         {
@@ -22,7 +23,6 @@ namespace SmallEngine
             m11 = pM11;
         }
 
-        float _r;
         public Matrix2X2(float pRadians)
         {
             float c = MathF.Cos(pRadians);

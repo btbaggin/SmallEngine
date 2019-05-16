@@ -79,16 +79,25 @@ namespace SmallEngine.Graphics
         readonly Factory _factory;
 
         #region Constructor
-        private Font(Factory pFactory, SharpDX.Direct2D1.SolidColorBrush pBrush, string pFamily, float pSize)
+        private Font(string pFamily, float pSize, Color pColor, IGraphicsAdapter pAdapter)
         {
-            _factory = pFactory;
-            Format = new TextFormat(pFactory, pFamily, pSize);
-            Brush = pBrush;
+            if(pAdapter.Method == RenderMethods.DirectX)
+            {
+                var dx = (DirectXAdapter)pAdapter;
+                _factory = dx.FactoryDWrite;
+                Format = new TextFormat(dx.FactoryDWrite, pFamily, pSize);
+                Brush = new SharpDX.Direct2D1.SolidColorBrush(dx.Context, pColor);
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
+            
         }
 
-        internal static Font Create(Factory pFactory, SharpDX.Direct2D1.RenderTarget pTarget, string pFamily, float pSize, Color pColor)
+        public static Font Create(string pFamily, float pSize, Color pColor, IGraphicsAdapter pAdapter)
         {
-            return new Font(pFactory, new SharpDX.Direct2D1.SolidColorBrush(pTarget, pColor), pFamily, pSize);
+            return new Font(pFamily, pSize, pColor, pAdapter);
         }
         #endregion  
 

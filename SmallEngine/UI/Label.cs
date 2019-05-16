@@ -17,7 +17,7 @@ namespace SmallEngine.UI
 
         public Label(string pName, string pText) : base(pName)
         {
-            Font = Game.Graphics.CreateFont(UIManager.DefaultFontFamily, UIManager.DefaultFontSize, UIManager.DefaultFontColor);
+            Font = Font.Create(UIManager.DefaultFontFamily, UIManager.DefaultFontSize, UIManager.DefaultFontColor, Game.Graphics);
             Font.Alignment = Alignments.Center;
             Text = pText;
             AllowFocus = false;

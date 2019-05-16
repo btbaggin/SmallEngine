@@ -10,30 +10,70 @@ namespace SmallEngine.Graphics
 {
     public class Brush : IDisposable
     {
-        static Dictionary<Color, Brush> _cache = new Dictionary<Color, Brush>();
+        internal SolidColorBrush OutlineColorBrush { get; private set; }
+        internal SolidColorBrush FillColorBrush { get; private set; }
 
-        public SolidColorBrush ColorBrush { get; private set; }
-        public Color Color { get; private set; }
-        private Brush(Color pColor, RenderTarget pTarget)
+        public Color FillColor
         {
-            ColorBrush = new SolidColorBrush(pTarget, new SharpDX.Color4(pColor.R / 255f, pColor.G / 255f, pColor.B / 255f, pColor.A / 255f));
-            ColorBrush.Opacity = pColor.A / 255f;
-            Color = pColor;
+            get { return FillColorBrush.Color; }
+            set { FillColorBrush.Color = value; }
         }
 
-        internal static Brush Create(Color pColor, RenderTarget pTarget)
+        public Color Outlinecolor
         {
-            if(!_cache.ContainsKey(pColor))
+            get { return OutlineColorBrush.Color; }
+            set { OutlineColorBrush.Color = value; }
+        }
+
+        public float OutlineSize { get; set; }
+
+        private Brush(Color? pFillColor, Color? pOutlineColor, IGraphicsAdapter pTarget)
+        {
+            if(pTarget.Method == RenderMethods.DirectX)
             {
-                _cache.Add(pColor, new Brush(pColor, pTarget));
+                var dx = (DirectXAdapter)pTarget;
+                if(pFillColor.HasValue)
+                {
+                    var fc = pFillColor.Value;
+                    FillColorBrush = new SolidColorBrush(dx.Context, new SharpDX.Color4(fc.R / 255f, fc.G / 255f, fc.B / 255f, fc.A / 255f));
+                    FillColorBrush.Opacity = fc.A / 255f;
+                }
+
+                if(pOutlineColor.HasValue)
+                {
+                    var oc = pOutlineColor.Value;
+                    OutlineColorBrush = new SolidColorBrush(dx.Context, new SharpDX.Color4(oc.R / 255f, oc.G / 255f, oc.B / 255f, oc.A / 255f));
+                    OutlineColorBrush.Opacity = oc.A / 255f;
+                }
+            }
+            else
+            {
+                throw new NotImplementedException();
             }
 
-            return _cache[pColor];
+            OutlineSize = 1;
+        }
+
+
+        public static Brush CreateOutlineBrush(Color pColor, IGraphicsAdapter pAdapter)
+        {
+            return new Brush(null, pColor, pAdapter);
+        }
+
+        public static Brush CreateFillBrush(Color pColor, IGraphicsAdapter pAdapter)
+        {
+            return new Brush(pColor, null, pAdapter);
+        }
+
+        public static Brush Create(Color pFillColor, Color pOutlineColor, IGraphicsAdapter pAdapter)
+        {
+            return new Brush(pFillColor, pOutlineColor, pAdapter);
         }
 
         public void Dispose()
         {
-            ColorBrush.Dispose();
+            FillColorBrush.Dispose();
+            OutlineColorBrush.Dispose();
         }
     }
 }
