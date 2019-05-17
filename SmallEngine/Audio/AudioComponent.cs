@@ -2,15 +2,17 @@
 {
     public class AudioComponent : Component
     {
+        private int _id;
         private AudioResource _sound;
 
-        public AudioComponent()
-        {
-        }
+        public float Volume { get; set; }
+
+        public AudioComponent() { }
 
         public AudioComponent(string pAlias)
         {
             _sound = ResourceManager.Request<AudioResource>(pAlias);
+            Volume = AudioPlayer.MaxVolume;
         }
 
         public void SetAudio(string pAlias)
@@ -20,8 +22,29 @@
 
         public void Play()
         {
-            AudioPlayer.Play(_sound);
+            _id = AudioPlayer.Play(_sound, Volume);
         }
+
+        public void Loop()
+        {
+            _id = AudioPlayer.Loop(_sound, Volume);
+        }
+
+        public void Stop()
+        {
+            AudioPlayer.Stop(_id);
+        }
+
+        public void Pause()
+        {
+            AudioPlayer.Pause(_id);
+        }
+
+        public void Resume()
+        {
+            AudioPlayer.Resume(_id);
+        }
+
         public override void Dispose()
         {
             base.Dispose();

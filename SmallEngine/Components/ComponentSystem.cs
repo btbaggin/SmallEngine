@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace SmallEngine.Components
 {
-    public abstract class ComponentSystem
+    public abstract class ComponentSystem : IUpdatable
     {
         readonly Dictionary<string, IEnumerable<Type>> _cache = new Dictionary<string, IEnumerable<Type>>();
 

@@ -1,32 +1,33 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Concurrent;
 
 namespace SmallEngine.Messages
 {
     /// <summary>
-    /// Message bus that adds all messages to the end of a queue
+    /// Message bus that will only process one message of a type at a time
+    /// If a message of the same type is sent before one is processed, it will be dropped
     /// </summary>
-    public sealed class QueueingMessageBus : MessageBus
+    public sealed class GroupingMessageBus : MessageBus
     {
+
         readonly ConcurrentQueue<IMessage> _messages;
 
-        public QueueingMessageBus(int pThreads) : base(pThreads)
+        public GroupingMessageBus(int pThreads) : base(pThreads)
         {
             _messages = new ConcurrentQueue<IMessage>();
         }
 
         public sealed override void SendMessage(IMessage pM)
         {
-            _messages.Enqueue(pM);
-            base.SendMessage(pM);
+            if(_messages.Count == 0 || (_messages.TryPeek(out IMessage m) && m.Type != pM.Type))
+            {
+                _messages.Enqueue(pM);
+                base.SendMessage(pM);
+            }
         }
 
         protected sealed override void ProcessMessage(IMessage pMessage)
         {
-            if(pMessage.Recipient == null)
+            if (pMessage.Recipient == null)
             {
                 foreach (var l in _receivers)
                 {

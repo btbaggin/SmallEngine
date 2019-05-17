@@ -14,7 +14,7 @@ using SmallEngine.Messages;
 
 namespace SmallEngine
 {
-    public class Game : IDisposable
+    public class Game : IUpdatable, IDisposable
     {
         /*TODO
          * Generic render component?

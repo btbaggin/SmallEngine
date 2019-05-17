@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Drawing;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SmallEngine.Input;
 using SmallEngine.Messages;
+using SmallEngine.Graphics;
 
 namespace SmallEngine
 {
@@ -17,7 +17,7 @@ namespace SmallEngine
 
         Vector2 Position { get; set; }
 
-        Vector2 Scale { get; set; }
+        Size Scale { get; set; }
 
         float Rotation { get; set; }
 

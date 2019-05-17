@@ -41,5 +41,12 @@ namespace SmallEngine
             _head = (_head + 1) % _capacity;
             return t;
         }
+
+        public T Peek()
+        {
+            if (IsEmpty) throw new InvalidOperationException("Unable to Peek with no elements");
+
+            return _data[_head];
+        }
     }
 }

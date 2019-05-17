@@ -91,7 +91,6 @@
     <Compile Include="Components\Component.cs" />
     <Compile Include="Components\DependencyComponent.cs" />
     <Compile Include="Components\ComponentSystem.cs" />
-    <Compile Include="Components\IDrawable.cs" />
     <Compile Include="Components\IGameObject.cs" />
     <Compile Include="Components\ImportComponentAttribute.cs" />
     <Compile Include="Audio\AudioResource.cs" />
@@ -111,11 +110,13 @@
     <Compile Include="Components\IComponent.cs" />
     <Compile Include="Graphics\RenderComponent.cs" />
     <Compile Include="Graphics\RenderSystem.cs" />
+    <Compile Include="Graphics\Size.cs" />
     <Compile Include="Graphics\Transform.cs" />
     <Compile Include="Input\Keyboard.cs" />
     <Compile Include="Input\Mouse.cs" />
     <Compile Include="Matrix2x2.cs" />
     <Compile Include="Messages\GameMessage.cs" />
+    <Compile Include="Messages\GroupingMessageBus.cs" />
     <Compile Include="Messages\IMessage.cs" />
     <Compile Include="Messages\IMessageReciever.cs" />
     <Compile Include="Input\InputState.cs" />
@@ -132,7 +133,7 @@
     <Compile Include="Physics\PhysicsHelper.cs" />
     <Compile Include="Physics\PhysicsSystem.cs" />
     <Compile Include="Physics\CollisionMesh.cs" />
-    <Compile Include="Rectangle.cs" />
+    <Compile Include="Graphics\Rectangle.cs" />
     <Compile Include="RingBuffer.cs" />
     <Compile Include="SceneGraph.cs" />
     <Compile Include="UI\Alignment.cs" />

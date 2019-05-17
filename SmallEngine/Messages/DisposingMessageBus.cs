@@ -6,19 +6,28 @@ using System.Threading.Tasks;
 
 namespace SmallEngine.Messages
 {
+    /// <summary>
+    /// Message bus that will dispose any messages after it has reached it's Capacity
+    /// It will also group like messages together and only process one message of a type at a time
+    /// </summary>
     public sealed class DisposingMessageBus : MessageBus
     {
         readonly RingBuffer<IMessage> _messages;
+        public int Capacity { get; private set; }
 
         public DisposingMessageBus(int pCapacity, int pThreads) : base(pThreads)
         {
+            Capacity = pCapacity;
             _messages = new RingBuffer<IMessage>(pCapacity);
         }
 
         public sealed override void SendMessage(IMessage pM)
         {
-            _messages.Push(pM);
-            base.SendMessage(pM);
+            if(_messages.IsEmpty || _messages.Peek().Type != pM.Type)
+            {
+                _messages.Push(pM);
+                base.SendMessage(pM);
+            }
         }
 
         protected sealed override void ProcessMessage(IMessage pMessage)
