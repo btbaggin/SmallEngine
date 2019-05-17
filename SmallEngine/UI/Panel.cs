@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -36,8 +35,8 @@ namespace SmallEngine.UI
 
         public override Size MeasureOverride(Size pSize)
         {
-            int desiredWidth = Orientation == PanelOrientation.Vertical ? pSize.Width : 0;
-            int desiredHeight = Orientation == PanelOrientation.Horizontal ? pSize.Height : 0;
+            var desiredWidth = Orientation == PanelOrientation.Vertical ? pSize.Width : 0;
+            var desiredHeight = Orientation == PanelOrientation.Horizontal ? pSize.Height : 0;
             foreach (var c in Children)
             {
                 c.Measure(pSize);
@@ -52,8 +51,8 @@ namespace SmallEngine.UI
 
         public override void ArrangeOverride(Rectangle pBounds)
         {
-            int width = 0;
-            int height = 0;
+            float width = 0;
+            float height = 0;
             if(Orientation == PanelOrientation.Horizontal)
             {
                 height = (int)pBounds.Height;

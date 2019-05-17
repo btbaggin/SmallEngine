@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Drawing;
 using SmallEngine.Graphics;
 using SmallEngine.Input;
 
@@ -59,7 +58,17 @@ namespace SmallEngine.UI
 
         protected List<UIElement> Children { get; private set; }
 
-        public Rectangle Bounds { get; private set; }
+        protected Rectangle Bounds { get; private set; }
+
+        public float ActualHeight
+        {
+            get { return Bounds.Height; }
+        }
+
+        public float ActualWidth
+        {
+            get { return Bounds.Width; }
+        }
 
         short _zindex;
         public short ZIndex
@@ -90,6 +99,7 @@ namespace SmallEngine.UI
             Enabled = true;
             AllowFocus = true;
             Name = pName;
+            if (Name != null) UIManager.AddNamedElement(this);
         }
 
         protected void InvalidateMeasure()
@@ -154,8 +164,8 @@ namespace SmallEngine.UI
         public virtual Size MeasureOverride(Size pSize)
         {
             //Default to taking up minimum space as possible
-            int desiredHeight = Height;
-            int desiredWidth = Width;
+            float desiredHeight = Height;
+            float desiredWidth = Width;
 
             //Only auto size if we haven't already set dimensions
             bool setHeight = Height != 0;

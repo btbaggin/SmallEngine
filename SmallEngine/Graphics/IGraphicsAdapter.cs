@@ -20,8 +20,8 @@ namespace SmallEngine.Graphics
         void DrawText(string pText, Rectangle pRect, Font pFont);
         void DrawText(string pText, Rectangle pRect, Font pFont, bool pClip);
 
-        void DrawBitmap(BitmapResource pBitmap, float pOpacity, Vector2 pPosition, Vector2 pScale);
-        void DrawBitmap(BitmapResource pBitmap, float pOpacity, Vector2 pPosition, Vector2 pScale, Rectangle pSourceRect);
+        void DrawBitmap(BitmapResource pBitmap, float pOpacity, Vector2 pPosition, Size pScale);
+        void DrawBitmap(BitmapResource pBitmap, float pOpacity, Vector2 pPosition, Size pScale, Rectangle pSourceRect);
         void DrawImage(BitmapResource pBitmap, Effect pEffect, Vector2 pPosition);
 
         void DrawLine(Vector2 pPoint1, Vector2 pPoint2, Brush pBrush);

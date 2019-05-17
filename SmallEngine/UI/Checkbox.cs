@@ -9,16 +9,17 @@ namespace SmallEngine.UI
 {
     public class Checkbox : UIElement
     {
-        enum ButtonState
+        public Color Background
         {
-            Idle,
-            MouseOver,
-            MouseDown
+            get { return _backgroundBrush.FillColor; }
+            set { _backgroundBrush.FillColor = value; }
         }
 
-        public Color Background { get; set; }
-
-        public Color Foreground { get; set; }
+        public Color Foreground
+        {
+            get { return _foregroundBrush.FillColor; }
+            set { _foregroundBrush.FillColor = value; }
+        }
 
         public bool IsChecked { get; set; }
 
@@ -28,11 +29,8 @@ namespace SmallEngine.UI
 
         public Checkbox(string pName) : base(pName)
         {
-            Background = Color.Gray;
-            Foreground = Color.Black;
-
-            _backgroundBrush = Brush.CreateFillBrush(Background, Game.Graphics);
-            _foregroundBrush = Brush.CreateFillBrush(Foreground, Game.Graphics);
+            _backgroundBrush = Brush.CreateFillBrush(Color.Gray, Game.Graphics);
+            _foregroundBrush = Brush.CreateFillBrush(Color.Black, Game.Graphics);
         }
 
         public override void Draw(IGraphicsAdapter pSystem)

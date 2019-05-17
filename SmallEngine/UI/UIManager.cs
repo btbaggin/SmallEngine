@@ -20,10 +20,13 @@ namespace SmallEngine.UI
         public static void Register(UIElement pElement)
         {
             _elements.AddOrdered(pElement);
-            if(pElement.Name != null)
-            {
-                _namedElements.Add(pElement.Name, pElement);
-            }
+        }
+
+        internal static void AddNamedElement(UIElement pElement)
+        {
+            System.Diagnostics.Debug.Assert(pElement.Name != null);
+
+            _namedElements.Add(pElement.Name, pElement);
         }
 
         public static void Unregister(UIElement pElement)
@@ -58,7 +61,7 @@ namespace SmallEngine.UI
         internal void Update(float pDeltaTime)
         {
             var bounds = new Rectangle(0, 0, Game.Form.Width, Game.Form.Height);
-            var size = new System.Drawing.Size(Game.Form.Width, Game.Form.Height);
+            var size = new Size(Game.Form.Width, Game.Form.Height);
             foreach (var e in _elements)
             {
                 if(_measureInvalid) e.Measure(size);

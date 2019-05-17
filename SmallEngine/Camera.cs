@@ -1,8 +1,9 @@
 ﻿using SmallEngine.Input;
+using SmallEngine.Graphics;
 
 namespace SmallEngine
 {
-    public class Camera
+    public class Camera : IUpdatable
     {
         #region Properties
         public Rectangle Viewport
@@ -117,8 +118,8 @@ namespace SmallEngine
         public bool IsVisible(IGameObject pGameObject)
         {
             var p = pGameObject.Position - _position;
-            return p.X + (pGameObject.Scale.X * Zoom) > 0 && p.X < Width &&
-                   p.Y + (pGameObject.Scale.Y * Zoom) > 0 && p.Y < Height;
+            return p.X + (pGameObject.Scale.Width * Zoom) > 0 && p.X < Width &&
+                   p.Y + (pGameObject.Scale.Height * Zoom) > 0 && p.Y < Height;
         }
 
         public void Follow(IGameObject pObject)

@@ -57,7 +57,7 @@ namespace SmallEngine.UI
                         break;
 
                     case ButtonState.MouseOver:
-                        _brush.FillColor = MouseDownColor;
+                        _brush.FillColor = MouseOverColor;
                         break;
 
                     default:

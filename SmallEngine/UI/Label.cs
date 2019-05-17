@@ -33,10 +33,10 @@ namespace SmallEngine.UI
             InvalidateMeasure(); 
         }
 
-        public override System.Drawing.Size MeasureOverride(System.Drawing.Size pSize)
+        public override Size MeasureOverride(Size pSize)
         {
             var s = Font.MeasureString(Text, pSize.Width);
-            return new System.Drawing.Size((int)Math.Max(s.Width, pSize.Width), (int)s.Height);
+            return new Size(Math.Max(s.Width, pSize.Width), s.Height);
         }
     }
 }

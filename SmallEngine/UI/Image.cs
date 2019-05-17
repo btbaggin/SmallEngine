@@ -19,7 +19,7 @@ namespace SmallEngine.UI
 
         public override void Draw(IGraphicsAdapter pSystem)
         {
-            pSystem.DrawBitmap(_bitmap, 1, Position, new Vector2(Width, Height));
+            pSystem.DrawBitmap(_bitmap, 1, Position, Bounds.Size);
         }
 
         public override void Update(float pDeltaTime) { }

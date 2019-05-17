@@ -10,11 +10,17 @@ namespace SmallEngine.UI
 {
     public class Slider : UIElement
     {
+        #region Properties
         public int Min { get; set; }
 
         public int Max { get; set; }
 
         public int Value { get; set; }
+
+        public float Percent
+        {
+            get { return (float)Value / (Max - Min); }
+        }
 
         float _sliderRadius;
         int _sliderSize;
@@ -30,7 +36,24 @@ namespace SmallEngine.UI
 
         public int BarHeight { get; set; }
 
+        public Color BarColor
+        {
+            get { return _barBrush.FillColor; }
+            set { _barBrush.FillColor = value; }
+        }
+
+        public Color SliderColor
+        {
+            get { return _sliderBrush.FillColor; }
+            set { _sliderBrush.FillColor = value; }
+        }
+
+        public Font LabelFont { get; set; }
+        #endregion
+
         Vector2 _sliderPosition;
+        Rectangle _barBounds;
+        float _labelWidth;
         bool _dragging;
         readonly Brush _barBrush, _sliderBrush;
 
@@ -44,43 +67,69 @@ namespace SmallEngine.UI
             SliderSize = 20;
             BarHeight = 10;
 
+            LabelFont = Font.Create(UIManager.DefaultFontFamily, UIManager.DefaultFontSize, Color.White, Game.Graphics);
+            LabelFont.Alignment = Alignments.Center;
+
             _barBrush = Brush.CreateFillBrush(Color.Gray, Game.Graphics);
             _sliderBrush = Brush.CreateFillBrush(Color.Red, Game.Graphics);
         }
 
         public override void Draw(IGraphicsAdapter pSystem)
         {
-            var y = Bounds.Top + ((Bounds.Height - BarHeight) / 2);
-            pSystem.DrawRect(new Rectangle(Bounds.Left + _sliderRadius, y, Bounds.Width - SliderSize, BarHeight), _barBrush);
+            //Draw labels
+            var y = Bounds.Top + ((ActualHeight - BarHeight) / 2);
+            pSystem.DrawText(Min.ToString(), new Rectangle(Position.X, Position.Y, _labelWidth, ActualHeight), LabelFont);
+            pSystem.DrawText(Max.ToString(), new Rectangle(_barBounds.Right, Position.Y, _labelWidth, ActualHeight), LabelFont);
 
+            //Draw slider
+            pSystem.DrawRect(_barBounds, _barBrush);
             pSystem.DrawElipse(_sliderPosition, _sliderRadius, _sliderBrush);
+
+            //Show value if sliding
+            if (_dragging)
+            {
+                pSystem.DrawText(Value.ToString(), new Rectangle(_sliderPosition, _labelWidth, ActualHeight), LabelFont);
+            }
         }
 
         public override void Update(float pDeltaTime)
         {
-            if(_sliderPosition.X == 0)
+            //Calculate size for label
+            _labelWidth = LabelFont.MeasureString(Min.ToString(), ActualWidth).Width;
+            _labelWidth = Math.Max(LabelFont.MeasureString(Max.ToString(), ActualWidth).Width, _labelWidth);
+            _labelWidth += _sliderRadius;
+
+            //Initialize slider position to beginning if it isn't set
+            if (_sliderPosition.X == 0)
             {
-                _sliderPosition = new Vector2(Position.X + _sliderRadius, Position.Y + Bounds.Height / 2);
+                _sliderPosition = new Vector2(Position.X + _sliderRadius + _labelWidth, Position.Y + ActualHeight / 2);
             }
 
+            //Calculate bounds for bar
+            var x = Bounds.Left + _sliderRadius + _labelWidth;
+            var y = Bounds.Top + ((ActualHeight - BarHeight) / 2);
+            var width = ActualWidth - SliderSize - _labelWidth * 2;
+            _barBounds = new Rectangle(x, y, width, BarHeight);
+
+            //Calculate bounds for slider
             var sliderBounds = new Rectangle(_sliderPosition.X, Position.Y, SliderSize, SliderSize);
             if (sliderBounds.Contains(Mouse.Position) && Mouse.ButtonDown(MouseButtons.Left)) _dragging = true;
             else if (Mouse.ButtonUp(MouseButtons.Left)) _dragging = false;
 
+            //Move slider
             if(_dragging)
             {
-                var x = Mouse.Position.X - (SliderSize / 2);
-                x = MathF.Clamp(x, Bounds.Left, Bounds.Right);
+                var sliderX = Mouse.Position.X - (SliderSize / 2);
+                sliderX = MathF.Clamp(sliderX, _barBounds.Left, _barBounds.Right);
 
-                _sliderPosition = new Vector2(x, Position.Y + Bounds.Height / 2);
-                Value = (int)((x / (Position.X + Bounds.Width)) * (Max - Min));
+                _sliderPosition = new Vector2(sliderX, Position.Y + ActualHeight / 2);
+                Value = (int)(sliderX / (_barBounds.X + _barBounds.Width) * (Max - Min));
             }
-            System.Diagnostics.Debug.WriteLine(Value);
         }
 
-        public override System.Drawing.Size MeasureOverride(System.Drawing.Size pSize)
+        public override Size MeasureOverride(Size pSize)
         {
-            return new System.Drawing.Size(pSize.Width, SliderSize);
+            return new Size(pSize.Width, SliderSize);
         }
     }
 }

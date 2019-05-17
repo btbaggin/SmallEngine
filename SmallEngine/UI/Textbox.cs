@@ -10,7 +10,17 @@ namespace SmallEngine.UI
 {
     public class Textbox : UIElement
     {
-        public Color Background { get; set; }
+        public Color Background
+        {
+            get { return _backgroundBrush.FillColor; }
+            set { _backgroundBrush.FillColor = value; }
+        }
+
+        public Color Foreground
+        {
+            get { return _foregroundBrush.FillColor; }
+            set { _foregroundBrush.FillColor = value; }
+        }
 
         public Font Font { get; set; }
 
@@ -30,7 +40,7 @@ namespace SmallEngine.UI
         int _cursorPos;
         float _cursorTick;
         bool _showCursor;
-        readonly Brush _backgroundBrush, _cursorBrush;
+        readonly Brush _backgroundBrush, _foregroundBrush;
 
         public Textbox() : this(null) { }
 
@@ -38,10 +48,9 @@ namespace SmallEngine.UI
         {
             Font = Font.Create(UIManager.DefaultFontFamily, UIManager.DefaultFontSize, UIManager.DefaultFontColor, Game.Graphics);
             Font.Alignment = Alignments.Leading;
-            Background = Color.Gray;
 
-            _backgroundBrush = Brush.CreateFillBrush(Background, Game.Graphics);
-            _cursorBrush = Brush.CreateFillBrush(Color.Black, Game.Graphics);
+            _backgroundBrush = Brush.CreateFillBrush(Color.Gray, Game.Graphics);
+            _foregroundBrush = Brush.CreateFillBrush(UIManager.DefaultFontColor, Game.Graphics);
         }
 
         public override void Draw(IGraphicsAdapter pSystem)
@@ -52,9 +61,9 @@ namespace SmallEngine.UI
 
             if(_showCursor && IsFocused)
             {
-                var s = Font.MeasureString(Text.Substring(0, _cursorPos), Bounds.Width);
+                var s = Font.MeasureString(Text.Substring(0, _cursorPos), ActualWidth);
                 var x = Bounds.Left + s.Width + 1;
-                pSystem.DrawLine(new Vector2(x, Bounds.Top + 1), new Vector2(x, Bounds.Bottom - 1), _cursorBrush);
+                pSystem.DrawLine(new Vector2(x, Bounds.Top + 1), new Vector2(x, Bounds.Bottom - 1), _foregroundBrush);
             }
         }
 
@@ -119,10 +128,10 @@ namespace SmallEngine.UI
             }
         }
 
-        public override System.Drawing.Size MeasureOverride(System.Drawing.Size pSize)
+        public override Size MeasureOverride(Size pSize)
         {
             var s = Font.MeasureString(Text, pSize.Width);
-            return new System.Drawing.Size(pSize.Width, (int)s.Height);
+            return new Size(pSize.Width, s.Height);
         }
     }
 }

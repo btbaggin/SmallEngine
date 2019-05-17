@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SmallEngine
+namespace SmallEngine.Graphics
 {
     public struct Rectangle
     {
@@ -21,12 +21,12 @@ namespace SmallEngine
 
         public float Width
         {
-            get { return Size.X; }
+            get { return Size.Width; }
         }
 
         public float Height
         {
-            get { return Size.Y; }
+            get { return Size.Height; }
         }
 
         public float Left
@@ -51,11 +51,11 @@ namespace SmallEngine
 
         public Vector2 Location { get; set; }
 
-        public Vector2 Size { get; set; }
+        public Size Size { get; set; }
         #endregion
 
         #region Constructors
-        public Rectangle(Vector2 pLocation, Vector2 pSize)
+        public Rectangle(Vector2 pLocation, Size pSize)
         {
             Location = pLocation;
             Size = pSize;
@@ -64,13 +64,13 @@ namespace SmallEngine
         public Rectangle(Vector2 pLocation, float pWidth, float pHeight)
         {
             Location = pLocation;
-            Size = new Vector2(pWidth, pHeight);
+            Size = new Size(pWidth, pHeight);
         }
 
         public Rectangle(float pX, float pY, float pWdith, float pHeight)
         {
             Location = new Vector2(pX, pY);
-            Size = new Vector2(pWdith, pHeight);
+            Size = new Size(pWdith, pHeight);
         }
         #endregion
 
@@ -101,7 +101,7 @@ namespace SmallEngine
 
         public Rectangle Grow(float pX, float pY)
         {
-            return new Rectangle(Location, Size.X + pX, Size.Y + pY);
+            return new Rectangle(Location, Size.Width + pX, Size.Height + pY);
         }
 
         #region Operators

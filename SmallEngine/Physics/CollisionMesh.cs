@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SmallEngine.Graphics;
 
 namespace SmallEngine.Physics
 {
@@ -63,15 +64,18 @@ namespace SmallEngine.Physics
     #region SquareMesh
     public class SquareMesh : PolygonMesh
     {
-        public Vector2 Size { get; set; }
-        public SquareMesh(Vector2 pSize, Material pMaterial) : base(new Vector2[] { Vector2.Zero, new Vector2(pSize.X, 0), pSize, new Vector2(0, pSize.Y) }, pMaterial)
+        public Size Size { get; set; }
+        public SquareMesh(Size pSize, Material pMaterial) : base(new Vector2[] { Vector2.Zero,
+                                                                                 new Vector2(pSize.Width, 0), 
+                                                                                 new Vector2(pSize.Width, pSize.Height),
+                                                                                 new Vector2(0, pSize.Height) }, pMaterial)
         {
             Size = pSize;
         }
 
         public override AxisAlignedBoundingBox CalculateAABB(Vector2 pPosition)
         {
-            return new AxisAlignedBoundingBox(pPosition, pPosition + Size);
+            return new AxisAlignedBoundingBox(pPosition, new Vector2(pPosition.X + Size.Width, pPosition.Y + Size.Height));
         }
     }
     #endregion

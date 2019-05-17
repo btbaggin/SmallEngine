@@ -195,19 +195,19 @@ namespace SmallEngine.Graphics
             }
         }
 
-        public void DrawBitmap(BitmapResource pBitmap, float pOpacity, Vector2 pPosition, Vector2 pScale)
+        public void DrawBitmap(BitmapResource pBitmap, float pOpacity, Vector2 pPosition, Size pScale)
         {
             var x = pPosition.X;
             var y = pPosition.Y;
-            Context.DrawBitmap(pBitmap.DirectXBitmap, new RawRectangleF(x, y, x + pScale.X, y + pScale.Y), pOpacity, BitmapInterpolationMode.NearestNeighbor);
+            Context.DrawBitmap(pBitmap.DirectXBitmap, new RawRectangleF(x, y, x + pScale.Width, y + pScale.Height), pOpacity, BitmapInterpolationMode.NearestNeighbor);
         }
 
-        public void DrawBitmap(BitmapResource pBitmap, float pOpacity, Vector2 pPosition, Vector2 pScale, Rectangle pSourceRect)
+        public void DrawBitmap(BitmapResource pBitmap, float pOpacity, Vector2 pPosition, Size pScale, Rectangle pSourceRect)
         {
             var x = pPosition.X;
             var y = pPosition.Y;
             Context.DrawBitmap(pBitmap.DirectXBitmap,
-                                      new RawRectangleF(x, y, x + pScale.X, y + pScale.Y),
+                                      new RawRectangleF(x, y, x + pScale.Width, y + pScale.Height),
                                       pOpacity,
                                       BitmapInterpolationMode.NearestNeighbor,
                                       pSourceRect);
