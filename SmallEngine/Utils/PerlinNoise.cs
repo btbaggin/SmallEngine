@@ -65,7 +65,7 @@ namespace SmallEngine
 
         public float Noise(float x, float y, float z)
         {
-            /* The main noise function. Looks up the pseudorandom gradients at the nearest
+            /* The main noise function. Looks up the pseudo random gradients at the nearest
                lattice points, dots them with the input vector, and interpolates the
                results to produce a single output value in [0, 1] range. */
 

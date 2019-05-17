@@ -4,17 +4,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using SmallEngine.Graphics;
 
 namespace SmallEngine
 {
-    #region "WindowEventArgs"
+    #region WindowEventArgs
     public class WindowEventArgs : EventArgs
     {
         public bool Enabled { get; private set; }
         public bool Activated { get; private set; }
         public bool Maximized { get; private set; }
-        public System.Drawing.Size Size { get; private set; }
-        public WindowEventArgs(bool pEnabled, bool pActivated, bool pMaximized, System.Drawing.Size pSize)
+        public Size Size { get; private set; }
+        public WindowEventArgs(bool pEnabled, bool pActivated, bool pMaximized, Size pSize)
         {
             Enabled = pEnabled;
             Activated = pActivated;

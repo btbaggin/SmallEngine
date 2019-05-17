@@ -48,54 +48,38 @@ namespace SmallEngine
             get { return X == 0 && Y == 0; }
         }
 
-        static readonly Vector2 _zeroVector = new Vector2(0f, 0f);
         /// <summary>
         /// Vector with 0 X and Y components
         /// </summary>
-        public static Vector2 Zero
-        {
-            get { return _zeroVector; }
-        }
+        public static Vector2 Zero { get; } = new Vector2(0, 0);
 
-        static readonly Vector2 _unitVector = new Vector2(1f, 1f);
         /// <summary>
         /// Vector with 1 X and Y components
         /// </summary>
-        public static Vector2 Unit
-        {
-            get { return _unitVector; }
-        }
+        public static Vector2 Unit { get; } = new Vector2(1, 1);
 
-        static readonly Vector2 _unitXVector = new Vector2(1f, 0f);
         /// <summary>
         /// Vector with 1 X and 0 Y components
         /// </summary>
-        public static Vector2 UnitX
-        {
-            get { return _unitXVector; }
-        }
+        public static Vector2 UnitX { get; } = new Vector2(1, 0);
 
-        static readonly Vector2 _unitYVector = new Vector2(0f, 1f);
         /// <summary>
         /// Vector with 0 X and 1 Y components
         /// </summary>
-        public static Vector2 UnitY
-        {
-            get { return _unitYVector; }
-        }
+        public static Vector2 UnitY { get; } = new Vector2(0, 1);
         #endregion
 
-        #region Construtors
+        #region Constructors
         public Vector2(float pXY)
         {
-            this.X = pXY;
-            this.Y = pXY;
+            X = pXY;
+            Y = pXY;
         }
 
         public Vector2(float pX, float pY) : this()
         {
-            this.X = pX;
-            this.Y = pY;
+            X = pX;
+            Y = pY;
         }
         #endregion
 

@@ -44,7 +44,7 @@ namespace SmallEngine
         }
 
         /// <summary>
-        /// Milliseconds elapased since <see cref="Tick"/> not affected by time scaling
+        /// Milliseconds elapsed since <see cref="Tick"/> not affected by time scaling
         /// </summary>
         public static float UnscaledDeltaTime
         {

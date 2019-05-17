@@ -19,5 +19,15 @@ namespace SmallEngine.Graphics
             Width = pWidth;
             Height = pHeight;
         }
+
+        public static implicit operator System.Drawing.Size(Size pSize)
+        {
+            return new System.Drawing.Size((int)pSize.Width, (int)pSize.Height);
+        }
+
+        public static implicit operator Size(System.Drawing.Size pSize)
+        {
+            return new Size(pSize.Width, pSize.Height);
+        }
     }
 }
