@@ -80,7 +80,11 @@ namespace SmallEngine.UI
                 {
                     if (_state == ButtonState.MouseDown)
                     {
-                        if(Input.Mouse.ButtonUp(Input.MouseButtons.Left)) Clicked?.Invoke(this, new EventArgs());
+                        if (Input.Mouse.ButtonUp(Input.MouseButtons.Left))
+                        {
+                            Clicked?.Invoke(this, new EventArgs());
+                            _state = ButtonState.MouseOver;
+                        }
                     }
                     else _state = ButtonState.MouseOver;
                 }

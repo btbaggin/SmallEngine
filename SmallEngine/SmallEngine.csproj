@@ -100,6 +100,8 @@
     <Compile Include="Components\GameObject.cs" />
     <Compile Include="GameForm.cs" />
     <Compile Include="GameTime.cs" />
+    <Compile Include="Graphics\Animation.cs" />
+    <Compile Include="Graphics\AnimationComponent.cs" />
     <Compile Include="Graphics\BitmapResource.cs" />
     <Compile Include="Graphics\Brush.cs" />
     <Compile Include="Graphics\Color.cs" />
@@ -111,7 +113,9 @@
     <Compile Include="Graphics\RenderComponent.cs" />
     <Compile Include="Graphics\RenderSystem.cs" />
     <Compile Include="Graphics\Size.cs" />
+    <Compile Include="Graphics\SpriteStrip.cs" />
     <Compile Include="Graphics\Transform.cs" />
+    <Compile Include="Input\KeyMapping.cs" />
     <Compile Include="Input\Keyboard.cs" />
     <Compile Include="Input\Mouse.cs" />
     <Compile Include="Matrix2x2.cs" />

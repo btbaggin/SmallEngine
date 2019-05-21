@@ -55,7 +55,7 @@ namespace SmallEngine.UI
                 c.Measure(pSize);
             }
 
-            return pSize;
+            return new Size(Width == 0 ? pSize.Width : Width, Height == 0 ? pSize.Height : Height);
         }
 
         public override void ArrangeOverride(Rectangle pBounds)

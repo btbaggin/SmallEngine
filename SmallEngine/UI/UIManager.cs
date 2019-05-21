@@ -45,6 +45,16 @@ namespace SmallEngine.UI
             return null;
         }
 
+        public static T GetElement<T>(string pName) where T : UIElement
+        {
+            if(_namedElements.ContainsKey(pName))
+            {
+                return (T)_namedElements[pName];
+            }
+
+            return null;
+        }
+
         #region Internal Methods
         internal void Draw(IGraphicsAdapter pSystem)
         {

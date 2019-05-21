@@ -101,11 +101,11 @@ namespace SmallEngine.Graphics
         }
         #endregion  
 
-        public System.Drawing.SizeF MeasureString(string pText, float pWidth)
+        public Size MeasureString(string pText, float pWidth)
         {
             using (TextLayout l = new TextLayout(_factory, pText, Format, pWidth, Format.FontSize))
             {
-                return new System.Drawing.SizeF(l.Metrics.Width, l.Metrics.Height);
+                return new Size(l.Metrics.Width, l.Metrics.Height);
             }
         }
 

@@ -99,6 +99,7 @@ namespace SmallEngine.UI
             Enabled = true;
             AllowFocus = true;
             Name = pName;
+            HorizontalAlignment = HorizontalAlignments.Center;
             if (Name != null) UIManager.AddNamedElement(this);
         }
 

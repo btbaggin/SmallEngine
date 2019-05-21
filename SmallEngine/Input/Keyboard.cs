@@ -26,6 +26,34 @@ namespace SmallEngine.Input
             _inputState = new InputState(_keyInput);
         }
 
+        #region KeyMapping exposure
+        static KeyMapping _mapping = new KeyMapping();
+        public static void AddMapping(string pName, Keys pKey)
+        {
+            _mapping.AddMapping(pName, pKey);
+        }
+
+        public static Keys GetKey(string pName)
+        {
+            return _mapping.GetKey(pName);
+        }
+
+        public static bool KeyPressed(string pName)
+        {
+            return _mapping.IsPressed(pName);
+        }
+
+        public static bool KeyDown(string pName)
+        {
+            return _mapping.KeyDown(pName);
+        }
+
+        public static bool KeyUp(string pName)
+        {
+            return _mapping.KeyUp(pName);
+        }
+        #endregion
+
         public static bool KeyPressed(Keys pKey)
         {
             return _inputState.IsPressed(pKey) && !_previousState.IsPressed(pKey);

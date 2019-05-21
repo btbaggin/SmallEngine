@@ -15,7 +15,11 @@ namespace SmallEngine.UI
 
         public int Max { get; set; }
 
-        public int Value { get; set; }
+        public int Value
+        {
+            get;
+            set;
+        }
 
         public float Percent
         {
@@ -99,17 +103,18 @@ namespace SmallEngine.UI
             _labelWidth = Math.Max(LabelFont.MeasureString(Max.ToString(), ActualWidth).Width, _labelWidth);
             _labelWidth += _sliderRadius;
 
-            //Initialize slider position to beginning if it isn't set
-            if (_sliderPosition.X == 0)
-            {
-                _sliderPosition = new Vector2(Position.X + _sliderRadius + _labelWidth, Position.Y + ActualHeight / 2);
-            }
-
             //Calculate bounds for bar
             var x = Bounds.Left + _sliderRadius + _labelWidth;
             var y = Bounds.Top + ((ActualHeight - BarHeight) / 2);
             var width = ActualWidth - SliderSize - _labelWidth * 2;
             _barBounds = new Rectangle(x, y, width, BarHeight);
+
+            //Initialize slider position to beginning if it isn't set
+            if (_sliderPosition.X == 0)
+            {
+                var initialX = Percent * _barBounds.Width;
+                _sliderPosition = new Vector2(Position.X + _sliderRadius + _labelWidth + initialX, Position.Y + ActualHeight / 2);
+            }
 
             //Calculate bounds for slider
             var sliderBounds = new Rectangle(_sliderPosition.X, Position.Y, SliderSize, SliderSize);
@@ -123,7 +128,7 @@ namespace SmallEngine.UI
                 sliderX = MathF.Clamp(sliderX, _barBounds.Left, _barBounds.Right);
 
                 _sliderPosition = new Vector2(sliderX, Position.Y + ActualHeight / 2);
-                Value = (int)(sliderX / (_barBounds.X + _barBounds.Width) * (Max - Min));
+                Value = (int)((sliderX - _barBounds.X) / _barBounds.Width * (Max - Min));
             }
         }
 

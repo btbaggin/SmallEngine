@@ -35,8 +35,7 @@ namespace SmallEngine.UI
 
         public override Size MeasureOverride(Size pSize)
         {
-            var s = Font.MeasureString(Text, pSize.Width);
-            return new Size(Math.Max(s.Width, pSize.Width), s.Height);
+            return Font.MeasureString(Text, pSize.Width);
         }
     }
 }

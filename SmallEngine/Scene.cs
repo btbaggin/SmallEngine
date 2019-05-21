@@ -57,6 +57,9 @@ namespace SmallEngine
             End();
         }
 
+        //TODO need to be able to replace scenes
+        //TODO UI interaction with scenes
+
         #region Overridable Methods
         public virtual void Update(float pDeltaTime)
         {
@@ -224,6 +227,17 @@ namespace SmallEngine
         #endregion
 
         #region GameObject Queries
+        public static IGameObject FindGameObjectInScenes(string pName)
+        {
+            foreach(var s in _scenes)
+            {
+                var go = s.FindGameObject(pName);
+                if (go != null) return go;
+            }
+
+            return null;
+        }
+
         public IGameObject FindGameObject(string pName)
         {
             if(_namedObjects.ContainsKey(pName))

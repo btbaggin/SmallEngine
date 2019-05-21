@@ -18,7 +18,7 @@ namespace SmallEngine.Graphics
     {
         public static RenderComparer Comparer => new RenderComparer();
 
-        [ImportComponent]
+        [ImportComponent(false)]
         private Physics.RigidBodyComponent _body;
 
         public bool Visible { get; set; } = true;
@@ -29,6 +29,8 @@ namespace SmallEngine.Graphics
 
         public BitmapResource Bitmap { get; set; }
 
+        public Rectangle Frame { get; set; }
+
         public Color Color { get; set; }
 
         public virtual void Draw(IGraphicsAdapter pSystem, float pDeltaTime)
@@ -38,7 +40,11 @@ namespace SmallEngine.Graphics
                 if (_body != null) pSystem.SetTransform(_body.CreateTransform());
                 else pSystem.ResetTransform();
 
-                pSystem.DrawBitmap(Bitmap, Opacity, GameObject.Position, GameObject.Scale);
+                var position = GameObject.Position;
+                position += _body.Velocity * pDeltaTime * GameTime.DeltaTime; //Interpolate position based on the amount of leftover update time
+
+                if (Frame.Width == 0) pSystem.DrawBitmap(Bitmap, Opacity, position, GameObject.Scale);
+                else pSystem.DrawBitmap(Bitmap, Opacity, position, GameObject.Scale, Frame);
             }
         }
 
