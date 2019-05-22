@@ -231,7 +231,7 @@ namespace SmallEngine.Graphics
         public void DrawRect(Rectangle pRect, Brush pBrush)
         {
             if(pBrush.FillColorBrush != null) Context.FillRectangle(pRect, pBrush.FillColorBrush);
-            if(pBrush.OutlineColorBrush != null) Context.DrawRectangle(pRect, pBrush.FillColorBrush, pBrush.OutlineSize);
+            if(pBrush.OutlineColorBrush != null) Context.DrawRectangle(pRect, pBrush.OutlineColorBrush, pBrush.OutlineSize);
         }
 
         public void DrawElipse(Vector2 pPoint, float pRadius, Brush pBrush)

@@ -27,7 +27,7 @@ namespace SmallEngine.Graphics
 
         public float OutlineSize { get; set; }
 
-        private Brush(Color? pFillColor, Color? pOutlineColor, IGraphicsAdapter pTarget)
+        private Brush(Color? pFillColor, Color? pOutlineColor, float pOutlineSize, IGraphicsAdapter pTarget)
         {
             if(pTarget.Method == RenderMethods.DirectX)
             {
@@ -51,23 +51,23 @@ namespace SmallEngine.Graphics
                 throw new NotImplementedException();
             }
 
-            OutlineSize = 1;
+            OutlineSize = pOutlineSize;
         }
 
 
-        public static Brush CreateOutlineBrush(Color pColor, IGraphicsAdapter pAdapter)
+        public static Brush CreateOutlineBrush(Color pColor, float pOutlineSize, IGraphicsAdapter pAdapter)
         {
-            return new Brush(null, pColor, pAdapter);
+            return new Brush(null, pColor, pOutlineSize, pAdapter);
         }
 
         public static Brush CreateFillBrush(Color pColor, IGraphicsAdapter pAdapter)
         {
-            return new Brush(pColor, null, pAdapter);
+            return new Brush(pColor, null, 0, pAdapter);
         }
 
-        public static Brush Create(Color pFillColor, Color pOutlineColor, IGraphicsAdapter pAdapter)
+        public static Brush Create(Color pFillColor, Color pOutlineColor, float pOutlineSize, IGraphicsAdapter pAdapter)
         {
-            return new Brush(pFillColor, pOutlineColor, pAdapter);
+            return new Brush(pFillColor, pOutlineColor, pOutlineSize, pAdapter);
         }
 
         public void Dispose()
