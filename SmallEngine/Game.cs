@@ -20,7 +20,6 @@ namespace SmallEngine
          * Generic render component?
          */
 
-        readonly UIManager _uiManager;
         readonly RenderSystem _render;
         float _timeElapsed;
         int _frameCount;
@@ -82,7 +81,6 @@ namespace SmallEngine
             Graphics = RenderMethod == RenderMethods.DirectX ? new DirectXAdapter() : null;
             Graphics.Initialize(Form, false);
 
-            _uiManager = new UIManager();
             _render = new RenderSystem(Graphics);
             PhysicsHelper.Create();
 
@@ -98,7 +96,6 @@ namespace SmallEngine
 
         public virtual void Update(float pDeltaTime)
         {
-            _uiManager.Update(pDeltaTime);
             ActiveCamera.Update(pDeltaTime);
 
             Scene.UpdateAll(pDeltaTime);
@@ -107,7 +104,7 @@ namespace SmallEngine
         private void Draw(float pDeltaTime)
         {
             _render.Update(pDeltaTime);
-            _uiManager.Draw(Graphics);
+            Scene.DrawUI(Graphics);
         }
         #endregion
 
@@ -170,7 +167,7 @@ namespace SmallEngine
 
         private void WindowSizeChanged(object sender, WindowEventArgs e)
         {
-            UIManager.InvalidateMeasure();
+            Scene.InvalidateAllMeasure();
         }
 
         private void OnIdle(object pSender, EventArgs pEventArgs)

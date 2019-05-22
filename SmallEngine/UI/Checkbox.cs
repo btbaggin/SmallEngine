@@ -43,7 +43,7 @@ namespace SmallEngine.UI
             }
         }
 
-        public override void Update(float pDeltaTime)
+        public override void Update()
         {
             if (IsMouseOver() && Input.Mouse.ButtonPressed(Input.MouseButtons.Left))
             {

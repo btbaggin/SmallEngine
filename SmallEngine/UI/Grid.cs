@@ -77,6 +77,6 @@ namespace SmallEngine.UI
 
         public override void Draw(IGraphicsAdapter pSystem) { }
 
-        public override void Update(float pDeltaTime) { }
+        public override void Update() { }
     }
 }

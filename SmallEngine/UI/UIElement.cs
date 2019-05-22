@@ -8,7 +8,7 @@ using SmallEngine.Input;
 
 namespace SmallEngine.UI
 {
-    public abstract class UIElement : IUpdatable, IDisposable, IComparable<UIElement>
+    public abstract class UIElement : IDisposable, IComparable<UIElement>
     {
         #region Properties
         public Vector2 Position { get; protected set; }
@@ -20,7 +20,7 @@ namespace SmallEngine.UI
             set
             {
                 _width = value;
-                UIManager.InvalidateMeasure();
+                _containingScene.InvalidateMeasure(); //TODO make better
             }
         }
 
@@ -31,7 +31,7 @@ namespace SmallEngine.UI
             set
             {
                 _height = value;
-                UIManager.InvalidateMeasure();
+                _containingScene.InvalidateMeasure();
             }
         }
 
@@ -42,7 +42,7 @@ namespace SmallEngine.UI
             set
             {
                 _margin = value;
-                UIManager.InvalidateMeasure();
+                _containingScene.InvalidateMeasure();
             }
         }
 
@@ -90,17 +90,18 @@ namespace SmallEngine.UI
         public string Name { get; private set; }
         #endregion
 
+        readonly Scene _containingScene;
         readonly List<UIElement> _orderedItems = new List<UIElement>();
         protected UIElement(string pName)
         {
             Children = new List<UIElement>();
-            Margin = new Thickness(5);
+            _margin = new Thickness(5);
             Visible = Visibility.Visible;
             Enabled = true;
             AllowFocus = true;
             Name = pName;
             HorizontalAlignment = HorizontalAlignments.Center;
-            if (Name != null) UIManager.AddNamedElement(this);
+            _containingScene = Scene.OnUIElementCreated(this);
         }
 
         protected void InvalidateMeasure()
@@ -109,20 +110,14 @@ namespace SmallEngine.UI
             else { Measure(new Size(Game.Form.Width, Game.Form.Height)); }
         }
 
-        public void Display()
+        public void FinalizeLayout()
         {
-            UIManager.Register(this);
-            InvalidateMeasure();
-        }
-
-        public void Remove()
-        {
-            UIManager.Unregister(this);
+            Scene.RegisterUI(this);
         }
 
         public abstract void Draw(IGraphicsAdapter pSystem);
 
-        public abstract void Update(float pDeltaTime);
+        public abstract void Update();
 
         protected void AddChild(UIElement pElement)
         {
@@ -202,13 +197,14 @@ namespace SmallEngine.UI
             var height = Math.Min(pBounds.Height, DesiredSize.Height);
 
             //Orient based off alignments
+            //TODO these don't work with children
             if (HorizontalAlignment == HorizontalAlignments.Center)
             {
                 x += (pBounds.Width - Margin.Left - Margin.Right - width) / 2; 
             }
             else if (HorizontalAlignment == HorizontalAlignments.Right)
             {
-                x = pBounds.Right - Margin.Right - width;
+                x = pBounds.Right - Margin.Right - Margin.Left - width;
             }
 
             if(VerticalAlignment == VerticalAlignments.Center)
@@ -217,13 +213,12 @@ namespace SmallEngine.UI
             }
             else if(VerticalAlignment == VerticalAlignments.Bottom)
             {
-                y = pBounds.Bottom - Margin.Bottom - height;
+                y = pBounds.Bottom - Margin.Bottom - Margin.Top - height;
             }
 
-            //ActualSize includes margins
+            //Space left over does not include margins
             ActualSize = new Size((int)width, (int)height);
 
-            //Space left over does not include margins
             width -= Margin.Left + Margin.Right;
             height -= Margin.Top + Margin.Bottom;
 
@@ -256,20 +251,17 @@ namespace SmallEngine.UI
             }
         }
 
-        internal void UpdateInternal(float pDeltaTime)
+        internal void UpdateInternal()
         {
-            Update(pDeltaTime);
+            Update();
             foreach (var e in Children)
             {
-                e.UpdateInternal(pDeltaTime);
+                e.UpdateInternal();
             }
         }
         #endregion  
 
-        public void Dispose()
-        {
-            UIManager.Unregister(this);
-        }
+        public virtual void Dispose() { }
 
         public int CompareTo(UIElement other)
         {

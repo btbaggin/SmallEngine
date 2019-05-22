@@ -67,7 +67,7 @@ namespace SmallEngine.UI
             }
         }
 
-        public override void Update(float pDeltaTime)
+        public override void Update()
         {
             //TODO caret navigation using mouse
             if(Mouse.ButtonPressed(MouseButtons.Left))
@@ -78,7 +78,7 @@ namespace SmallEngine.UI
             if (!IsFocused) return;
 
             //Toggle cursor every half second
-            _cursorTick += pDeltaTime;
+            _cursorTick += GameTime.UnscaledDeltaTime;
             if(_cursorTick >= .5f)
             {
                 _showCursor = !_showCursor;

@@ -15,6 +15,8 @@ namespace SmallEngine.UI
 
     public class Panel : UIElement
     {
+        //TODO fill dimensions?
+
         public PanelOrientation Orientation { get; set; }
 
         public Panel(PanelOrientation pOrientation) : this(null, pOrientation) { }
@@ -26,7 +28,7 @@ namespace SmallEngine.UI
 
         public override void Draw(IGraphicsAdapter pSystem) { }
 
-        public override void Update(float pDeltaTime) { }
+        public override void Update() { }
 
         public void AddElement(UIElement pElement)
         {
@@ -42,7 +44,7 @@ namespace SmallEngine.UI
                 c.Measure(pSize);
 
                 var s = c.DesiredSize;
-                if(Orientation == PanelOrientation.Horizontal) desiredWidth += s.Width;
+                if (Orientation == PanelOrientation.Horizontal) desiredWidth += s.Width;
                 else if (Orientation == PanelOrientation.Vertical) desiredHeight += s.Height;
             }
 
@@ -70,13 +72,13 @@ namespace SmallEngine.UI
                 c.Arrange(new Rectangle(p, width, height));
                 if(Orientation == PanelOrientation.Horizontal)
                 {
-                    p.X += c.ActualSize.Width;
-                    width -= c.ActualSize.Width;
+                    p.X += c.ActualWidth;
+                    width -= c.ActualWidth;
                 }
                 else if(Orientation == PanelOrientation.Vertical)
                 {
-                    p.Y += c.ActualSize.Height;
-                    height -= c.ActualSize.Height;
+                    p.Y += c.ActualHeight;
+                    height -= c.ActualHeight;
                 }
             }
         }

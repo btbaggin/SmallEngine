@@ -22,6 +22,6 @@ namespace SmallEngine.UI
             pSystem.DrawBitmap(_bitmap, 1, Position, Bounds.Size);
         }
 
-        public override void Update(float pDeltaTime) { }
+        public override void Update() { }
     }
 }

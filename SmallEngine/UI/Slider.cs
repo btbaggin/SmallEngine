@@ -96,7 +96,7 @@ namespace SmallEngine.UI
             }
         }
 
-        public override void Update(float pDeltaTime)
+        public override void Update()
         {
             //Calculate size for label
             _labelWidth = LabelFont.MeasureString(Min.ToString(), ActualWidth).Width;

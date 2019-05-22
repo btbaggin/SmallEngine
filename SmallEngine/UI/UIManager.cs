@@ -9,33 +9,27 @@ namespace SmallEngine.UI
 {
     public class UIManager
     {
-        static List<UIElement> _elements = new List<UIElement>();
-        static Dictionary<string, UIElement> _namedElements = new Dictionary<string, UIElement>();
-        static bool _measureInvalid = true;
+        List<UIElement> _elements = new List<UIElement>();
+        Dictionary<string, UIElement> _namedElements = new Dictionary<string, UIElement>();
+        bool _measureInvalid = true;
 
         public static string DefaultFontFamily { get; set; } = "Arial";
         public static int DefaultFontSize { get; set; } = 14;
         public static Color DefaultFontColor { get; set; } = Color.Black;
 
-        public static void Register(UIElement pElement)
+        public void Register(UIElement pElement)
         {
             _elements.AddOrdered(pElement);
         }
 
-        internal static void AddNamedElement(UIElement pElement)
+        internal void AddNamedElement(UIElement pElement)
         {
             System.Diagnostics.Debug.Assert(pElement.Name != null);
 
             _namedElements.Add(pElement.Name, pElement);
         }
 
-        public static void Unregister(UIElement pElement)
-        {
-            //TODO what to do with this?
-            _elements.Remove(pElement);
-        }
-
-        public static UIElement GetElement(string pName)
+        public UIElement GetElement(string pName)
         {
             if(_namedElements.ContainsKey(pName))
             {
@@ -45,43 +39,30 @@ namespace SmallEngine.UI
             return null;
         }
 
-        public static T GetElement<T>(string pName) where T : UIElement
-        {
-            if(_namedElements.ContainsKey(pName))
-            {
-                return (T)_namedElements[pName];
-            }
-
-            return null;
-        }
-
         #region Internal Methods
-        internal void Draw(IGraphicsAdapter pSystem)
+        internal void UpdateAndDraw(IGraphicsAdapter pSystem)
         {
+            //We update and draw at the same time because GameObjects will often manipulate UI elements
+            //So if we arrange before those updates can happen it can cause a frame of misplaced items
+            var bounds = new Rectangle(0, 0, Game.Form.Width, Game.Form.Height);
+            var size = new Size(Game.Form.Width, Game.Form.Height);
             pSystem.ResetTransform();
+
             foreach (var e in _elements)
             {
+                if (_measureInvalid) e.Measure(size);
+                e.Arrange(bounds);
+                e.UpdateInternal();
+
                 if (e.Visible == Visibility.Visible)
                 {
                     e.DrawInternal(pSystem);
                 }
             }
-        }
-
-        internal void Update(float pDeltaTime)
-        {
-            var bounds = new Rectangle(0, 0, Game.Form.Width, Game.Form.Height);
-            var size = new Size(Game.Form.Width, Game.Form.Height);
-            foreach (var e in _elements)
-            {
-                if(_measureInvalid) e.Measure(size);
-                e.Arrange(bounds);
-                e.UpdateInternal(pDeltaTime);
-            }
             _measureInvalid = false;
         }
 
-        internal static void InvalidateMeasure()
+        internal void InvalidateMeasure()
         {
             _measureInvalid = true;
         }

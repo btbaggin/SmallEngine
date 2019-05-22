@@ -6,22 +6,29 @@ using System.Text;
 using System.Threading.Tasks;
 using SmallEngine.Graphics;
 using SmallEngine.Components;
-using SmallEngine.Messages;
+using SmallEngine.UI;
 
 namespace SmallEngine
 {
+    public enum SceneLoadModes
+    {
+        Additive,
+        LoadOver,
+        Replace
+    }
+
     public class Scene : IUpdatable
     {
         //https://gamedevelopment.tutsplus.com/tutorials/spaces-useful-game-object-containers--gamedev-14091
 
         readonly Dictionary<string, IGameObject> _namedObjects;
         readonly ConcurrentBag<IGameObject> _toRemove = new ConcurrentBag<IGameObject>();
+        readonly UIManager _ui;
 
         static List<ComponentSystem> _systems = new List<ComponentSystem>();
-        static List<Scene> _scenes = new List<Scene>();
-        internal readonly static Dictionary<string, List<Type>> _definitions = new Dictionary<string, List<Type>>();
+        static Stack<Scene> _scenes = new Stack<Scene>();
 
-        private bool _started;
+        internal readonly static Dictionary<string, List<Type>> _definitions = new Dictionary<string, List<Type>>();
 
         #region Properties
         public List<IGameObject> GameObjects { get; }
@@ -34,31 +41,55 @@ namespace SmallEngine
         {
             GameObjects = new List<IGameObject>();
             _namedObjects = new Dictionary<string, IGameObject>();
+            _ui = new UIManager();
         }
 
-        public static T Create<T>() where T : Scene
+        public static T Load<T>(SceneLoadModes pMode) where T : Scene
         {
             //TODO allow creating scene that isn't registered to all systems
-            return (T)Activator.CreateInstance(typeof(T));
+            var s = (T)Activator.CreateInstance(typeof(T));
+            if(_scenes.Count > 0)
+            {
+                switch(pMode)
+                {
+                    case SceneLoadModes.Replace:
+                        _scenes.Pop();
+                        break;
+
+                    case SceneLoadModes.Additive:
+                        var peek = _scenes.Peek();
+                        peek.Suspend();
+                        break;
+
+                    case SceneLoadModes.LoadOver:
+                        var load = _scenes.Peek();
+                        load.Suspend();
+                        load.Active = false;
+                        break;
+                }
+            }
+
+            _scenes.Push(s);
+            s.Begin();
+
+            return s;
         }
         #endregion
 
-        public void Start()
+        public void Unload()
         {
-            if (_started) throw new InvalidOperationException("Scene has already started");
-            _scenes.Add(this);
-            _started = true;
-            Begin();
-        }
-
-        public void Stop()
-        {
-            _scenes.Remove(this);
             End();
-        }
+            if(_scenes.Count > 0)
+            {
+                //Remove current scene
+                _scenes.Pop(); 
 
-        //TODO need to be able to replace scenes
-        //TODO UI interaction with scenes
+                //Restore next scene
+                var peek = _scenes.Peek();
+                peek.Active = true;
+                peek.Restore();
+            }
+        }
 
         #region Overridable Methods
         public virtual void Update(float pDeltaTime)
@@ -69,12 +100,16 @@ namespace SmallEngine
             }
         }
 
-        protected internal virtual void Begin() { }
+        protected virtual void Begin() { }
 
-        protected internal virtual void End()
+        protected virtual void End()
         {
             DisposeGameObjects();
         }
+
+        protected virtual void Suspend() { }
+
+        protected virtual void Restore() { }
         #endregion
 
         #region Static methods
@@ -85,7 +120,7 @@ namespace SmallEngine
 
         internal static void UpdateAll(float pDeltaTime)
         {
-            foreach (var s in _scenes)
+            foreach (var s in _scenes.ToList())
             {
                 if (s.Active)
                 {
@@ -104,9 +139,39 @@ namespace SmallEngine
 
         internal static void EndSceneAll()
         {
-            foreach (var s in _scenes.ToList())
+            foreach (var s in _scenes)
             {
-                s.Stop();
+                s.Unload();
+            }
+        }
+
+        internal static void RegisterUI(UIElement pElement)
+        {
+            var s = _scenes.Peek();
+            s._ui.Register(pElement);
+        }
+
+        internal static Scene OnUIElementCreated(UIElement pElement)
+        {
+            if (_scenes.Count == 0) throw new InvalidOperationException("UI element created with no scene loaded");
+            var s = _scenes.Peek();
+            if (pElement.Name != null) s._ui.AddNamedElement(pElement);
+            return s;
+        }
+
+        internal static void DrawUI(IGraphicsAdapter pAdapter)
+        {
+            foreach (var s in _scenes)
+            {
+                if (s.Active) s._ui.UpdateAndDraw(pAdapter);
+            }
+        }
+
+        internal static void InvalidateAllMeasure()
+        {
+            foreach (var s in _scenes)
+            {
+                s.InvalidateMeasure();
             }
         }
         #endregion
@@ -254,6 +319,29 @@ namespace SmallEngine
             {
                 if (go.Tag == pTag) yield return go;
             }
+        }
+        #endregion
+
+        #region UI Methods
+        internal void InvalidateMeasure()
+        {
+            _ui.InvalidateMeasure();
+        }
+
+        public UIElement FindUIElement(string pName)
+        {
+            return _ui.GetElement(pName);
+        }
+
+        public static UIElement FindUIElementInScenes(string pName)
+        {
+            foreach(var s in _scenes)
+            {
+                var e = s.FindUIElement(pName);
+                if (e != null) return e;
+            }
+
+            return null;
         }
         #endregion
 

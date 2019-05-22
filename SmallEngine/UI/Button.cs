@@ -28,6 +28,8 @@ namespace SmallEngine.UI
 
         ButtonState _state;
         readonly Brush _brush;
+        public Button(string pText) : this(null, new Label(pText)) { }
+
         public Button(UIElement pContent) : this(null, pContent) { }
 
         public Button(string pName, UIElement pContent) : base(pName)
@@ -39,6 +41,14 @@ namespace SmallEngine.UI
             MouseOverColor = Color.LightGray;
             MouseDownColor = Color.DarkGray;
             _brush = Brush.CreateFillBrush(Color, Game.Graphics);
+        }
+
+        public override Size MeasureOverride(Size pSize)
+        {
+            //TODO button size. Need to expose the invalidate measure better
+            var content = Children[0];
+            content.Measure(pSize);
+            return new Size(content.DesiredSize.Width, content.DesiredSize.Height);
         }
 
         public override void Draw(IGraphicsAdapter pSystem)
@@ -68,7 +78,7 @@ namespace SmallEngine.UI
             pSystem.DrawRect(Bounds, _brush);
         }
 
-        public override void Update(float pDeltaTime)
+        public override void Update()
         {
             if(IsMouseOver())
             {

@@ -148,6 +148,7 @@
     <Compile Include="UI\Label.cs" />
     <Compile Include="UI\Panel.cs" />
     <Compile Include="UI\Slider.cs" />
+    <Compile Include="UI\Textblock.cs" />
     <Compile Include="UI\Textbox.cs" />
     <Compile Include="UI\Thickness.cs" />
     <Compile Include="UI\UIElement.cs" />

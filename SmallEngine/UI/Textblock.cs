@@ -7,7 +7,7 @@ using SmallEngine.Graphics;
 
 namespace SmallEngine.UI
 {
-    public class Label : UIElement
+    public class Textblock : UIElement
     {
         private Font _font;
         public Font Font
@@ -31,14 +31,13 @@ namespace SmallEngine.UI
             }
         }
 
-        public Label(string pText) : this(null, pText) { }
+        public Textblock(string pText) : this(null, pText) { }
 
-        public Label(string pName, string pText) : base(pName)
+        public Textblock(string pName, string pText) : base(pName)
         {
-            _font = Font.Create(UIManager.DefaultFontFamily, UIManager.DefaultFontSize, UIManager.DefaultFontColor, Game.Graphics);
+            Font = Font.Create(UIManager.DefaultFontFamily, UIManager.DefaultFontSize, UIManager.DefaultFontColor, Game.Graphics);
             Font.Alignment = Alignments.Center;
             Text = pText;
-            AllowFocus = false;
         }
 
         public override void Draw(IGraphicsAdapter pSystem)
