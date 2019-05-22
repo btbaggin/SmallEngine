@@ -74,6 +74,21 @@ namespace SmallEngine.Input
             return !_inputState.IsPressed(pKey);
         }
 
+        public static bool AnyKeyPressed(out Keys pPressed)
+        {
+            for(int i = (int)Keys.Backspace; i < 256; i++)
+            {
+                if (KeyPressed((Keys)i))
+                {
+                    pPressed = (Keys)i;
+                    return true;
+                }
+            }
+
+            pPressed = 0;
+            return false;
+        }
+
         public static InputState GetInputState()
         {
             return _inputState;
