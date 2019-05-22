@@ -103,6 +103,8 @@ namespace SmallEngine.Graphics
 
         public Size MeasureString(string pText, float pWidth)
         {
+            if (pText == null) return new Size();
+
             using (TextLayout l = new TextLayout(_factory, pText, Format, pWidth, Format.FontSize))
             {
                 return new Size(l.Metrics.Width, l.Metrics.Height);
