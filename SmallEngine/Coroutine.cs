@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace SmallEngine
 {
@@ -13,6 +14,7 @@ namespace SmallEngine
     public class WaitForSeconds : WaitEvent
     {
         private float _timer;
+        private CancellationToken _token;
         /// <summary>
         /// An object that can be yielded to wait for pSeconds before continuing
         /// </summary>
@@ -22,8 +24,15 @@ namespace SmallEngine
             _timer = pSeconds;
         }
 
+        public WaitForSeconds(float pSeconds, CancellationToken pToken)
+        {
+            _timer = pSeconds;
+            _token = pToken;
+        }
+
         public override bool Update(float pDeltaTime)
         {
+            _token.ThrowIfCancellationRequested();
             _timer -= pDeltaTime;
             return _timer <= 0f;
         }
@@ -105,10 +114,17 @@ namespace SmallEngine
         {
             foreach (IEnumerator<WaitEvent> e in _coroutines.ToList())
             { 
-                if(e.Current.Update(pDeltaTime) && !e.MoveNext())
+                try
+                {
+                    if (e.Current.Update(pDeltaTime) && !e.MoveNext())
+                    {
+                        _coroutines.Remove(e);
+                    }
+                }catch(OperationCanceledException)
                 {
                     _coroutines.Remove(e);
                 }
+                
             }
         }
     }
