@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SmallEngine.Input;
+using SmallEngine.Components;
 
 namespace SmallEngine.Graphics
 {
@@ -42,8 +43,10 @@ namespace SmallEngine.Graphics
 
                 var position = GameObject.Position;
                 position += _body.Velocity * pDeltaTime * GameTime.DeltaTime; //Interpolate position based on the amount of leftover update time
+                position = Game.ActiveCamera.ToCameraSpace(position);
 
-                if (Frame.Width == 0) pSystem.DrawBitmap(Bitmap, Opacity, position, GameObject.Scale);
+                var scale = GameObject.Scale * Game.ActiveCamera.Zoom;
+                if (Frame.Width == 0) pSystem.DrawBitmap(Bitmap, Opacity, position, scale);
                 else pSystem.DrawBitmap(Bitmap, Opacity, position, GameObject.Scale, Frame);
             }
         }

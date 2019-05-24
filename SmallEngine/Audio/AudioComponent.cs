@@ -1,4 +1,6 @@
-﻿namespace SmallEngine.Audio
+﻿using SmallEngine.Components;
+
+namespace SmallEngine.Audio
 {
     public class AudioComponent : Component
     {

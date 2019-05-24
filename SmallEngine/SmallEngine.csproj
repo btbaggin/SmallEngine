@@ -36,6 +36,7 @@
     <DefineConstants>TRACE;DEBUG;WINDOWS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <LangVersion>7.2</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -129,6 +130,7 @@
     <Compile Include="Messages\MessageBus.cs" />
     <Compile Include="Messages\DisposingMessageBus.cs" />
     <Compile Include="Messages\QueueingMessageBus.cs" />
+    <Compile Include="Messages\SingleUseMessage.cs" />
     <Compile Include="Physics\AxisAlignedBoundingBox.cs" />
     <Compile Include="Physics\CollisionDetection.cs" />
     <Compile Include="Physics\CollisionEventArgs.cs" />
@@ -140,6 +142,8 @@
     <Compile Include="Graphics\Rectangle.cs" />
     <Compile Include="RingBuffer.cs" />
     <Compile Include="SceneGraph.cs" />
+    <Compile Include="Serialization\Setting.cs" />
+    <Compile Include="Serialization\SettingsFile.cs" />
     <Compile Include="UI\Alignment.cs" />
     <Compile Include="UI\Button.cs" />
     <Compile Include="UI\Checkbox.cs" />

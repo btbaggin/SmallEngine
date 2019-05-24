@@ -15,6 +15,12 @@ namespace SmallEngine.Input
             _mappings.Add(pName, pKey);
         }
 
+        public void UpdateMapping(string pName, Keys pKey)
+        {
+            if (!_mappings.ContainsKey(pName)) throw new KeyNotFoundException();
+            _mappings[pName] = pKey;
+        }
+
         public Keys GetKey(string pName)
         {
             if (!_mappings.ContainsKey(pName)) throw new KeyNotFoundException();

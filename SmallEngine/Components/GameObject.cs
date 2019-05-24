@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using SmallEngine.Messages;
 using SmallEngine.Graphics;
+using SmallEngine.Components;
 
 namespace SmallEngine
 {
@@ -12,6 +13,11 @@ namespace SmallEngine
     {
         #region Properties
         public string Name { get; set; }
+
+        public Vector2 Center
+        {
+            get { return new Vector2(Position.X + Scale.Width / 2, Position.Y + Scale.Height / 2); }
+        }
 
         public Vector2 Position { get; set; }
 
@@ -116,6 +122,11 @@ namespace SmallEngine
         protected void SendMessage(string pType, object pData, IMessageReceiver pRecipient)
         {
             Game.Messages.SendMessage(new GameMessage(pType, pData, this, pRecipient));
+        }
+
+        protected void SendMessage(IMessage pMessage)
+        {
+            Game.Messages.SendMessage(pMessage);
         }
 
         public void Destroy()

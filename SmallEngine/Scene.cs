@@ -84,10 +84,13 @@ namespace SmallEngine
                 //Remove current scene
                 _scenes.Pop(); 
 
-                //Restore next scene
-                var peek = _scenes.Peek();
-                peek.Active = true;
-                peek.Restore();
+                if(_scenes.Count > 0)
+                {
+                    //Restore next scene
+                    var peek = _scenes.Peek();
+                    peek.Active = true;
+                    peek.Restore();
+                }
             }
         }
 
@@ -161,7 +164,7 @@ namespace SmallEngine
 
         internal static void DrawUI(IGraphicsAdapter pAdapter)
         {
-            foreach (var s in _scenes)
+            foreach (var s in _scenes.ToList()) //TODO i don't like this
             {
                 if (s.Active) s._ui.UpdateAndDraw(pAdapter);
             }
@@ -313,6 +316,11 @@ namespace SmallEngine
             return null;
         }
 
+        public T FindGameObject<T>(string pName) where T : IGameObject
+        {
+            return (T)FindGameObject(pName);
+        }
+
         public IEnumerable<IGameObject> FindGameObjectsWithTag(string pTag)
         {
             foreach (var go in GameObjects)
@@ -331,6 +339,11 @@ namespace SmallEngine
         public UIElement FindUIElement(string pName)
         {
             return _ui.GetElement(pName);
+        }
+
+        public T FindUIElement<T>(string pName) where T : UIElement
+        {
+            return (T)FindUIElement(pName);
         }
 
         public static UIElement FindUIElementInScenes(string pName)

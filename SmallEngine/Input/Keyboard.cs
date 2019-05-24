@@ -33,6 +33,11 @@ namespace SmallEngine.Input
             _mapping.AddMapping(pName, pKey);
         }
 
+        public static void UpdateMapping(string pName, Keys pKey)
+        {
+            _mapping.UpdateMapping(pName, pKey);
+        }
+
         public static Keys GetKey(string pName)
         {
             return _mapping.GetKey(pName);

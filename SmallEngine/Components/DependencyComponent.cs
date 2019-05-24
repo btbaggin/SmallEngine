@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace SmallEngine
+namespace SmallEngine.Components
 {
     public abstract class DependencyComponent : Component
     {

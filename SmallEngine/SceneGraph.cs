@@ -134,7 +134,8 @@ namespace SmallEngine
             
             foreach(var go in _entities)
             {
-                if(Vector2.DistanceSqrd(pPoint, go.Position) < distanceSqrd)
+                var center = new Vector2(go.Position.X + go.Scale.Width / 2, go.Position.Y + go.Scale.Height / 2);
+                if(Vector2.DistanceSqrd(pPoint, center) < distanceSqrd)
                 {
                     pReturnObjects.Add(go);
                 }

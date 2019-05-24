@@ -32,8 +32,8 @@ namespace SmallEngine
             //Set to default resource
             var r = new T()
             {
-                Path = pPath,
-                Alias = pAlias,
+                Path = System.IO.Path.GetFullPath(pPath),
+                Alias = pAlias
             };            
             _resources.Add(pAlias, r);
             //Begin sync load
@@ -122,8 +122,8 @@ namespace SmallEngine
             //Set to default resource
             r = new T()
             {
-                Path = pPath,
-                Alias = pAlias,
+                Path = System.IO.Path.GetFullPath(pPath),
+                Alias = pAlias
             };
             _resources.Add(pAlias, r);
 

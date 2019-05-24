@@ -52,7 +52,6 @@ namespace SmallEngine.Audio
 
         private void Initialize(string pFileName)
         {
-            pFileName = System.IO.Path.GetFullPath(pFileName);
             System.Diagnostics.Debug.Assert(System.IO.File.Exists(pFileName));
 
             System.IO.FileStream s= System.IO.File.OpenRead(pFileName);

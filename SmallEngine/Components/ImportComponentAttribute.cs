@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SmallEngine
+namespace SmallEngine.Components
 {
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
     public class ImportComponentAttribute : Attribute

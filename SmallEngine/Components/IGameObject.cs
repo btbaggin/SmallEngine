@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using SmallEngine.Input;
 using SmallEngine.Messages;
 using SmallEngine.Graphics;
+using SmallEngine.Components;
 
 namespace SmallEngine
 {

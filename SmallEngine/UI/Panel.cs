@@ -15,7 +15,7 @@ namespace SmallEngine.UI
 
     public class Panel : UIElement
     {
-        //TODO fill dimensions?
+        public bool FillParent { get; set; }
 
         public PanelOrientation Orientation { get; set; }
 
@@ -24,6 +24,7 @@ namespace SmallEngine.UI
         public Panel(string pName, PanelOrientation pOrientation) : base(pName)
         {
             Orientation = pOrientation;
+            FillParent = true;
         }
 
         public override void Draw(IGraphicsAdapter pSystem) { }
@@ -37,18 +38,32 @@ namespace SmallEngine.UI
 
         public override Size MeasureOverride(Size pSize)
         {
-            var desiredWidth = Orientation == PanelOrientation.Vertical ? pSize.Width : 0;
-            var desiredHeight = Orientation == PanelOrientation.Horizontal ? pSize.Height : 0;
-            foreach (var c in Children)
+            float width = 0;
+            float height = 0;
+            switch(Orientation)
             {
-                c.Measure(pSize);
+                case PanelOrientation.Vertical:
+                    if (FillParent) width = pSize.Width;
+                    foreach (var c in Children)
+                    {
+                        c.Measure(pSize);
+                        height += c.DesiredSize.Height;
+                        if (!FillParent) width = Math.Max(width, c.DesiredSize.Width);
+                    }
+                    break;
 
-                var s = c.DesiredSize;
-                if (Orientation == PanelOrientation.Horizontal) desiredWidth += s.Width;
-                else if (Orientation == PanelOrientation.Vertical) desiredHeight += s.Height;
+                case PanelOrientation.Horizontal:
+                    if (FillParent) height = pSize.Height;
+                    foreach (var c in Children)
+                    {
+                        c.Measure(pSize);
+                        width += c.DesiredSize.Width;
+                        if (!FillParent) height = Math.Max(height, c.DesiredSize.Height);
+                    }
+                    break;
             }
 
-            return new Size(desiredWidth, desiredHeight);
+            return new Size(width, height);
         }
 
         public override void ArrangeOverride(Rectangle pBounds)

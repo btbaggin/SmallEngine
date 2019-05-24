@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SmallEngine
+namespace SmallEngine.Components
 {
     public interface IComponent : IDisposable
     {

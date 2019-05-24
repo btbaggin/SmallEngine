@@ -29,5 +29,15 @@ namespace SmallEngine.Graphics
         {
             return new Size(pSize.Width, pSize.Height);
         }
+
+        public static Size operator *(Size pV1, float pScalar)
+        {
+            return new Size(pV1.Width * pScalar, pV1.Height * pScalar);
+        }
+
+        public static Size operator *(float pScalar, Size pV1)
+        {
+            return new Size(pV1.Width * pScalar, pV1.Height * pScalar);
+        }
     }
 }

@@ -46,6 +46,7 @@ namespace SmallEngine.Physics
             foreach(var component in Components)
             {
                 var r = (RigidBodyComponent)component;
+                //TODO triggers
 
                 //Find all intersections before we insert our new entity
                 foreach (var colliders in _quadTree.Retrieve(r))
