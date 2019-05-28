@@ -14,7 +14,7 @@ namespace SmallEngine.Physics
         readonly CollisionResolutionDelegate[,] _resolvers = { { CollisionDetection.CircleVsCircle, CollisionDetection.CirclevsPolygon },
                                                                { CollisionDetection.PolygonvsCircle, CollisionDetection.PolygonvsPolygon } };
 
-        QuadTree<RigidBodyComponent> _quadTree;
+        QuadTree<ColliderComponent> _quadTree;
         public PhysicsSystem()
         {
             Scene.Register(this);
@@ -22,12 +22,12 @@ namespace SmallEngine.Physics
 
         public void CreateQuadTree()
         {
-            _quadTree = new QuadTree<RigidBodyComponent>(PhysicsHelper.WorldBounds);
+            _quadTree = new QuadTree<ColliderComponent>(PhysicsHelper.WorldBounds);
         }
 
         protected override List<IComponent> DiscoverComponents(string pTemplate, IGameObject pObject)
         {
-            var r = pObject.GetComponent(typeof(RigidBodyComponent));
+            var r = pObject.GetComponent(typeof(ColliderComponent));
 
             List<IComponent> components = new List<IComponent>();
             if (r != null)
@@ -45,8 +45,7 @@ namespace SmallEngine.Physics
 
             foreach(var component in Components)
             {
-                var r = (RigidBodyComponent)component;
-                //TODO triggers
+                var r = (ColliderComponent)component;
 
                 //Find all intersections before we insert our new entity
                 foreach (var colliders in _quadTree.Retrieve(r))
@@ -80,7 +79,7 @@ namespace SmallEngine.Physics
             }
         }
 
-        internal RigidBodyComponent HitTest(Vector2 pPoint)
+        internal ColliderComponent HitTest(Vector2 pPoint)
         {
             foreach(var c in _quadTree.Retrieve(pPoint))
             {

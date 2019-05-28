@@ -8,11 +8,11 @@ namespace SmallEngine.Physics
 {
     public class CollisionEventArgs : EventArgs
     {
-        public RigidBodyComponent Collider { get; private set; }
+        public ColliderComponent Collider { get; private set; }
 
         public Manifold Collision { get; private set; }
 
-        public CollisionEventArgs(RigidBodyComponent pCollider, Manifold pCollision)
+        public CollisionEventArgs(ColliderComponent pCollider, Manifold pCollision)
         {
             Collider = pCollider;
             Collision = pCollision;

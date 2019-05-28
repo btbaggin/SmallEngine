@@ -15,7 +15,7 @@ namespace SmallEngine.Physics
 
     public abstract class CollisionMesh
     {
-        internal RigidBodyComponent Body { get; set; }
+        internal ColliderComponent Body { get; set; }
 
         public Shapes Shape { get; protected set; }
 

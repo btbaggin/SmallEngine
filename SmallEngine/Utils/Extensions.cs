@@ -15,6 +15,7 @@ namespace SmallEngine
             pList.Insert(i, pElement);
         }
 
+        #region Random
         public static float NextFloat(this Random r)
         {
             return (float)r.NextDouble();
@@ -29,7 +30,9 @@ namespace SmallEngine
         {
             return min + r.NextFloat() * (max - min);
         }
+        #endregion
 
+        #region IGameObject
         public static IEnumerable<IGameObject> WithinDistance(this IEnumerable<IGameObject> pGameObjects, IGameObject pGameObject, float pDistance, string pTag)
         {
             return pGameObjects.Where(pGo => pGo.Tag == pTag && 
@@ -57,5 +60,14 @@ namespace SmallEngine
         {
             return NearestWithinDistance(pGameObjects, pGameObject, float.MaxValue, pTag);
         }
+
+        public static IEnumerable<IGameObject> WithTag(this IEnumerable<IGameObject> pGameObjects, string pTag)
+        {
+            foreach(var go in pGameObjects)
+            {
+                if (pTag == go.Tag) yield return go;
+            }
+        }
+        #endregion
     }
 }

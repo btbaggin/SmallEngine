@@ -14,7 +14,7 @@ namespace SmallEngine.Messages
 
         public string Type { get; }
 
-        object _data;
+        readonly object _data;
         volatile int _valid;
         public SingleUseMessage(string pType, IMessageReceiver pRecipient, IMessageReceiver pSender, object pData)
         {

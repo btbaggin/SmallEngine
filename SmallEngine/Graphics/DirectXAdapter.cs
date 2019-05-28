@@ -14,10 +14,9 @@ namespace SmallEngine.Graphics
 {
     public class DirectXAdapter : IGraphicsAdapter
     {
-        private Image _renderTarget;
-        private SwapChain _swapChain;
-        private SharpDX.Direct3D11.DeviceContext1 _d3Context;
-        private Surface _backBuffer;
+        Image _renderTarget;
+        SwapChain _swapChain;
+        Surface _backBuffer;
 
         private SharpDX.Direct2D1.Device _2dDevice;
 
@@ -48,7 +47,7 @@ namespace SmallEngine.Graphics
                 var defaultDevice = new Device(DriverType.Hardware, DeviceCreationFlags.Debug | DeviceCreationFlags.BgraSupport);
 
                 Device = defaultDevice.QueryInterface<SharpDX.Direct3D11.Device1>();
-                _d3Context = Device.ImmediateContext.QueryInterface<SharpDX.Direct3D11.DeviceContext1>();
+                //var d3Context = Device.ImmediateContext.QueryInterface<SharpDX.Direct3D11.DeviceContext1>();
 
                 var dxgiDevice2 = Device.QueryInterface<SharpDX.DXGI.Device2>();
                 var dxgiFactory2 = dxgiDevice2.Adapter.GetParent<SharpDX.DXGI.Factory2>();

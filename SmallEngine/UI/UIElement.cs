@@ -154,7 +154,7 @@ namespace SmallEngine.UI
 
             //Measure children
             var s = MeasureOverride(pSize);
-            DesiredSize = new Size(s.Width + Margin.Left + Margin.Right, s.Height + Margin.Top + Margin.Bottom);
+            DesiredSize = new Size(s.Width + Margin.Width, s.Height + Margin.Height);
         }
 
         public virtual Size MeasureOverride(Size pSize)
@@ -200,27 +200,27 @@ namespace SmallEngine.UI
             //TODO these don't work with children
             if (HorizontalAlignment == HorizontalAlignments.Center)
             {
-                x += (pBounds.Width - Margin.Left - Margin.Right - width) / 2; 
+                x += (pBounds.Width - Margin.Width- width) / 2; 
             }
             else if (HorizontalAlignment == HorizontalAlignments.Right)
             {
-                x = pBounds.Right - Margin.Right - Margin.Left - width;
+                x = pBounds.Right - Margin.Width - width;
             }
 
             if(VerticalAlignment == VerticalAlignments.Center)
             {
-                y += (pBounds.Height - Margin.Top - Margin.Bottom - height) / 2;
+                y += (pBounds.Height - Margin.Height - height) / 2;
             }
             else if(VerticalAlignment == VerticalAlignments.Bottom)
             {
-                y = pBounds.Bottom - Margin.Bottom - Margin.Top - height;
+                y = pBounds.Bottom - Margin.Height - height;
             }
 
             //Space left over does not include margins
             ActualSize = new Size((int)width, (int)height);
 
-            width -= Margin.Left + Margin.Right;
-            height -= Margin.Top + Margin.Bottom;
+            width -= Margin.Width;
+            height -= Margin.Height;
 
             Bounds = new Rectangle(x, y, width, height);
             Position = Bounds.Location;

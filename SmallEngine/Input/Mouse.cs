@@ -23,23 +23,17 @@ namespace SmallEngine.Input
 
         [DllImport("user32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        static extern bool GetCursorPos(out POINT lpPoint);
+        static extern bool GetCursorPos(out Point lpPoint);
 
         [StructLayout(LayoutKind.Sequential)]
-        public struct POINT
+        struct Point
         {
             public int X;
             public int Y;
-
-            public POINT(int X, int Y)
-            {
-                this.X = X;
-                this.Y = Y;
-            }
         }
 
         [DllImport("user32.dll")]
-        static extern bool ScreenToClient(IntPtr hWnd, ref POINT lpPoint);
+        static extern bool ScreenToClient(IntPtr hWnd, ref Point lpPoint);
 
         [DllImport("user32.dll")]
         static extern int ShowCursor(bool bShow);
@@ -100,7 +94,7 @@ namespace SmallEngine.Input
             _inputState = new InputState(mouseInput);
 
             //Get mouse position
-            GetCursorPos(out POINT p);
+            GetCursorPos(out Point p);
             ScreenToClient(_handle, ref p);
             _mousePos = new Vector2(p.X, p.Y);
             CheckDrag();

@@ -38,8 +38,8 @@ namespace SmallEngine.Graphics
         {
             if(Bitmap != null)
             {
-                if (_body != null) pSystem.SetTransform(_body.CreateTransform());
-                else pSystem.ResetTransform();
+                var t = Transform.Create(GameObject);
+                pSystem.SetTransform(t);
 
                 var position = GameObject.Position;
                 position += _body.Velocity * pDeltaTime * GameTime.DeltaTime; //Interpolate position based on the amount of leftover update time

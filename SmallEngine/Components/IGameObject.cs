@@ -22,6 +22,8 @@ namespace SmallEngine
 
         float Rotation { get; set; }
 
+        Matrix2X2 RotationMatrix { get; }
+
         string Tag { get; set; }
 
         Scene ContainingScene { get; set; }

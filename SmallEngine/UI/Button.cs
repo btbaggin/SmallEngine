@@ -26,6 +26,17 @@ namespace SmallEngine.UI
 
         public Color MouseDownColor { get; set; }
 
+        Thickness _padding;
+        public Thickness Padding
+        {
+            get { return _padding; }
+            set
+            {
+                _padding = value;
+                InvalidateMeasure();
+            }
+        }
+
         ButtonState _state;
         readonly Brush _brush;
         public Button(string pText) : this(null, new Label(pText)) { }
@@ -41,14 +52,14 @@ namespace SmallEngine.UI
             MouseOverColor = Color.LightGray;
             MouseDownColor = Color.DarkGray;
             _brush = Brush.CreateFillBrush(Color, Game.Graphics);
+            _padding = new Thickness(3);
         }
 
         public override Size MeasureOverride(Size pSize)
         {
-            //TODO button size. Need to expose the invalidate measure better
             var content = Children[0];
             content.Measure(pSize);
-            return new Size(content.DesiredSize.Width, content.DesiredSize.Height);
+            return new Size(content.DesiredSize.Width + Padding.Width, content.DesiredSize.Height + Padding.Height);
         }
 
         public override void Draw(IGraphicsAdapter pSystem)

@@ -13,8 +13,8 @@ namespace SmallEngine.Physics
 
         public static bool CircleVsCircle(ref Manifold pM)
         {
-            RigidBodyComponent A = pM.BodyA;
-            RigidBodyComponent B = pM.BodyB;
+            ColliderComponent A = pM.BodyA;
+            ColliderComponent B = pM.BodyB;
 
             Vector2 n = B.AABB.Center - A.AABB.Center;
             float aRadius = ((CircleMesh)A.Mesh).Radius;
@@ -43,13 +43,14 @@ namespace SmallEngine.Physics
 
         public static bool CirclevsPolygon(ref Manifold pM)
         {
-            RigidBodyComponent A = pM.BodyA;
-            RigidBodyComponent B = pM.BodyB;
+            ColliderComponent A = pM.BodyA;
+            ColliderComponent B = pM.BodyB;
             CircleMesh c = (CircleMesh)A.Mesh;
             PolygonMesh p = (PolygonMesh)B.Mesh;
 
+            var bMat = B.GameObject.RotationMatrix;
             Vector2 center = A.AABB.Center;
-            center = B.OrientationMatrix.Transpose() * (center - B.AABB.Center);
+            center = bMat.Transpose() * (center - B.AABB.Center);
 
             float maxSeparation = float.MinValue;
             int faceNormal = 0;
@@ -71,7 +72,7 @@ namespace SmallEngine.Physics
 
             if (maxSeparation < .00005f)
             {
-                pM.Normal = -(B.OrientationMatrix * p.Normals[faceNormal]);
+                pM.Normal = -(bMat * p.Normals[faceNormal]);
                 pM.Contacts = new Vector2[] { pM.Normal * c.Radius + A.AABB.Center };
                 pM.Penetration = c.Radius;
                 return true;
@@ -86,11 +87,11 @@ namespace SmallEngine.Physics
                 if (Vector2.DistanceSqrd(center, v1) > c.Radius * c.Radius) return false; 
 
                 Vector2 n = v1 - center;
-                n = B.OrientationMatrix * n;
+                n = bMat * n;
                 n.Normalize();
                 pM.Normal = n;
 
-                v1 = B.OrientationMatrix * v1 + B.AABB.Center;
+                v1 = bMat * v1 + B.AABB.Center;
                 pM.Contacts = new Vector2[] { v1 };
             }
             else if(dot2 <= 0)
@@ -98,11 +99,11 @@ namespace SmallEngine.Physics
                 if (Vector2.DistanceSqrd(center, v2) > c.Radius * c.Radius) return false;
 
                 Vector2 n = v2 - center;
-                n = B.OrientationMatrix * n;
+                n = bMat * n;
                 n.Normalize();
                 pM.Normal = n;
 
-                v2 = B.OrientationMatrix * v2 + B.AABB.Center;
+                v2 = bMat * v2 + B.AABB.Center;
                 pM.Contacts = new Vector2[] { v2 };
             }
             else
@@ -110,7 +111,7 @@ namespace SmallEngine.Physics
                 Vector2 n = p.Normals[faceNormal];
                 if (Vector2.DotProduct(center - v1, n) > c.Radius) return false;
 
-                n = B.OrientationMatrix * n;
+                n = bMat * n;
                 pM.Normal = -n;
                 pM.Contacts = new Vector2[] { pM.Normal * c.Radius + A.AABB.Center };
             }
@@ -162,8 +163,9 @@ namespace SmallEngine.Physics
             referenceIndex = referenceIndex + 1 == reference.Verticies.Length ? 0 : referenceIndex + 1;
             Vector2 v2 = reference.Verticies[referenceIndex];
 
-            v1 = reference.Body.OrientationMatrix * v1 + reference.Body.AABB.Center;
-            v2 = reference.Body.OrientationMatrix * v2 + reference.Body.AABB.Center;
+            var rMat = reference.Body.GameObject.RotationMatrix;
+            v1 = rMat * v1 + reference.Body.AABB.Center;
+            v2 = rMat * v2 + reference.Body.AABB.Center;
 
             Vector2 sidePlaneNormal = v2 - v1;
             sidePlaneNormal.Normalize();
@@ -205,18 +207,20 @@ namespace SmallEngine.Physics
             float best = float.MinValue;
             pIndex = 0;
 
+            var aMat = pA.Body.GameObject.RotationMatrix;
+            var bMat = pB.Body.GameObject.RotationMatrix;
             for(int i = 0; i < pA.Verticies.Length; i++)
             {
                 Vector2 normal = pA.Normals[i];
-                Vector2 orientedNormal = pA.Body.OrientationMatrix * normal;
+                Vector2 orientedNormal = aMat * normal;
 
-                Matrix2X2 buT = pB.Body.OrientationMatrix.Transpose();
+                Matrix2X2 buT = bMat.Transpose();
                 normal = buT * orientedNormal;
 
                 Vector2 support = pB.GetSupport(-normal);
 
                 Vector2 vertex = pA.Verticies[i];
-                vertex = pA.Body.OrientationMatrix * vertex + pA.Body.AABB.Center;
+                vertex = aMat * vertex + pA.Body.AABB.Center;
                 vertex -= pB.Body.AABB.Center;
                 vertex = buT * vertex;
 
@@ -236,8 +240,9 @@ namespace SmallEngine.Physics
         {
             Vector2 referenceNormal = pRef.Normals[pIndex];
 
-            referenceNormal = pRef.Body.OrientationMatrix * referenceNormal;
-            referenceNormal = pInc.Body.OrientationMatrix.Transpose() * referenceNormal;
+            var iMat = pInc.Body.GameObject.RotationMatrix;
+            referenceNormal = pRef.Body.GameObject.RotationMatrix * referenceNormal;
+            referenceNormal = iMat.Transpose() * referenceNormal;
 
             int incidentFace = 0;
             float min = float.MaxValue;
@@ -252,10 +257,10 @@ namespace SmallEngine.Physics
             }
 
             pV = new Vector2[2];
-            pV[0] = pInc.Body.OrientationMatrix * pInc.Verticies[incidentFace] + pInc.Body.AABB.Center;
+            pV[0] = iMat * pInc.Verticies[incidentFace] + pInc.Body.AABB.Center;
 
             incidentFace = incidentFace + 1 >= pInc.Verticies.Length ? 0 : incidentFace + 1;
-            pV[1] = pInc.Body.OrientationMatrix * pInc.Verticies[incidentFace] + pInc.Body.AABB.Center;
+            pV[1] = iMat * pInc.Verticies[incidentFace] + pInc.Body.AABB.Center;
         }
 
         private static int Clip(Vector2 n, float c, ref Vector2[] pFace)

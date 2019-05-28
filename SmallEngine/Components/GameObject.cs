@@ -23,7 +23,18 @@ namespace SmallEngine
 
         public Size Scale { get; set; }
 
-        public float Rotation { get; set; }
+        float _rotation;
+        public float Rotation
+        {
+            get { return _rotation; }
+            set
+            {
+                _rotation = value;
+                RotationMatrix = new Matrix2X2(_rotation);
+            }
+        }
+
+        public Matrix2X2 RotationMatrix { get; private set; }
 
         public bool Destroyed { get; private set; }
 
@@ -41,6 +52,7 @@ namespace SmallEngine
         public GameObject(string pName)
         {
             Name = pName;
+            RotationMatrix = Matrix2X2.Identity;
         }
 
         #region Components

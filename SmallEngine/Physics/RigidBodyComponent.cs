@@ -8,12 +8,8 @@ using SmallEngine.Components;
 
 namespace SmallEngine.Physics
 {
-    public class RigidBodyComponent : Component, IPhysicsBody
+    public class RigidBodyComponent : DependencyComponent
     {
-        private List<RigidBodyComponent> Colliders = new List<RigidBodyComponent>();
-        public EventHandler<CollisionEventArgs> CollisionEnter { get; set; }
-        public EventHandler<CollisionEventArgs> CollisionExit { get; set; }
-
         #region "Properties"
         internal float InverseMass;
         internal float InverseInertia;
@@ -22,7 +18,7 @@ namespace SmallEngine.Physics
         public float Mass
         {
             get { return _mass; }
-            private set
+            internal set
             {
                 _mass = value;
                 if (_mass == 0) InverseMass = 0;
@@ -51,41 +47,12 @@ namespace SmallEngine.Physics
 
         public Vector2 Force { get; private set; }
 
-        public float Orientation { get; private set; }
-
         public float AngularVelocity { get; private set; }
 
         public float Torque { get; internal set; }
 
-        CollisionMesh _mesh;
-        public CollisionMesh Mesh
-        {
-            get { return _mesh; }
-            set
-            {
-                _mesh = value;
-                _mesh.Body = this;
-
-                _mesh.CalculateMass(out float mass, out float inertia);
-                Mass = mass;
-                Inertia = inertia;
-            }
-        }
-
-        public AxisAlignedBoundingBox AABB { get; private set; }
-
-        public short Layer { get; private set; }
-
-        public Matrix2X2 OrientationMatrix { get; private set; }
-
         public bool IsKinematic { get; set; }
         #endregion
-
-        public RigidBodyComponent()
-        {
-            OrientationMatrix = Matrix2X2.Identity;
-            Layer = 1;
-        }
 
         public void MoveBody(Vector2 pAmount)
         {
@@ -106,30 +73,12 @@ namespace SmallEngine.Physics
                 {
                     Velocity += (InverseMass * Force + PhysicsHelper.Gravity) * (pDeltaTime / 2);
                     AngularVelocity += Torque * InverseInertia * (pDeltaTime / 2);
-                    Orientation += AngularVelocity * pDeltaTime;
-                    OrientationMatrix = new Matrix2X2(Orientation);
+                    GameObject.Rotation += AngularVelocity * pDeltaTime;
                 }
 
                 Force = Vector2.Zero;
                 Torque = 0;
             }
-
-            AABB = Mesh.CalculateAABB(Position);
-        }
-
-        public void AddToLayer(short pLayer)
-        {
-            Layer |= pLayer;
-        }
-
-        public void RemoveFromLayer(short pLayer)
-        {
-            Layer &= (short)~(int)pLayer;
-        }
-
-        public bool HasLayer(short pLayer)
-        {
-            return (Layer & pLayer) != 0;
         }
 
         public void ApplyImpulse(Vector2 pImpulse, Vector2 pContact)
@@ -146,30 +95,6 @@ namespace SmallEngine.Physics
         public void ApplyTorque(float pTorque)
         {
             Torque += pTorque;
-        }
-
-        public Graphics.Transform CreateTransform()
-        {
-            return OrientationMatrix.ToTransform(AABB.Center);
-        }
-
-        internal void OnCollisionEnter(RigidBodyComponent pCollider, Manifold pManifold)
-        {
-            var ce = CollisionEnter;
-            if(ce != null && !Colliders.Contains(pCollider))
-            {
-                Colliders.Add(pCollider);
-                ce.Invoke(this, new CollisionEventArgs(pCollider, pManifold));
-            }
-        }
-
-        internal void OnCollisionExit(RigidBodyComponent pCollider, Manifold pManifold)
-        {
-            var ce = CollisionExit;
-            if(ce != null && Colliders.Remove(pCollider))
-            {
-                ce.Invoke(this, new CollisionEventArgs(pCollider, pManifold));
-            }
         }
     }
 }

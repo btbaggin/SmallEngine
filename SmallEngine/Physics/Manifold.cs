@@ -8,14 +8,14 @@ namespace SmallEngine.Physics
 {
     public struct Manifold
     {
-        public RigidBodyComponent BodyA { get; private set; }
-        public RigidBodyComponent BodyB { get; private set; }
+        public ColliderComponent BodyA { get; private set; }
+        public ColliderComponent BodyB { get; private set; }
         public float Penetration { get; set; }
         public Vector2 Normal { get; set; }
 
         public Vector2[] Contacts { get; set; }
 
-        public Manifold(RigidBodyComponent pBodyA, RigidBodyComponent pBodyB)
+        public Manifold(ColliderComponent pBodyA, ColliderComponent pBodyB)
         {
             BodyA = pBodyA;
             BodyB = pBodyB;
@@ -27,12 +27,15 @@ namespace SmallEngine.Physics
         public void Resolve()
         {
             System.Diagnostics.Debug.Assert(Contacts != null && Contacts.Length > 0);
+            var rBodyA = BodyA.Body;
+            var rBodyB = BodyB.Body;
+            if (rBodyA == null || rBodyB == null) return;
 
             //Check for static objects
-            if(BodyA.Mass + BodyB.Mass == 0)
+            if (rBodyA.Mass + rBodyB.Mass == 0)
             {
-                BodyA.Velocity = Vector2.Zero;
-                BodyB.Velocity = Vector2.Zero;
+                rBodyA.Velocity = Vector2.Zero;
+                rBodyB.Velocity = Vector2.Zero;
                 return;
             }
 
@@ -43,16 +46,16 @@ namespace SmallEngine.Physics
                 Vector2 ra = Contacts[i] - BodyA.AABB.Center;
                 Vector2 rb = Contacts[i] - BodyB.AABB.Center;
 
-                Vector2 relativeVelocity = BodyB.Velocity + Vector2.CrossProduct(BodyB.AngularVelocity, rb) - 
-                                           BodyA.Velocity - Vector2.CrossProduct(BodyA.AngularVelocity, ra);
+                Vector2 relativeVelocity = rBodyB.Velocity + Vector2.CrossProduct(rBodyB.AngularVelocity, rb) - 
+                                           rBodyA.Velocity - Vector2.CrossProduct(rBodyA.AngularVelocity, ra);
 
                 float contactVel = Vector2.DotProduct(relativeVelocity, Normal);
                 if (contactVel > 0) return;
 
                 float raCrossN = Vector2.CrossProduct(ra, Normal);
                 float rbCrossN = Vector2.CrossProduct(rb, Normal);
-                float invMassSum = BodyA.InverseMass + BodyB.InverseMass + (raCrossN * raCrossN) * 
-                                   BodyA.InverseInertia + (rbCrossN * rbCrossN) * BodyB.InverseInertia;
+                float invMassSum = rBodyA.InverseMass + rBodyB.InverseMass + (raCrossN * raCrossN) * 
+                                   rBodyA.InverseInertia + (rbCrossN * rbCrossN) * rBodyB.InverseInertia;
 
                 //Calculate impulse magnitude
                 var e = Math.Min(BodyA.Mesh.Material.Restitution, BodyB.Mesh.Material.Restitution);
@@ -61,12 +64,12 @@ namespace SmallEngine.Physics
                 j /= contactCount;
 
                 Vector2 impulse = Normal * j;
-                BodyA.ApplyImpulse(-impulse, ra);
-                BodyB.ApplyImpulse(impulse, rb);
+                rBodyA.ApplyImpulse(-impulse, ra);
+                rBodyB.ApplyImpulse(impulse, rb);
 
                 //Friction
-                relativeVelocity = BodyB.Velocity + Vector2.CrossProduct(BodyB.AngularVelocity, rb) - 
-                                   BodyA.Velocity - Vector2.CrossProduct(BodyA.AngularVelocity, ra);
+                relativeVelocity = rBodyB.Velocity + Vector2.CrossProduct(rBodyB.AngularVelocity, rb) - 
+                                   rBodyA.Velocity - Vector2.CrossProduct(rBodyA.AngularVelocity, ra);
 
                 Vector2 t = relativeVelocity - (Normal * Vector2.DotProduct(relativeVelocity, Normal));
                 t.Normalize();
@@ -94,15 +97,17 @@ namespace SmallEngine.Physics
                     tangent = t * -j * dynamicFriction;
                 }
 
-                BodyA.ApplyImpulse(-tangent, ra);
-                BodyB.ApplyImpulse(tangent, rb);
+                rBodyA.ApplyImpulse(-tangent, ra);
+                rBodyB.ApplyImpulse(tangent, rb);
             }
         }
 
         public void CorrectPositions()
         {
-            RigidBodyComponent A = BodyA;
-            RigidBodyComponent B = BodyB;
+            RigidBodyComponent A = BodyA.Body;
+            RigidBodyComponent B = BodyB.Body;
+
+            if (A == null || B == null) return;
 
             //Prevent objects from sinking. Allow things to be slightly overlapping
             const float percent = 0.2f;

@@ -17,5 +17,11 @@ namespace SmallEngine.Graphics
         {
             Rotation = pRotation;
         }
+
+        public static Transform Create(IGameObject pGameObject)
+        {
+            var center = new Vector2(pGameObject.Position.X + pGameObject.Scale.Width / 2, pGameObject.Position.Y + pGameObject.Scale.Height / 2);
+            return pGameObject.RotationMatrix.ToTransform(center);
+        }
     }
 }

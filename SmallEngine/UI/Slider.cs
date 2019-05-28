@@ -82,8 +82,8 @@ namespace SmallEngine.UI
         {
             //Draw labels
             var y = Bounds.Top + ((ActualHeight - BarHeight) / 2);
-            pSystem.DrawText(Min.ToString(), new Rectangle(Position.X, Position.Y, _labelWidth, ActualHeight), LabelFont);
-            pSystem.DrawText(Max.ToString(), new Rectangle(_barBounds.Right, Position.Y, _labelWidth, ActualHeight), LabelFont);
+            pSystem.DrawText(Min.ToString(), new Rectangle(Position.X, y, _labelWidth, ActualHeight), LabelFont);
+            pSystem.DrawText(Max.ToString(), new Rectangle(_barBounds.Right, y, _labelWidth, ActualHeight), LabelFont);
 
             //Draw slider
             pSystem.DrawRect(_barBounds, _barBrush);

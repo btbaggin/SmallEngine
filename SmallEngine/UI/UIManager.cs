@@ -9,8 +9,8 @@ namespace SmallEngine.UI
 {
     public class UIManager
     {
-        List<UIElement> _elements = new List<UIElement>();
-        Dictionary<string, UIElement> _namedElements = new Dictionary<string, UIElement>();
+        readonly List<UIElement> _elements = new List<UIElement>();
+        readonly Dictionary<string, UIElement> _namedElements = new Dictionary<string, UIElement>();
         bool _measureInvalid = true;
 
         public static string DefaultFontFamily { get; set; } = "Arial";

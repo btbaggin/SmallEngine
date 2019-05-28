@@ -13,7 +13,7 @@ namespace SmallEngine.Physics
 
         public static Vector2 Gravity { get; set; }
 
-        public static RigidBodyComponent HitTest(Vector2 pPoint)
+        public static ColliderComponent HitTest(Vector2 pPoint)
         {
             return _physics.HitTest(pPoint);
         }

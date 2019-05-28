@@ -132,6 +132,7 @@
     <Compile Include="Messages\QueueingMessageBus.cs" />
     <Compile Include="Messages\SingleUseMessage.cs" />
     <Compile Include="Physics\AxisAlignedBoundingBox.cs" />
+    <Compile Include="Physics\ColliderComponent.cs" />
     <Compile Include="Physics\CollisionDetection.cs" />
     <Compile Include="Physics\CollisionEventArgs.cs" />
     <Compile Include="Physics\IPhysicsBody.cs" />

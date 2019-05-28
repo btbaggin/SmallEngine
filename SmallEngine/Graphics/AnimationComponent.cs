@@ -11,7 +11,7 @@ namespace SmallEngine.Graphics
     {
         [ImportComponent]
         RenderComponent _render;
-        Dictionary<string, Animation> _animations = new Dictionary<string, Animation>();
+        readonly Dictionary<string, Animation> _animations = new Dictionary<string, Animation>();
 
         public Animation Current { get; private set; }
 
