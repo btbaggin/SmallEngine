@@ -23,7 +23,7 @@ namespace SmallEngine.Messages
 
         public sealed override void SendMessage(IMessage pM)
         {
-            if(_messages.IsEmpty || _messages.Peek().Type != pM.Type)
+            if((_messages.TryPeek(out IMessage m) && m.Type != pM.Type) || _messages.IsEmpty)
             {
                 _messages.Push(pM);
                 base.SendMessage(pM);

@@ -58,12 +58,30 @@ namespace SmallEngine
         /// <summary>
         /// Returns the item most recently added to the RingBuffer
         /// </summary>
-        /// <returns></returns>
         public T Peek()
         {
             if (IsEmpty) throw new InvalidOperationException("Unable to Peek with no elements");
 
             return _data[_head];
+        }
+
+        /// <summary>
+        /// Thread-safe way to peek into the RingBuffer
+        /// </summary>
+        /// <param name="pItem">Item that was at the head of the RingBuffer at the time TryPeek was called</param>
+        public bool TryPeek(out T pItem)
+        {
+            //Save current location so if another thread calls Get
+            //it won't cause problems
+            var head = _head;
+            if (head != _tail)
+            {
+                pItem = _data[head];
+                return true;
+            }
+
+            pItem = default;
+            return false;
         }
     }
 }
