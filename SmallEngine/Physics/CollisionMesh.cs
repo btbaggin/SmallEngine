@@ -182,7 +182,7 @@ namespace SmallEngine.Physics
         public Vector2 GetSupport(Vector2 pDirection)
         {
             float best = float.MinValue;
-            Vector2 bestVert = default(Vector2);
+            Vector2 bestVert = default;
 
             for (int i = 0; i < Verticies.Length; i++)
             {

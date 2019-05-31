@@ -8,7 +8,7 @@ using SmallEngine.Components;
 
 namespace SmallEngine.Physics
 {
-    public class RigidBodyComponent : DependencyComponent
+    public sealed class RigidBodyComponent : DependencyComponent
     {
         #region "Properties"
         internal float InverseMass;

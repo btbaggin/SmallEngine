@@ -7,7 +7,7 @@ using SmallEngine.Components;
 
 namespace SmallEngine.Physics
 {
-    public class ColliderComponent : DependencyComponent, IPhysicsBody
+    public sealed class ColliderComponent : DependencyComponent, IPhysicsBody
     {
         readonly  HashSet<ColliderComponent> Colliders = new HashSet<ColliderComponent>();
         public EventHandler<CollisionEventArgs> CollisionEnter { get; set; }
@@ -32,8 +32,11 @@ namespace SmallEngine.Physics
                 _mesh.Body = this;
 
                 _mesh.CalculateMass(out float mass, out float inertia);
-                _body.Mass = mass;
-                _body.Inertia = inertia;
+                if(_body != null)
+                {
+                    _body.Mass = mass;
+                    _body.Inertia = inertia;
+                }
             }
         }
 
@@ -47,6 +50,10 @@ namespace SmallEngine.Physics
         public short Layer { get; private set; }
 
         public bool IsTrigger { get; set; }
+
+        bool _triggerEnter;
+        bool _triggerExit;
+        public bool TriggerOnlyOnce { get; set; }
 
         public ColliderComponent()
         {
@@ -62,7 +69,18 @@ namespace SmallEngine.Physics
 
         internal void OnCollisionEnter(ColliderComponent pCollider, Manifold pManifold)
         {
-            var ce = IsTrigger ? TriggerEnter : CollisionEnter;
+            EventHandler<CollisionEventArgs> ce = null;
+            if (IsTrigger)
+            {
+                //Check if we have already triggered this collider
+                if(!TriggerOnlyOnce || !_triggerEnter)
+                {
+                    ce = TriggerEnter;
+                    _triggerEnter = true;
+                }
+            }
+            else ce = CollisionEnter;
+
             if (ce != null && Colliders.Add(pCollider))
             {
                 ce.Invoke(this, new CollisionEventArgs(pCollider, pManifold));
@@ -71,7 +89,18 @@ namespace SmallEngine.Physics
 
         internal void OnCollisionExit(ColliderComponent pCollider, Manifold pManifold)
         {
-            var ce = IsTrigger ? TriggerExit : CollisionExit;
+            EventHandler<CollisionEventArgs> ce = null;
+            if (IsTrigger)
+            {
+                //Check if we have already triggered this collider
+                if (!TriggerOnlyOnce || !_triggerExit)
+                {
+                    ce = TriggerExit;
+                    _triggerExit = true;
+                }
+            }
+            else ce = CollisionExit;
+
             if (ce != null && Colliders.Remove(pCollider))
             {
                 ce.Invoke(this, new CollisionEventArgs(pCollider, pManifold));
