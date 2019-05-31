@@ -183,8 +183,9 @@ namespace SmallEngine
                 GameTime.Tick();
 
                 //Cache pressed keys
-                Keyboard.ProcessInput();
-                Mouse.ProcessInput();
+                var input = Keyboard.GetInput();
+                Keyboard.SetState(input);
+                Mouse.SetState(input);
 
                 Coroutine.Update(GameTime.DeltaTime);
 

@@ -79,21 +79,14 @@ namespace SmallEngine.Input
             _handle = pHandle;
         }
 
-        internal static void ProcessInput()
+
+        internal static void SetState(byte[] pInput)
         {
-            WheelDelta = 0;
-
-            var mouseInput = new byte[7];
-            mouseInput[1] = IsKeyPressed((int)MouseButtons.Left) ? (byte)0xff : (byte)0x00;
-            mouseInput[2] = IsKeyPressed((int)MouseButtons.Right) ? (byte)0xff : (byte)0x00;
-            mouseInput[4] = IsKeyPressed((int)MouseButtons.Middle) ? (byte)0xff : (byte)0x00;
-            mouseInput[5] = IsKeyPressed((int)MouseButtons.X1) ? (byte)0xff : (byte)0x00;
-            mouseInput[6] = IsKeyPressed((int)MouseButtons.X2) ? (byte)0xff : (byte)0x00;
-
             _previousState = _inputState;
-            _inputState = new InputState(mouseInput);
+            _inputState = new InputState(pInput);
 
             //Get mouse position
+            WheelDelta = 0;
             GetCursorPos(out Point p);
             ScreenToClient(_handle, ref p);
             _mousePos = new Vector2(p.X, p.Y);

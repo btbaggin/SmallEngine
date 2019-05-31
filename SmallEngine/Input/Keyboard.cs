@@ -17,13 +17,17 @@ namespace SmallEngine.Input
         static InputState _previousState = new InputState(new byte[256]);
         static byte[] _keyInput;
 
-        internal static void ProcessInput()
+        internal static byte[] GetInput()
         {
             _keyInput = new byte[256];
             GetKeyboardState(_keyInput);
+            return _keyInput;
+        }
 
+        internal static void SetState(byte[] pInput)
+        {
             _previousState = _inputState;
-            _inputState = new InputState(_keyInput);
+            _inputState = new InputState(pInput);
         }
 
         #region KeyMapping exposure
