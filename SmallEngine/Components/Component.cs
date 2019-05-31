@@ -60,5 +60,10 @@ namespace SmallEngine.Components
         {
             return typeof(IComponent).IsAssignableFrom(pType);
         }
+
+        public virtual int CompareTo(IComponent other)
+        {
+            return 0;
+        }
     }
 }

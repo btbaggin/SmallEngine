@@ -12,23 +12,34 @@ namespace SmallEngine
     {
         public static Matrix2X2 Identity { get; } = new Matrix2X2(1, 0, 0, 1);
         readonly float m00, m01, m10, m11;
-        readonly float _r;
+        public float Rotation { get; private set; }
 
+        /// <summary>
+        /// Creates a new matrix from the specified values
+        /// </summary>
+        /// <param name="pM00">Value for position 0,0</param>
+        /// <param name="pM01">Value for position 0,1</param>
+        /// <param name="pM10">Value for position 1,0</param>
+        /// <param name="pM11">Value for position 1,1</param>
         public Matrix2X2(float pM00, float pM01, float pM10, float pM11)
         {
-            _r = 0;
+            Rotation = 0;
             m00 = pM00;
             m01 = pM01;
             m10 = pM10;
             m11 = pM11;
         }
 
+        /// <summary>
+        /// Creates a new value for the rotation specified in radians
+        /// </summary>
+        /// <param name="pRadians">Radians to rotate the matrix</param>
         public Matrix2X2(float pRadians)
         {
             float c = MathF.Cos(pRadians);
             float s = MathF.Sin(pRadians);
 
-            _r = pRadians;
+            Rotation = pRadians;
             m00 = c;
             m01 = -s;
             m10 = s;
@@ -40,12 +51,7 @@ namespace SmallEngine
             return new Matrix2X2(m00, m10, m01, m11);
         }
 
-        public Transform ToTransform(Vector2 pCenter)
-        {
-            Matrix3x2.Rotation(_r, new SharpDX.Vector2(pCenter.X, pCenter.Y), out Matrix3x2 m);
-            return new Transform(m);
-        }
-
+        #region Operators
         public static Vector2 operator *(Matrix2X2 pM, Vector2 pV)
         {
             return new Vector2(pM.m00 * pV.X + pM.m01 * pV.Y, pM.m10 * pV.X + pM.m11 * pV.Y);
@@ -55,6 +61,6 @@ namespace SmallEngine
         {
             return new Vector2(pM.m00 * pV.X + pM.m01 * pV.Y, pM.m10 * pV.X + pM.m11 * pV.Y);
         }
-
+        #endregion
     }
 }

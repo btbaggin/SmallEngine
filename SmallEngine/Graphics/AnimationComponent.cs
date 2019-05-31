@@ -25,8 +25,7 @@ namespace SmallEngine.Graphics
             Current = _animations[anim];
             Current.Update(pDeltaTime);
 
-            _render.Frame = Current.Frame;
-            _render.Bitmap = Current.Bitmap;
+            _render.Bitmap = Current.Bitmap.CreateSubBitmap(Current.Frame);
         }
 
         public void AddAnimation(string pName, Animation pAnim)

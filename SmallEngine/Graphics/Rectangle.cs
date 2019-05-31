@@ -145,9 +145,15 @@ namespace SmallEngine.Graphics
             return new SharpDX.Mathematics.Interop.RawRectangleF(pRect.Left, pRect.Top, pRect.Right, pRect.Bottom);
         }
 
-        public static implicit operator SharpDX.Mathematics.Interop.RawRectangleF?(Rectangle pRect)
+        public static implicit operator SharpDX.Mathematics.Interop.RawRectangleF?(Rectangle? pRect)
         {
-            return new SharpDX.Mathematics.Interop.RawRectangleF(pRect.Left, pRect.Top, pRect.Right, pRect.Bottom);
+            if (!pRect.HasValue) return null;
+            return new SharpDX.Mathematics.Interop.RawRectangleF(pRect.Value.Left, pRect.Value.Top, pRect.Value.Right, pRect.Value.Bottom);
+        }
+
+        public static implicit operator SharpDX.Mathematics.Interop.RawRectangle (Rectangle pRect)
+        {
+            return new SharpDX.Mathematics.Interop.RawRectangle((int)pRect.Left, (int)pRect.Top, (int)pRect.Right, (int)pRect.Bottom);
         }
         #endregion
     }

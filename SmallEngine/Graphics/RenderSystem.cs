@@ -10,10 +10,9 @@ namespace SmallEngine.Graphics
     class RenderSystem : ComponentSystem
     {
         readonly IGraphicsAdapter _adapter;
-        public RenderSystem(IGraphicsAdapter pAdapter)
+        public RenderSystem(IGraphicsAdapter pAdapter) : base()
         {
             _adapter = pAdapter;
-            Scene.Register(this);
         }
 
         public override void RunUpdate(float pDeltaTime)
@@ -28,16 +27,12 @@ namespace SmallEngine.Graphics
             }
         }
 
-        protected override List<IComponent> DiscoverComponents(string pTemplate, IGameObject pObject)
+        protected override List<IComponent> DiscoverComponents(IGameObject pObject)
         {
-            var r = pObject.GetComponentOfType(typeof(RenderComponent));
+            var r = pObject.GetComponent(typeof(RenderComponent));
 
             List<IComponent> components = new List<IComponent>();
-            if (r != null)
-            {
-                components.Add(r);
-                Remember(pTemplate, r.GetType());
-            }
+            if (r != null) components.Add(r);
 
             return components;
         }

@@ -15,26 +15,17 @@ namespace SmallEngine.Physics
                                                                { CollisionDetection.PolygonvsCircle, CollisionDetection.PolygonvsPolygon } };
 
         QuadTree<ColliderComponent> _quadTree;
-        public PhysicsSystem()
-        {
-            Scene.Register(this);
-        }
-
         public void CreateQuadTree()
         {
             _quadTree = new QuadTree<ColliderComponent>(PhysicsHelper.WorldBounds);
         }
 
-        protected override List<IComponent> DiscoverComponents(string pTemplate, IGameObject pObject)
+        protected override List<IComponent> DiscoverComponents(IGameObject pObject)
         {
             var r = pObject.GetComponent(typeof(ColliderComponent));
 
             List<IComponent> components = new List<IComponent>();
-            if (r != null)
-            {
-                components.Add(r);
-                Remember(pTemplate, r.GetType());
-            }
+            if (r != null) components.Add(r);
 
             return components;
         }

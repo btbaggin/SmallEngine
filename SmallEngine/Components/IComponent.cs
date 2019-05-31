@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SmallEngine.Components
 {
-    public interface IComponent : IDisposable
+    public interface IComponent : IDisposable, IComparable<IComponent>
     {
         bool Active { get; set; }
         IGameObject GameObject { get; }

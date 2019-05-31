@@ -67,6 +67,12 @@ namespace SmallEngine
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static float RadiansToDegrees(float pRadians)
+        {
+            return (float)(pRadians * (180 / Math.PI));
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float Round(float a, int pPlaces)
         {
             return (float)Math.Round(a, pPlaces);

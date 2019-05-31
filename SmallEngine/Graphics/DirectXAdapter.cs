@@ -12,7 +12,7 @@ using SharpDX.Mathematics.Interop;
 
 namespace SmallEngine.Graphics
 {
-    public class DirectXAdapter : IGraphicsAdapter
+    public sealed class DirectXAdapter : IGraphicsAdapter
     {
         Image _renderTarget;
         SwapChain _swapChain;
@@ -143,35 +143,34 @@ namespace SmallEngine.Graphics
         {
             Bitmap b = new Bitmap(Context, new Size2(pWidth, pHeight), new BitmapProperties(new PixelFormat(Format.B8G8R8A8_UNorm, SharpDX.Direct2D1.AlphaMode.Premultiplied)));
             b.CopyFromMemory(pData, pWidth * 4);
-            var br = new BitmapResource() { DirectXBitmap = b };
-            return br;
+            return new BitmapResource() { DirectXBitmap = b };
         }
 
-        public Bitmap LoadBitmap(string pFile, out int pWidth, out int pHeight)
+        public Bitmap LoadBitmap(string pFile)
         {
             System.Diagnostics.Debug.Assert(System.IO.File.Exists(pFile));
 
             // Loads from file using System.Drawing.Image
             using (var bitmap = (System.Drawing.Bitmap)System.Drawing.Image.FromFile(pFile))
             {
-                pWidth = bitmap.Width;
-                pHeight = bitmap.Height;
-                var sourceArea = new System.Drawing.Rectangle(0, 0, pWidth, pHeight);
+                var width = bitmap.Width;
+                var height = bitmap.Height;
+                var sourceArea = new System.Drawing.Rectangle(0, 0, width, height);
                 var bitmapProperties = new BitmapProperties(new PixelFormat(Format.R8G8B8A8_UNorm, SharpDX.Direct2D1.AlphaMode.Premultiplied));
-                var size = new Size2(pWidth, pHeight);
+                var size = new Size2(width, height);
 
                 // Transform pixels from BGRA to RGBA
-                int stride = pWidth * sizeof(int);
-                using (var tempStream = new DataStream(pHeight * stride, true, true))
+                int stride = width * sizeof(int);
+                using (var tempStream = new DataStream(height * stride, true, true))
                 {
                     // Lock System.Drawing.Bitmap
                     var bitmapData = bitmap.LockBits(sourceArea, System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppPArgb);
 
                     // Convert all pixels 
-                    for (int y = 0; y < pHeight; y++)
+                    for (int y = 0; y < height; y++)
                     {
                         int offset = bitmapData.Stride * y;
-                        for (int x = 0; x < pWidth; x++)
+                        for (int x = 0; x < width; x++)
                         {
                             //Convert BGRA to RGBA
                             int bgra = System.Runtime.InteropServices.Marshal.ReadInt32(bitmapData.Scan0, offset);
@@ -198,23 +197,44 @@ namespace SmallEngine.Graphics
         {
             var x = pPosition.X;
             var y = pPosition.Y;
-            Context.DrawBitmap(pBitmap.DirectXBitmap, new RawRectangleF(x, y, x + pScale.Width, y + pScale.Height), pOpacity, BitmapInterpolationMode.NearestNeighbor);
+            Context.DrawBitmap(pBitmap.DirectXBitmap, 
+                               new RawRectangleF(x, y, x + pScale.Width, y + pScale.Height), 
+                               pOpacity, 
+                               BitmapInterpolationMode.NearestNeighbor, 
+                               pBitmap.Source);
         }
 
-        public void DrawBitmap(BitmapResource pBitmap, float pOpacity, Vector2 pPosition, Size pScale, Rectangle pSourceRect)
+        public BitmapResource TileBitmap(BitmapResource pBitmap, int pTileWidth, int pTileHeight, int pXCount, int pYCount)
         {
-            var x = pPosition.X;
-            var y = pPosition.Y;
-            Context.DrawBitmap(pBitmap.DirectXBitmap,
-                                      new RawRectangleF(x, y, x + pScale.Width, y + pScale.Height),
-                                      pOpacity,
-                                      BitmapInterpolationMode.NearestNeighbor,
-                                      pSourceRect);
-        }
+            Bitmap b = new Bitmap(Context, 
+                                  new Size2(pXCount * pTileWidth, pYCount * pTileHeight), 
+                                  new BitmapProperties(new PixelFormat(Format.B8G8R8A8_UNorm, SharpDX.Direct2D1.AlphaMode.Premultiplied)));
 
-        public void DrawImage(BitmapResource pBitmap, Effect pEffect, Vector2 pPosition)
-        {
-            pEffect.Draw(pBitmap, pPosition);
+            var t = Context.Target;
+            var dpi = Factory2D.DesktopDpi;
+            var prop = new BitmapProperties1(new PixelFormat(Format.B8G8R8A8_UNorm, SharpDX.Direct2D1.AlphaMode.Premultiplied), dpi.Height, dpi.Width, BitmapOptions.CannotDraw | BitmapOptions.Target);
+            Context.Target = new Bitmap1(Context, _backBuffer, prop);
+
+            Context.BeginDraw();
+            for (int x = 0; x < pXCount; x++)
+            {
+                for(int y = 0; y < pYCount; y++)
+                {
+                    var posX = x * pTileWidth;
+                    var posY = y * pTileHeight;
+                    Context.DrawBitmap(pBitmap.DirectXBitmap,
+                                       new RawRectangleF(posX, posY, posX + pTileWidth, posY + pTileHeight),
+                                       1,
+                                       BitmapInterpolationMode.NearestNeighbor,
+                                       pBitmap.Source);
+                }
+            }
+            Context.EndDraw();
+
+            b.CopyFromRenderTarget(Context);
+            Context.Target = t;
+
+            return new BitmapResource() { DirectXBitmap = b };
         }
 
         public void DrawPoint(Vector2 pPoint, Brush pBrush)
