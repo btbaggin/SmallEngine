@@ -56,11 +56,22 @@ namespace SmallEngine.Audio
             _messages.Start();
         }
 
+        /// <summary>
+        /// Will play the given AudioResource
+        /// </summary>
+        /// <param name="pResource">The resource to play</param>
+        /// <returns>ID for the instance of the sound play</returns>
         public static int Play(AudioResource pResource)
         {
             return Play(pResource, MaxVolume);
         }
 
+        /// <summary>
+        /// Will play the given AudioResource at the specified volume
+        /// </summary>
+        /// <param name="pResource">The resource to play</param>
+        /// <param name="pVolume">The volume at which to play the sound</param>
+        /// <returns>ID for the instance of the sound play</returns>
         public static int Play(AudioResource pResource, float pVolume)
         {
             System.Diagnostics.Debug.Assert(pVolume >= MinVolume);
@@ -71,11 +82,50 @@ namespace SmallEngine.Audio
             return id;
         }
 
+        /// <summary>
+        /// Will play the given sound only if it is not currently playing
+        /// </summary>
+        /// <param name="pResource">The resource to play</param>
+        /// <param name="pId">The ID of last time the resource was played</param>
+        /// <returns>ID of the instance of the sound play</returns>
+        public static int PlayOnce(AudioResource pResource, int pId)
+        {
+            return PlayOnce(pResource, MaxVolume, pId);
+        }
+
+        /// <summary>
+        /// Will play the given sound only if it is not currently playing at the specified volume
+        /// </summary>
+        /// <param name="pResource">The resource to play</param>
+        /// <param name="pVolume">The volume at which to play the sound</param>
+        /// <param name="pId">The ID of last time the resource was played</param>
+        /// <returns>ID of the instance of the sound play</returns>
+        public static int PlayOnce(AudioResource pResource, float pVolume, int pId)
+        {
+            System.Diagnostics.Debug.Assert(pVolume >= MinVolume);
+            System.Diagnostics.Debug.Assert(pVolume <= MaxVolume);
+
+            if (_playingSounds.ContainsKey(pId)) return pId;
+
+            return Play(pResource, pVolume);
+        }
+
+        /// <summary>
+        /// Will loop the sound indefinitely until <see cref="Stop(int)"/> is called
+        /// </summary>
+        /// <param name="pResource">The resource to loop</param>
+        /// <returns>ID of the instance of the sound play</returns>
         public static int Loop(AudioResource pResource)
         {
             return Loop(pResource, MaxVolume);
         }
 
+        /// <summary>
+        /// Will loop the sound indefinitely at the specified volume until <see cref="Stop(int)"/> is called
+        /// </summary>
+        /// <param name="pResource">The resource to loop</param>
+        /// <param name="pVolume">The volume at whiche to play the sound</param>
+        /// <returns>ID of the instance of the sound play</returns>
         public static int Loop(AudioResource pResource, float pVolume)
         {
             System.Diagnostics.Debug.Assert(pVolume >= MinVolume);
@@ -86,16 +136,28 @@ namespace SmallEngine.Audio
             return id;
         }
 
+        /// <summary>
+        /// Stops the sound specified in the sound ID
+        /// </summary>
+        /// <param name="pId">The ID of the sound to stop</param>
         public static void Stop(int pId)
         {
             _messages.SendMessage(new AudioMessage("Stop", pId));
         }
 
+        /// <summary>
+        /// Pauses the sound specified in the sound ID
+        /// </summary>
+        /// <param name="pId">The ID of the sound to pause</param>
         public static void Pause(int pId)
         {
             _messages.SendMessage(new AudioMessage("Pause", pId));
         }
 
+        /// <summary>
+        /// Resumes playing of the sound specified in the sound ID
+        /// </summary>
+        /// <param name="pId">The ID of the sound to resume</param>
         public static void Resume(int pId)
         {
             _messages.SendMessage(new AudioMessage("Resume", pId));

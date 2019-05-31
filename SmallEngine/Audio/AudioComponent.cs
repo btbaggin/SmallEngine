@@ -2,7 +2,7 @@
 
 namespace SmallEngine.Audio
 {
-    public class AudioComponent : Component
+    public sealed class AudioComponent : Component
     {
         private int _id;
         private AudioResource _sound;
