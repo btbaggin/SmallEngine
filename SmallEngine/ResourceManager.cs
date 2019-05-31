@@ -23,10 +23,7 @@ namespace SmallEngine
         /// <returns>Handle to the resource</returns>
         public static T Add<T>(string pAlias, string pPath) where T : Resource, new()
         {
-            if (_resources.ContainsKey(pAlias))
-            {
-                return Request<T>(pAlias);
-            }
+            System.Diagnostics.Debug.Assert(!_resources.ContainsKey(pAlias));
 
             //Add to dictionary
             //Set to default resource
@@ -43,10 +40,7 @@ namespace SmallEngine
 
         public static T Add<T>(string pAlias, T pResource) where T : Resource, new()
         {
-            if(_resources.ContainsKey(pAlias))
-            {
-                return Request<T>(pAlias);
-            }
+            System.Diagnostics.Debug.Assert(!_resources.ContainsKey(pAlias));
 
             pResource.Alias = pAlias;
             _resources.Add(pAlias, pResource);
@@ -91,7 +85,7 @@ namespace SmallEngine
         /// <returns>Handle to the resource</returns>
         public async static Task<T> AddAsync<T>(string pAlias, string pPath, Action<T> pCallback) where T : Resource, new()
         {
-            return await AddAsync<T>(pAlias, pPath, false, pCallback);
+            return await AddAsync(pAlias, pPath, false, pCallback);
         }
 
         /// <summary>
@@ -108,15 +102,7 @@ namespace SmallEngine
         {
 
             T r;
-            if (_resources.ContainsKey(pAlias))
-            {
-                r = Request<T>(pAlias);
-                if (pCallback != null)
-                {
-                    pCallback.Invoke(r);
-                }
-                return r;
-            }
+            System.Diagnostics.Debug.Assert(!_resources.ContainsKey(pAlias));
 
             //Add to dictionary
             //Set to default resource
