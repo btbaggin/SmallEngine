@@ -23,5 +23,11 @@ namespace SmallEngine.UI
         }
 
         public override void Update() { }
+
+        public override void Dispose()
+        {
+            _bitmap.Dispose();
+            base.Dispose();
+        }
     }
 }

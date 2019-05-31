@@ -136,5 +136,13 @@ namespace SmallEngine.UI
         {
             return new Size(pSize.Width, SliderSize);
         }
+
+        public override void Dispose()
+        {
+            LabelFont.Dispose();
+            _barBrush.Dispose();
+            _sliderBrush.Dispose();
+            base.Dispose();
+        }
     }
 }

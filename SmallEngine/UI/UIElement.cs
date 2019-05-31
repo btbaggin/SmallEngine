@@ -261,7 +261,13 @@ namespace SmallEngine.UI
         }
         #endregion  
 
-        public virtual void Dispose() { }
+        public virtual void Dispose()
+        {
+            foreach(var c in Children)
+            {
+                c.Dispose();
+            }
+        }
 
         public int CompareTo(UIElement other)
         {

@@ -57,5 +57,12 @@ namespace SmallEngine.UI
             var height = Math.Max(16, Height);
             return new Size(Math.Min(width, pSize.Width), Math.Min(height, pSize.Height));
         }
+
+        public override void Dispose()
+        {
+            _backgroundBrush.Dispose();
+            _foregroundBrush.Dispose();
+            base.Dispose();
+        }
     }
 }

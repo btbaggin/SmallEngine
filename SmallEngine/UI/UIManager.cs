@@ -66,6 +66,14 @@ namespace SmallEngine.UI
         {
             _measureInvalid = true;
         }
+
+        internal void DisposeElements()
+        {
+            foreach(var c in _elements)
+            {
+                c.Dispose();
+            }
+        }
         #endregion
     }
 }

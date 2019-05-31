@@ -108,11 +108,13 @@ namespace SmallEngine
             if(_scenes.Count > 0)
             {
                 //Remove current scene
-                var s = _scenes.Pop(); 
+                var s = _scenes.Pop();
+                s._ui.DisposeElements();
 
                 switch(s._mode)
                 {
                     case SceneLoadModes.Additive:
+                    case SceneLoadModes.Replace:
                         //Don't need to do anything
                         break;
 
@@ -120,10 +122,6 @@ namespace SmallEngine
                         var peek = _scenes.Peek();
                         peek.Active = true;
                         peek.Restore();
-                        break;
-
-                    case SceneLoadModes.Replace:
-                        System.Diagnostics.Debug.Assert(_scenes.Count == 0);
                         break;
                 }
             }

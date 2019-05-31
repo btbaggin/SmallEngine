@@ -133,5 +133,13 @@ namespace SmallEngine.UI
             var s = Font.MeasureString(Text, pSize.Width);
             return new Size(pSize.Width, s.Height);
         }
+
+        public override void Dispose()
+        {
+            _backgroundBrush.Dispose();
+            _foregroundBrush.Dispose();
+            Font.Dispose();
+            base.Dispose();
+        }
     }
 }

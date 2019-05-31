@@ -51,5 +51,11 @@ namespace SmallEngine.UI
         {
             return Font.MeasureString(Text, pSize.Width);
         }
+
+        public override void Dispose()
+        {
+            Font.Dispose();
+            base.Dispose();
+        }
     }
 }

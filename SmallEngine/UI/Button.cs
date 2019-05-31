@@ -122,5 +122,11 @@ namespace SmallEngine.UI
                 _state = ButtonState.Idle;
             }
         }
+
+        public override void Dispose()
+        {
+            _brush.Dispose();
+            base.Dispose();
+        }
     }
 }
