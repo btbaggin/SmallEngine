@@ -50,5 +50,12 @@ namespace SmallEngine.UI
                 IsChecked = !IsChecked;
             }
         }
+
+        public override Size MeasureOverride(Size pSize)
+        {
+            var width = Math.Max(16, Width);
+            var height = Math.Max(16, Height);
+            return new Size(Math.Min(width, pSize.Width), Math.Min(height, pSize.Height));
+        }
     }
 }

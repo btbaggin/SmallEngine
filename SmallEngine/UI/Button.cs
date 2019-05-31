@@ -39,7 +39,7 @@ namespace SmallEngine.UI
 
         ButtonState _state;
         readonly Brush _brush;
-        public Button(string pText) : this(null, new Label(pText)) { }
+        public Button(string pText) : this(null, new Label(pText) { HorizontalAlignment = HorizontalAlignments.Center }) { }
 
         public Button(UIElement pContent) : this(null, pContent) { }
 
@@ -60,6 +60,13 @@ namespace SmallEngine.UI
             var content = Children[0];
             content.Measure(pSize);
             return new Size(content.DesiredSize.Width + Padding.Width, content.DesiredSize.Height + Padding.Height);
+        }
+
+        public override void ArrangeOverride(Rectangle pBounds)
+        {
+            base.ArrangeOverride(pBounds);
+            var content = Children[0];
+            content.Arrange(new Rectangle(pBounds.X + Padding.Left, pBounds.Y + Padding.Top, pBounds.Width - Padding.Width, pBounds.Height - Padding.Height));
         }
 
         public override void Draw(IGraphicsAdapter pSystem)
