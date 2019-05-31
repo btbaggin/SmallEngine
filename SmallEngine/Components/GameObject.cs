@@ -63,7 +63,7 @@ namespace SmallEngine
                 return (T)_components[typeof(T)];
             }
 
-            return default(T);
+            return default;
         }
 
         public IComponent GetComponent(Type pType)

@@ -54,12 +54,12 @@ namespace SmallEngine.Messages
             {
                 if (!_messages.IsEmpty)
                 {
-                    pMessage = _messages.Pop();
+                    pMessage = _messages.Get();
                     return true;
                 }
             }
 
-            pMessage = default(IMessage);
+            pMessage = default;
             return false;
         }
     }

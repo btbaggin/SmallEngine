@@ -7,14 +7,17 @@ using SmallEngine.Graphics;
 
 namespace SmallEngine
 {
+    /// <summary>
+    /// Object to allow efficient querying of spatial information within the scene
+    /// </summary>
     public class SceneGraph
     {
-        private const int MAX_LEVELS = 8;
-        private const int MAX_OBJECTS = 128;
-        private readonly List<IGameObject> _entities;
-        private Rectangle _bounds;
+        const int MAX_LEVELS = 8;
+        const int MAX_OBJECTS = 128;
+        readonly List<IGameObject> _entities;
+        Rectangle _bounds;
 
-        private readonly SceneGraph[] _nodes = new SceneGraph[4];
+        readonly SceneGraph[] _nodes = new SceneGraph[4];
 
         #region Properties
         public float Width
@@ -55,6 +58,14 @@ namespace SmallEngine
         #endregion
 
         #region Public Functions
+        public void Update(Scene pScene)
+        {
+            Clear();
+            foreach (var go in pScene.GameObjects)
+            {
+                Insert(go);
+            }
+        }
         /// <summary>
         /// Removes all objects from the QuadTree
         /// </summary>

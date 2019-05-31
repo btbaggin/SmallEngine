@@ -8,7 +8,7 @@ namespace SmallEngine
 {
     public static class Extensions
     {
-        internal static void AddOrdered(this List<UI.UIElement> pList, UI.UIElement pElement)
+        internal static void AddOrdered<T>(this List<T> pList, T pElement) where T : IComparable<T>
         {
             var i = pList.BinarySearch(pElement);
             if (i < 0) i = ~i;

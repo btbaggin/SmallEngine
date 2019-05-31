@@ -43,6 +43,8 @@ namespace SmallEngine
 
         public Camera(float pMinZoom, float pMaxZoom)
         {
+            System.Diagnostics.Debug.Assert(_maxZoom >= _minZoom);
+
             Position = Vector2.Zero;
 
             _minZoom = pMinZoom;

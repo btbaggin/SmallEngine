@@ -16,10 +16,6 @@ namespace SmallEngine
 {
     public class Game : IUpdatable, IDisposable
     {
-        /*TODO
-         * Generic render component?
-         */
-
         readonly RenderSystem _render;
         float _timeElapsed;
         int _frameCount;
