@@ -242,9 +242,9 @@ namespace SmallEngine.Graphics
             Context.FillRectangle(new RawRectangleF(pPoint.X - 1, pPoint.Y - 1, pPoint.X + 1, pPoint.Y + 1), pBrush.FillColorBrush);
         }
 
-        public void DrawLine(Vector2 pPoint1, Vector2 pPoint2, Brush pBrush)
+        public void DrawLine(Vector2 pPoint1, Vector2 pPoint2, Pen pPen)
         {
-            Context.DrawLine(pPoint1, pPoint2, pBrush.FillColorBrush);
+            Context.DrawLine(pPoint1, pPoint2, pPen.DirectXBrush, pPen.Size);
         }
 
         public void DrawRect(Rectangle pRect, Brush pBrush)
@@ -262,7 +262,7 @@ namespace SmallEngine.Graphics
 
         public void SetTransform(Transform pTransform)
         {
-            Context.Transform = pTransform.Rotation;
+            Context.Transform = pTransform.Matrix;
         }
 
         public void ResetTransform()

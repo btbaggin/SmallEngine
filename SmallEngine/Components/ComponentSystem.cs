@@ -55,7 +55,7 @@ namespace SmallEngine.Components
                 }
             }
 
-            //TODO _mapping.Add(pObject, comps);
+            _mapping.Add(pObject, comps);
         }
 
         public void GameObjectRemoved(IGameObject pObject)
@@ -76,6 +76,6 @@ namespace SmallEngine.Components
                 RunUpdate(pDeltaTime);
             }
         }
-        public abstract void RunUpdate(float pDeltaTime);
+        protected abstract void RunUpdate(float pDeltaTime);
     }
 }

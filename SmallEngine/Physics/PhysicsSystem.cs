@@ -30,18 +30,19 @@ namespace SmallEngine.Physics
             return components;
         }
 
-        public override void RunUpdate(float pDeltaTime)
+        protected override void RunUpdate(float pDeltaTime)
         {
             _quadTree.Clear();
 
             foreach(var component in Components)
             {
                 var r = (ColliderComponent)component;
+                if (!r.Active) continue; //TODO just have ComponentSystem remove inactive from thing?
 
                 //Find all intersections before we insert our new entity
                 foreach (var colliders in _quadTree.Retrieve(r))
                 {
-                    if(r.HasLayer(colliders.Layer))
+                    if(r.HasLayer(colliders.Layer)) //TODO need to think how this layer stuff will work
                     {
                         Manifold m = new Manifold(r, colliders);
 

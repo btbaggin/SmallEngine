@@ -43,7 +43,11 @@ namespace SmallEngine.Physics
             get { return GameObject.Position; }
         }
 
-        public Vector2 Velocity { get; set; }
+        public Vector2 Velocity
+        {
+            get;
+            set;
+        }
 
         public Vector2 Force { get; private set; }
 
@@ -71,8 +75,8 @@ namespace SmallEngine.Physics
                 }
                 else
                 {
-                    Velocity += (InverseMass * Force + PhysicsHelper.Gravity) * (pDeltaTime / 2);
-                    AngularVelocity += Torque * InverseInertia * (pDeltaTime / 2);
+                    Velocity += (InverseMass * Force + PhysicsHelper.Gravity) * pDeltaTime;
+                    AngularVelocity += Torque * InverseInertia * pDeltaTime;
                     GameObject.Rotation += AngularVelocity * pDeltaTime;
                 }
 

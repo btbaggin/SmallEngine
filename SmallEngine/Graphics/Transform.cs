@@ -9,19 +9,27 @@ namespace SmallEngine.Graphics
 {
     public class Transform
     {
-        public static Transform Identity { get; } = new Transform(Matrix3x2.Identity);
+        public static Transform Identity { get; } = new Transform(SharpDX.Matrix3x2.Identity);
 
-        public Matrix3x2 Rotation { get; private set; }
+        public SharpDX.Matrix3x2 Matrix { get; private set; }
 
-        public Transform(Matrix3x2 pRotation)
+        public Transform(SharpDX.Matrix3x2 pMatrix)
         {
-            Rotation = pRotation;
+            Matrix = pMatrix;
         }
 
         public static Transform Create(IGameObject pGameObject)
         {
             var center = new Vector2(pGameObject.Position.X + pGameObject.Scale.Width / 2, pGameObject.Position.Y + pGameObject.Scale.Height / 2);
-            Matrix3x2.Rotation(pGameObject.RotationMatrix.Rotation, new SharpDX.Vector2(center.X, center.Y), out Matrix3x2 m);
+            SharpDX.Matrix3x2.Rotation(pGameObject.Rotation, new SharpDX.Vector2(center.X, center.Y), out SharpDX.Matrix3x2 m);
+            m *= pGameObject.TransformMatrix;
+            return new Transform(m);
+        }
+
+        public static Transform CreateBasic(IGameObject pGameObject)
+        {
+            var center = new Vector2(pGameObject.Position.X + pGameObject.Scale.Width / 2, pGameObject.Position.Y + pGameObject.Scale.Height / 2);
+            SharpDX.Matrix3x2.Rotation(pGameObject.Rotation, new SharpDX.Vector2(center.X, center.Y), out SharpDX.Matrix3x2 m);
             return new Transform(m);
         }
     }

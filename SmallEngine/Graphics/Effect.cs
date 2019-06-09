@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using SharpDX.Direct2D1;
 using SharpDX.Direct2D1.Effects;
+using SharpDX.DXGI;
 
 namespace SmallEngine.Graphics
 {
@@ -54,6 +55,10 @@ namespace SmallEngine.Graphics
 
         public void Draw(BitmapResource pBitmap, Vector2 pPosition)
         {
+            Bitmap b = new Bitmap(_context,
+                                  new SharpDX.Size2(pBitmap.Width, pBitmap.Height),
+                                  new BitmapProperties(new PixelFormat(Format.B8G8R8A8_UNorm, SharpDX.Direct2D1.AlphaMode.Premultiplied)));
+
             _effects[0].SetInput(0, pBitmap.DirectXBitmap, true);
             for (int i = 1; i < _effects.Count; i++)
             {
@@ -70,10 +75,10 @@ namespace SmallEngine.Graphics
         {
             var t = _context.Target;
             var b = new Bitmap1(_context,
-                new SharpDX.Size2((int)pBitmap.DirectXBitmap.Size.Width, (int)pBitmap.DirectXBitmap.Size.Height),
+                new SharpDX.Size2(pBitmap.Width, pBitmap.Height),
                 new BitmapProperties1()
                 {
-                    PixelFormat = new PixelFormat(SharpDX.DXGI.Format.B8G8R8A8_UNorm, AlphaMode.Premultiplied),
+                    PixelFormat = new PixelFormat(SharpDX.DXGI.Format.B8G8R8A8_UNorm, SharpDX.Direct2D1.AlphaMode.Premultiplied),
                     BitmapOptions = BitmapOptions.Target
                 });
 

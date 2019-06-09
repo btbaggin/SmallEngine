@@ -9,20 +9,31 @@ namespace SmallEngine.Graphics
 {
     public class AnimationComponent : DependencyComponent, IUpdatable
     {
+        public delegate void AnimationUpdateDelegate(AnimationComponent pComponent, ref Animation pCurrent);
+
         [ImportComponent]
         RenderComponent _render;
         readonly Dictionary<string, Animation> _animations = new Dictionary<string, Animation>();
 
-        public Animation Current { get; private set; }
+        Animation _current;
+        public Animation Current
+        {
+            get { return _current; }
+            private set { _current = value; }
+        }
 
-        public Func<string> Evaluator { get; set; }
+        public AnimationUpdateDelegate Evaluator { get; set; }
+
+        public int ZIndex
+        {
+            get { return _render.ZIndex; }
+            set { _render.ZIndex = value; }
+        }
 
         public void Update(float pDeltaTime)
         {
-            var anim = Evaluator.Invoke();
-            System.Diagnostics.Debug.Assert(_animations.ContainsKey(anim));
+            Evaluator?.Invoke(this, ref _current);
 
-            Current = _animations[anim];
             Current.Update(pDeltaTime);
 
             _render.Bitmap = Current.Bitmap.CreateSubBitmap(Current.Frame);
@@ -31,6 +42,12 @@ namespace SmallEngine.Graphics
         public void AddAnimation(string pName, Animation pAnim)
         {
             _animations.Add(pName, pAnim);
+        }
+
+        public void AddDefaultAnimation(string pName, Animation pAnim)
+        {
+            _animations.Add(pName, pAnim);
+            Current = pAnim;
         }
 
         public Animation GetAnimation(string pName)

@@ -14,13 +14,6 @@ namespace SmallEngine.Input
         static InputState _previousState = new InputState(new byte[7]);
 
         #region Win32
-        [DllImport("user32.dll")]
-        static extern short GetAsyncKeyState(int pKey);
-        static bool IsKeyPressed(int pKey)
-        {
-            return 0 != (GetAsyncKeyState(pKey) & 0x8000);
-        }
-
         [DllImport("user32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         static extern bool GetCursorPos(out Point lpPoint);

@@ -30,17 +30,17 @@ namespace SmallEngine
             set
             {
                 _rotation = value;
-                RotationMatrix = new Matrix2X2(_rotation);
+                ((IGameObject)this).RotationMatrix = new Matrix2X2(_rotation);
             }
         }
 
-        public Matrix2X2 RotationMatrix { get; private set; }
+        Matrix2X2 IGameObject.RotationMatrix { get; set; } = Matrix2X2.Identity;
+
+        public Matrix3X2 TransformMatrix { get; protected set; } = Matrix3X2.Identity;
 
         public bool Destroyed { get; private set; }
 
         public string Tag { get; set; }
-
-        public virtual int Order => 0;
 
         public Scene ContainingScene { get; set; }
         #endregion  
@@ -52,7 +52,6 @@ namespace SmallEngine
         public GameObject(string pName)
         {
             Name = pName;
-            RotationMatrix = Matrix2X2.Identity;
         }
 
         #region Components

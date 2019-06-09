@@ -90,6 +90,7 @@ namespace SmallEngine.UI
         public string Name { get; private set; }
         #endregion
 
+        bool _disposed;
         readonly Scene _containingScene;
         readonly List<UIElement> _orderedItems = new List<UIElement>();
         protected UIElement(string pName)
@@ -241,6 +242,7 @@ namespace SmallEngine.UI
         #region Internal Methods
         internal void DrawInternal(IGraphicsAdapter pSystem)
         {
+            if (_disposed) return;
             Draw(pSystem);
             foreach (var e in _orderedItems)
             {
@@ -263,6 +265,7 @@ namespace SmallEngine.UI
 
         public virtual void Dispose()
         {
+            _disposed = true;
             foreach(var c in Children)
             {
                 c.Dispose();

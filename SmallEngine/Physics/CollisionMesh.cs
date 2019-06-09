@@ -64,18 +64,13 @@ namespace SmallEngine.Physics
     #region SquareMesh
     public class SquareMesh : PolygonMesh
     {
-        public Size Size { get; set; }
-        public SquareMesh(Size pSize, Material pMaterial) : base(new Vector2[] { Vector2.Zero,
-                                                                                 new Vector2(pSize.Width, 0), 
-                                                                                 new Vector2(pSize.Width, pSize.Height),
-                                                                                 new Vector2(0, pSize.Height) }, pMaterial)
-        {
-            Size = pSize;
-        }
+        public SquareMesh(Size pSize, Material pMaterial) : this(Vector2.Zero, pSize, pMaterial) { }
 
-        public override AxisAlignedBoundingBox CalculateAABB(Vector2 pPosition)
+        public SquareMesh(Vector2 pPosition, Size pSize, Material pMaterial) : base(new Vector2[] { pPosition,
+                                                                                 new Vector2(pSize.Width, 0) + pPosition,
+                                                                                 new Vector2(pSize.Width, pSize.Height) + pPosition,
+                                                                                 new Vector2(0, pSize.Height) + pPosition}, pMaterial)
         {
-            return new AxisAlignedBoundingBox(pPosition, new Vector2(pPosition.X + Size.Width, pPosition.Y + Size.Height));
         }
     }
     #endregion
@@ -86,8 +81,11 @@ namespace SmallEngine.Physics
         public Vector2[] Verticies { get; private set; }
         public Vector2[] Normals { get; private set; }
 
+        Vector2 _min, _max;
         public PolygonMesh(Vector2[] pVerticies, Material pMaterial) : base(Shapes.Polygon, pMaterial)
         {
+            _min = new Vector2(float.MaxValue, float.MaxValue);
+            _max = new Vector2(-float.MaxValue, -float.MaxValue);
             SetVerticies(pVerticies);
         }
 
@@ -164,6 +162,11 @@ namespace SmallEngine.Physics
             for(int i = 0; i < actualVertexCount; i++)
             {
                 Verticies[i] = pVerticies[hull[i]];
+                var v = Verticies[i];
+                if (v.X < _min.X) _min.X = v.X;
+                if (v.Y < _min.Y) _min.Y = v.Y;
+                if (v.X > _max.X) _max.X = v.X;
+                if (v.Y > _max.Y) _max.Y = v.Y;
             }
 
             // Compute face normals
@@ -201,7 +204,7 @@ namespace SmallEngine.Physics
 
         public override AxisAlignedBoundingBox CalculateAABB(Vector2 pPosition)
         {
-            throw new NotImplementedException();
+            return new AxisAlignedBoundingBox(pPosition + _min, pPosition + _max);
         }
 
         public override bool Contains(Vector2 pPoint)

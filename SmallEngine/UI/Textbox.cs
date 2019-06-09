@@ -18,8 +18,8 @@ namespace SmallEngine.UI
 
         public Color Foreground
         {
-            get { return _foregroundBrush.FillColor; }
-            set { _foregroundBrush.FillColor = value; }
+            get { return _foregroundBrush.Color; }
+            set { _foregroundBrush.Color = value; }
         }
 
         public Font Font { get; set; }
@@ -40,7 +40,8 @@ namespace SmallEngine.UI
         int _cursorPos;
         float _cursorTick;
         bool _showCursor;
-        readonly Brush _backgroundBrush, _foregroundBrush;
+        readonly Brush _backgroundBrush;
+        readonly Pen _foregroundBrush;
 
         public Textbox() : this(null) { }
 
@@ -50,7 +51,7 @@ namespace SmallEngine.UI
             Font.Alignment = Alignments.Leading;
 
             _backgroundBrush = Brush.CreateFillBrush(Color.Gray, Game.Graphics);
-            _foregroundBrush = Brush.CreateFillBrush(UIManager.DefaultFontColor, Game.Graphics);
+            _foregroundBrush = Pen.Create(UIManager.DefaultFontColor, 1, Game.Graphics);
         }
 
         public override void Draw(IGraphicsAdapter pSystem)

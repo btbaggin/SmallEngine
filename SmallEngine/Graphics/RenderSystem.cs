@@ -15,7 +15,7 @@ namespace SmallEngine.Graphics
             _adapter = pAdapter;
         }
 
-        public override void RunUpdate(float pDeltaTime)
+        protected override void RunUpdate(float pDeltaTime)
         {
             foreach (var c in Components)
             {

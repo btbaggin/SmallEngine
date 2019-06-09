@@ -19,7 +19,7 @@ namespace SmallEngine.Graphics
             set { FillColorBrush.Color = value; }
         }
 
-        public Color Outlinecolor
+        public Color OutlineColor
         {
             get { return OutlineColorBrush.Color; }
             set { OutlineColorBrush.Color = value; }
@@ -72,8 +72,8 @@ namespace SmallEngine.Graphics
 
         public void Dispose()
         {
-            FillColorBrush.Dispose();
-            OutlineColorBrush.Dispose();
+            if(FillColorBrush != null) FillColorBrush.Dispose();
+            if(OutlineColorBrush != null) OutlineColorBrush.Dispose();
         }
     }
 }

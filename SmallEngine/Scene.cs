@@ -42,7 +42,7 @@ namespace SmallEngine
         readonly UIManager _ui;
 
         static List<ComponentSystem> _systems = new List<ComponentSystem>();
-        static Stack<Scene> _scenes = new Stack<Scene>();
+        static IndexedStack<Scene> _scenes = new IndexedStack<Scene>();
         SceneLoadModes _mode;
 
         internal readonly static Dictionary<string, List<Type>> _definitions = new Dictionary<string, List<Type>>();
@@ -130,11 +130,13 @@ namespace SmallEngine
         #region Overridable Methods
         public virtual void Update(float pDeltaTime)
         {
-            foreach(var go in GameObjects)
+            foreach(var go in GameObjects.ToList()) //TODO wait until creation or something... i need to figure this stuff out
             {
                 go.Update(pDeltaTime);
             }
         }
+
+        public virtual void Draw(IGraphicsAdapter pAdapter) { }
 
         /// <summary>
         /// Called when the scene is initially loaded
@@ -168,29 +170,59 @@ namespace SmallEngine
         #region Internal methods
         internal static void UpdateAll(float pDeltaTime)
         {
-            foreach (var s in _scenes.ToList())
+            for(int i = 0; i < _scenes.Count; i++)
             {
-                if (s.Active)
-                {
-                    s.Update(pDeltaTime);
-                }
+                var s = _scenes.PeekAt(i);
+                if (s.Active) s.Update(pDeltaTime);
             }
+            //foreach (var s in _scenes.ToList())
+            //{
+            //    if (s.Active)
+            //    {
+            //        s.Update(pDeltaTime);
+            //    }
+            //}
+        }
+
+        internal static void DrawAll(IGraphicsAdapter pAdapter)
+        {
+            for(int i = 0; i < _scenes.Count; i++)
+            {
+                var s = _scenes.PeekAt(i);
+                if (s.Active) s.Draw(pAdapter);
+            }
+            //foreach(var s in _scenes)
+            //{
+            //    if(s.Active)
+            //    {
+            //        s.Draw(pAdapter);
+            //    }
+            //}
         }
 
         internal static void DisposeGameObjectsAll()
         {
-            foreach (var s in _scenes)
+            for (int i = 0; i < _scenes.Count; i++)
             {
-                s.DisposeGameObjects();
+
+                _scenes.PeekAt(i).DisposeGameObjects();
             }
+            //foreach (var s in _scenes)
+            //{
+            //    s.DisposeGameObjects();
+            //}
         }
 
         internal static void EndSceneAll()
         {
-            foreach (var s in _scenes.ToList())
+            for(int i = 0; i < _scenes.Count; i++)
             {
-                s.Unload();
+                _scenes.PeekAt(i).Unload();
             }
+            //foreach (var s in _scenes.ToList())
+            //{
+            //    s.Unload();
+            //}
         }
 
         internal static void RegisterUI(UIElement pElement)
@@ -209,18 +241,27 @@ namespace SmallEngine
 
         internal static void DrawUI(IGraphicsAdapter pAdapter)
         {
-            foreach (var s in _scenes.ToList()) //TODO i don't like this
+            for(int i = 0; i < _scenes.Count; i++) //TODO if I end something.................
             {
+                var s = _scenes.PeekAt(i);
                 if (s.Active) s._ui.UpdateAndDraw(pAdapter);
             }
+            //foreach (var s in _scenes.ToList()) //TODO i don't like this
+            //{
+            //    if (s.Active) s._ui.UpdateAndDraw(pAdapter);
+            //}
         }
 
         internal static void InvalidateAllMeasure()
         {
-            foreach (var s in _scenes)
+            for(int i = 0; i < _scenes.Count; i++)
             {
-                s.InvalidateMeasure();
+                _scenes.PeekAt(i).InvalidateMeasure();
             }
+            //foreach (var s in _scenes)
+            //{
+            //    s.InvalidateMeasure();
+            //}
         }
 
         internal void DisposeGameObjects()
@@ -358,11 +399,16 @@ namespace SmallEngine
         /// <param name="pName">Name for which to search</param>
         public static IGameObject FindGameObjectInScenes(string pName)
         {
-            foreach(var s in _scenes)
+            for(int i = 0; i < _scenes.Count; i++)
             {
-                var go = s.FindGameObject<IGameObject>(pName);
+                var go = _scenes.PeekAt(i).FindGameObject<IGameObject>(pName);
                 if (go != null) return go;
             }
+            //foreach(var s in _scenes)
+            //{
+            //    var go = s.FindGameObject<IGameObject>(pName);
+            //    if (go != null) return go;
+            //}
 
             return null;
         }
@@ -435,11 +481,16 @@ namespace SmallEngine
         /// <param name="pName">Name for which to search</param>
         public static UIElement FindUIElementInScenes(string pName)
         {
-            foreach(var s in _scenes)
+            for(int i = 0; i < _scenes.Count; i++)
             {
-                var e = s.FindUIElement<UIElement>(pName);
+                var e = _scenes.PeekAt(i).FindUIElement<UIElement>(pName);
                 if (e != null) return e;
             }
+            //foreach(var s in _scenes)
+            //{
+            //    var e = s.FindUIElement<UIElement>(pName);
+            //    if (e != null) return e;
+            //}
 
             return null;
         }

@@ -22,7 +22,9 @@ namespace SmallEngine
 
         float Rotation { get; set; }
 
-        Matrix2X2 RotationMatrix { get; }
+        Matrix2X2 RotationMatrix { get; set; }
+
+        Matrix3X2 TransformMatrix { get; }
 
         string Tag { get; set; }
 

@@ -12,6 +12,16 @@ namespace SmallEngine.Graphics
 
         public Rectangle Frame { get; private set; }
 
+        public int FrameCount
+        {
+            get { return _end - _start + 1; }
+        }
+
+        public bool IsComplete
+        {
+            get { return _index == _end; }
+        }
+
         readonly Size _frame;
         readonly int _start;
         readonly int _end;
@@ -58,6 +68,15 @@ namespace SmallEngine.Graphics
         public void Reset()
         {
             _index = _start;
+        }
+
+        public void SetFrame(int pFrame)
+        {
+            System.Diagnostics.Debug.Assert(pFrame <= _end);
+            System.Diagnostics.Debug.Assert(pFrame >= 0);
+
+            _index = _start + pFrame;
+            SetFrame();
         }
 
         private void SetFrame()

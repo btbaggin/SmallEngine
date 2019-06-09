@@ -12,7 +12,7 @@ namespace SmallEngine
     {
         public static Matrix2X2 Identity { get; } = new Matrix2X2(1, 0, 0, 1);
         readonly float m00, m01, m10, m11;
-        public float Rotation { get; private set; }
+        float _r;
 
         /// <summary>
         /// Creates a new matrix from the specified values
@@ -23,7 +23,7 @@ namespace SmallEngine
         /// <param name="pM11">Value for position 1,1</param>
         public Matrix2X2(float pM00, float pM01, float pM10, float pM11)
         {
-            Rotation = 0;
+            _r = 0;
             m00 = pM00;
             m01 = pM01;
             m10 = pM10;
@@ -39,7 +39,7 @@ namespace SmallEngine
             float c = MathF.Cos(pRadians);
             float s = MathF.Sin(pRadians);
 
-            Rotation = pRadians;
+            _r = pRadians;
             m00 = c;
             m01 = -s;
             m10 = s;

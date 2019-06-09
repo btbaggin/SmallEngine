@@ -100,6 +100,7 @@ namespace SmallEngine
         private void Draw(float pDeltaTime)
         {
             _render.Update(pDeltaTime);
+            Scene.DrawAll(Graphics);
             Scene.DrawUI(Graphics);
         }
         #endregion

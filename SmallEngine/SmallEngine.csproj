@@ -97,6 +97,7 @@
     <Compile Include="Audio\AudioResource.cs" />
     <Compile Include="Components\IUpdatable.cs" />
     <Compile Include="Coroutine.cs" />
+    <Compile Include="Debug\DebugRenderSystem.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="Components\GameObject.cs" />
     <Compile Include="GameForm.cs" />
@@ -111,15 +112,18 @@
     <Compile Include="Graphics\Font.cs" />
     <Compile Include="Graphics\IGraphicsAdapter.cs" />
     <Compile Include="Components\IComponent.cs" />
+    <Compile Include="Graphics\Pen.cs" />
     <Compile Include="Graphics\RenderComponent.cs" />
     <Compile Include="Graphics\RenderSystem.cs" />
     <Compile Include="Graphics\Size.cs" />
     <Compile Include="Graphics\SpriteStrip.cs" />
     <Compile Include="Graphics\Transform.cs" />
+    <Compile Include="IndexedStack.cs" />
     <Compile Include="Input\KeyMapping.cs" />
     <Compile Include="Input\Keyboard.cs" />
     <Compile Include="Input\Mouse.cs" />
-    <Compile Include="Matrix2x2.cs" />
+    <Compile Include="Matrix2X2.cs" />
+    <Compile Include="Matrix3X2.cs" />
     <Compile Include="Messages\GameMessage.cs" />
     <Compile Include="Messages\GroupingMessageBus.cs" />
     <Compile Include="Messages\IMessage.cs" />
