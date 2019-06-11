@@ -42,6 +42,8 @@ namespace SmallEngine
         readonly UIManager _ui;
 
         static List<ComponentSystem> _systems = new List<ComponentSystem>();
+        //It should be fine to just iterate to the count for updates
+        //if something gets added it shouldn't be updated until the next frame anyway
         static IndexedStack<Scene> _scenes = new IndexedStack<Scene>();
         SceneLoadModes _mode;
 
@@ -69,8 +71,8 @@ namespace SmallEngine
         public static T Load<T>(SceneLoadModes pMode) where T : Scene
         {
             //TODO allow creating scene that isn't registered to all systems
-            var s = (T)Activator.CreateInstance(typeof(T));
-            s._mode = pMode;
+            var scene = (T)Activator.CreateInstance(typeof(T));
+            scene._mode = pMode;
             if(_scenes.Count > 0)
             {
                 switch(pMode)
@@ -92,10 +94,10 @@ namespace SmallEngine
                 }
             }
 
-            _scenes.Push(s);
-            s.Begin();
+            _scenes.Push(scene);
+            scene.Begin();
 
-            return s;
+            return scene;
         }
         #endregion
 
@@ -108,10 +110,10 @@ namespace SmallEngine
             if(_scenes.Count > 0)
             {
                 //Remove current scene
-                var s = _scenes.Pop();
-                s._ui.DisposeElements();
+                var scene = _scenes.Pop();
+                scene._ui.DisposeElements();
 
-                switch(s._mode)
+                switch(scene._mode)
                 {
                     case SceneLoadModes.Additive:
                     case SceneLoadModes.Replace:
@@ -130,9 +132,12 @@ namespace SmallEngine
         #region Overridable Methods
         public virtual void Update(float pDeltaTime)
         {
-            foreach(var go in GameObjects.ToList()) //TODO wait until creation or something... i need to figure this stuff out
+            //It's Ok to go until count because GameObjects aren't destroyed until the end of frame
+            //Any new objects won't get updated until the frame they are created
+            var count = GameObjects.Count;
+            for(int i = 0; i < count; i++) 
             {
-                go.Update(pDeltaTime);
+                GameObjects[i].Update(pDeltaTime);
             }
         }
 
@@ -148,7 +153,22 @@ namespace SmallEngine
         /// </summary>
         protected virtual void End()
         {
-            DisposeGameObjects();
+            //Dispose of all GameObjects created within the scene
+            foreach(var go in GameObjects)
+            {
+                foreach (var s in _systems)
+                {
+                    s.GameObjectRemoved(go);
+                }
+
+                if (!string.IsNullOrEmpty(go.Name) && _namedObjects.ContainsKey(go.Name))
+                {
+                    _namedObjects.Remove(go.Name);
+                }
+                go.Dispose();
+            }
+
+            GameObjects.Clear();
         }
 
         /// <summary>
@@ -175,13 +195,6 @@ namespace SmallEngine
                 var s = _scenes.PeekAt(i);
                 if (s.Active) s.Update(pDeltaTime);
             }
-            //foreach (var s in _scenes.ToList())
-            //{
-            //    if (s.Active)
-            //    {
-            //        s.Update(pDeltaTime);
-            //    }
-            //}
         }
 
         internal static void DrawAll(IGraphicsAdapter pAdapter)
@@ -191,26 +204,14 @@ namespace SmallEngine
                 var s = _scenes.PeekAt(i);
                 if (s.Active) s.Draw(pAdapter);
             }
-            //foreach(var s in _scenes)
-            //{
-            //    if(s.Active)
-            //    {
-            //        s.Draw(pAdapter);
-            //    }
-            //}
         }
 
         internal static void DisposeGameObjectsAll()
         {
             for (int i = 0; i < _scenes.Count; i++)
             {
-
-                _scenes.PeekAt(i).DisposeGameObjects();
+                _scenes.PeekAt(i).DisposeDestroyedGameObjects();
             }
-            //foreach (var s in _scenes)
-            //{
-            //    s.DisposeGameObjects();
-            //}
         }
 
         internal static void EndSceneAll()
@@ -219,10 +220,6 @@ namespace SmallEngine
             {
                 _scenes.PeekAt(i).Unload();
             }
-            //foreach (var s in _scenes.ToList())
-            //{
-            //    s.Unload();
-            //}
         }
 
         internal static void RegisterUI(UIElement pElement)
@@ -246,10 +243,6 @@ namespace SmallEngine
                 var s = _scenes.PeekAt(i);
                 if (s.Active) s._ui.UpdateAndDraw(pAdapter);
             }
-            //foreach (var s in _scenes.ToList()) //TODO i don't like this
-            //{
-            //    if (s.Active) s._ui.UpdateAndDraw(pAdapter);
-            //}
         }
 
         internal static void InvalidateAllMeasure()
@@ -258,13 +251,9 @@ namespace SmallEngine
             {
                 _scenes.PeekAt(i).InvalidateMeasure();
             }
-            //foreach (var s in _scenes)
-            //{
-            //    s.InvalidateMeasure();
-            //}
         }
 
-        internal void DisposeGameObjects()
+        private void DisposeDestroyedGameObjects()
         {
             while (_toRemove.TryTake(out IGameObject go))
             {
@@ -281,6 +270,7 @@ namespace SmallEngine
                 go.Dispose();
             }
         }
+
         #endregion
 
         #region GameObject Creation
@@ -404,11 +394,6 @@ namespace SmallEngine
                 var go = _scenes.PeekAt(i).FindGameObject<IGameObject>(pName);
                 if (go != null) return go;
             }
-            //foreach(var s in _scenes)
-            //{
-            //    var go = s.FindGameObject<IGameObject>(pName);
-            //    if (go != null) return go;
-            //}
 
             return null;
         }
@@ -486,11 +471,6 @@ namespace SmallEngine
                 var e = _scenes.PeekAt(i).FindUIElement<UIElement>(pName);
                 if (e != null) return e;
             }
-            //foreach(var s in _scenes)
-            //{
-            //    var e = s.FindUIElement<UIElement>(pName);
-            //    if (e != null) return e;
-            //}
 
             return null;
         }

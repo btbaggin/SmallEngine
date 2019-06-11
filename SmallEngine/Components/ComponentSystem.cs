@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace SmallEngine.Components
 {
-    public abstract class ComponentSystem : IUpdatable
+    public abstract class ComponentSystem
     {
         readonly Dictionary<string, IList<Type>> _cache = new Dictionary<string, IList<Type>>();
         readonly Dictionary<IGameObject, IEnumerable<IComponent>> _mapping = new Dictionary<IGameObject, IEnumerable<IComponent>>();
@@ -69,13 +69,13 @@ namespace SmallEngine.Components
 
         protected abstract List<IComponent> DiscoverComponents(IGameObject pObject);
 
-        public void Update(float pDeltaTime)
+        public void Process()
         {
             lock(Components)
             {
-                RunUpdate(pDeltaTime);
+                DoProcess();
             }
         }
-        protected abstract void RunUpdate(float pDeltaTime);
+        protected abstract void DoProcess();
     }
 }

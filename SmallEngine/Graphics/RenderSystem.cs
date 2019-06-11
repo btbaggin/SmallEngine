@@ -15,14 +15,15 @@ namespace SmallEngine.Graphics
             _adapter = pAdapter;
         }
 
-        protected override void RunUpdate(float pDeltaTime)
+        protected override void DoProcess()
         {
+            var deltaTime = GameTime.RenderTime;
             foreach (var c in Components)
             {
                 var r = (RenderComponent)c;
                 if (r.IsVisible() && r.GameObject.ContainingScene.Active)
                 {
-                    r.Draw(_adapter, pDeltaTime);
+                    r.Draw(_adapter, deltaTime);
                 }
             }
         }

@@ -30,19 +30,20 @@ namespace SmallEngine.Physics
             return components;
         }
 
-        protected override void RunUpdate(float pDeltaTime)
+        protected override void DoProcess()
         {
             _quadTree.Clear();
+            var deltaTime = GameTime.PhysicsTime;
 
             foreach(var component in Components)
             {
                 var r = (ColliderComponent)component;
-                if (!r.Active) continue; //TODO just have ComponentSystem remove inactive from thing?
+                if (!r.Active) continue;
 
                 //Find all intersections before we insert our new entity
                 foreach (var colliders in _quadTree.Retrieve(r))
                 {
-                    if(r.HasLayer(colliders.Layer)) //TODO need to think how this layer stuff will work
+                    if(colliders.Layer != 0 && r.HasLayer(colliders.Layer))
                     {
                         Manifold m = new Manifold(r, colliders);
 
@@ -67,7 +68,7 @@ namespace SmallEngine.Physics
                 }
                 
                 _quadTree.Insert(r);
-                r.Update(pDeltaTime);
+                r.Update(deltaTime);
             }
         }
 

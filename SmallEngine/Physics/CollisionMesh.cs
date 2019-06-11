@@ -265,7 +265,7 @@ namespace SmallEngine.Physics
                 Verticies[i] -= centroid;
 
             pMass = Material.Density * area;
-            pInertia = I * Material.Density;
+            pInertia = Material.Density * I;
         }
     }
     #endregion

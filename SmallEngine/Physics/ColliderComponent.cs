@@ -57,11 +57,6 @@ namespace SmallEngine.Physics
         bool _triggerExit;
         public bool TriggerOnlyOnce { get; set; }
 
-        public ColliderComponent()
-        {
-            Layer = 1;
-        }
-
         internal void Update(float pDeltaTime)
         {
             AABB = Mesh.CalculateAABB(Position);

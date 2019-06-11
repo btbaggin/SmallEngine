@@ -25,9 +25,10 @@ namespace SmallEngine.Physics
             _physics = new PhysicsSystem();
         }
 
-        internal static void Update(float pDeltaTime)
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        internal static void Update()
         {
-            _physics.Update(pDeltaTime);
+            _physics.Process();
         }
 
         internal static void CreateQuadTree()
