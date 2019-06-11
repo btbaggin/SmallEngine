@@ -44,6 +44,16 @@ namespace SmallEngine
         }
 
         /// <summary>
+        /// The amount of time leftover before a Draw call to be interpolated
+        /// </summary>
+        internal static float RenderTime { get; set; }
+
+        /// <summary>
+        /// The amount of time between each physics step
+        /// </summary>
+        internal static float PhysicsTime { get; set; }
+
+        /// <summary>
         /// Milliseconds elapsed since <see cref="Tick"/> not affected by time scaling
         /// </summary>
         public static float UnscaledDeltaTime
@@ -82,6 +92,7 @@ namespace SmallEngine
         /// <summary>
         /// Ticks the clock to set delta time
         /// </summary>
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         public static void Tick()
         {
             _currentTime = Stopwatch.GetTimestamp();

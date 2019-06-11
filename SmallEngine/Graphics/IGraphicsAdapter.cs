@@ -14,6 +14,7 @@ namespace SmallEngine.Graphics
         RenderMethods Method { get; }
         
         bool Initialize(GameForm pForm, bool pFullScreen);
+        void Resize(object sender, WindowEventArgs pE);
         void BeginDraw();
         void EndDraw();
 
@@ -30,5 +31,23 @@ namespace SmallEngine.Graphics
         void SetFullScreen(bool pFullScreen);
         void SetTransform(Transform pTransform);
         void ResetTransform();
+    }
+
+    public static class GraphicsAdapterFactory
+    {
+        public static IGraphicsAdapter Create(RenderMethods pMethod)
+        {
+            switch(pMethod)
+            {
+                case RenderMethods.DirectX:
+                    return new DirectXAdapter();
+
+                case RenderMethods.OpenGL:
+                    throw new NotImplementedException();
+
+                default:
+                    throw new UnknownEnumException(typeof(RenderMethods), pMethod);
+            }
+        }
     }
 }

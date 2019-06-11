@@ -14,11 +14,13 @@ namespace SmallEngine.Graphics
 {
     public sealed class DirectXAdapter : IGraphicsAdapter
     {
-        Image _renderTarget;
-        SwapChain _swapChain;
-        Surface _backBuffer;
+        const int BUFFER_COUNT = 2;
 
-        private SharpDX.Direct2D1.Device _2dDevice;
+        Image _renderTarget;
+        SwapChain1 _swapChain;
+        Surface _backBuffer;
+        DeviceDebug _debug;
+        SharpDX.Direct2D1.Device _2dDevice;
 
         #region Properties
         public RenderMethods Method
@@ -41,13 +43,20 @@ namespace SmallEngine.Graphics
         public bool Initialize(GameForm pForm, bool pFullScreen)
         {
             _form = pForm;
-            _form.WindowSizeChanged += Resize;
             try
             {
-                var defaultDevice = new Device(DriverType.Hardware, DeviceCreationFlags.Debug | DeviceCreationFlags.BgraSupport);
+#if DEBUG
+                var flags = DeviceCreationFlags.Debug | DeviceCreationFlags.BgraSupport;
+#else
+                var flags = DeviceCreationFlags.BgraSupport;
+#endif
+                var defaultDevice = new Device(DriverType.Hardware, flags);
 
                 Device = defaultDevice.QueryInterface<SharpDX.Direct3D11.Device1>();
-                //var d3Context = Device.ImmediateContext.QueryInterface<SharpDX.Direct3D11.DeviceContext1>();
+#if DEBUG
+                SharpDX.Configuration.EnableObjectTracking = true;
+                _debug = defaultDevice.QueryInterface<DeviceDebug>();
+#endif
 
                 var dxgiDevice2 = Device.QueryInterface<SharpDX.DXGI.Device2>();
                 var dxgiFactory2 = dxgiDevice2.Adapter.GetParent<SharpDX.DXGI.Factory2>();
@@ -60,7 +69,7 @@ namespace SmallEngine.Graphics
                     Format = Format.B8G8R8A8_UNorm,
                     Stereo = false,
                     SampleDescription = new SampleDescription(1, 0),
-                    BufferCount = 2,
+                    BufferCount = BUFFER_COUNT,
                     Scaling = Scaling.None,
                     SwapEffect = SwapEffect.FlipSequential,
                     Usage = Usage.RenderTargetOutput
@@ -69,7 +78,11 @@ namespace SmallEngine.Graphics
                 _swapChain = new SwapChain1(dxgiFactory2, Device, pForm.Handle, ref desc, null);
                 _2dDevice = new SharpDX.Direct2D1.Device(dxgiDevice2);
                 Context = new SharpDX.Direct2D1.DeviceContext(_2dDevice, DeviceContextOptions.None);
+#if DEBUG
+                Factory2D = new SharpDX.Direct2D1.Factory(FactoryType.SingleThreaded, DebugLevel.Information);
+#else
                 Factory2D = new SharpDX.Direct2D1.Factory(FactoryType.SingleThreaded);
+#endif
                 var dpi = Factory2D.DesktopDpi;
                 var prop = new BitmapProperties1(new PixelFormat(Format.B8G8R8A8_UNorm, SharpDX.Direct2D1.AlphaMode.Premultiplied), dpi.Height, dpi.Width, BitmapOptions.CannotDraw | BitmapOptions.Target);
                 _backBuffer = _swapChain.GetBackBuffer<Surface>(0);
@@ -97,10 +110,13 @@ namespace SmallEngine.Graphics
         {
             try
             {
+                Device.ImmediateContext.ClearState();
+
                 _backBuffer.Dispose();
                 _renderTarget.Dispose();
                 Context.Dispose();
-                _swapChain.ResizeBuffers(0, 0, 0, Format.Unknown, SwapChainFlags.AllowModeSwitch);
+
+                _swapChain.ResizeBuffers(BUFFER_COUNT, (int)pE.Size.Width, (int)pE.Size.Height, Format.Unknown, SwapChainFlags.AllowModeSwitch);
 
                 Context = new SharpDX.Direct2D1.DeviceContext(_2dDevice, DeviceContextOptions.None);
                 var dpi = Factory2D.DesktopDpi;
@@ -117,6 +133,10 @@ namespace SmallEngine.Graphics
 
         public void Dispose()
         {
+#if DEBUG
+            _debug.ReportLiveDeviceObjects(ReportingLevel.Detail | ReportingLevel.IgnoreInternal);
+            _debug.Dispose();
+#endif
             Device.Dispose();
             _swapChain.Dispose();
             _backBuffer.Dispose();
@@ -125,9 +145,9 @@ namespace SmallEngine.Graphics
             Factory2D.Dispose();
             FactoryDWrite.Dispose();
         }
-        #endregion
+#endregion
 
-        #region Overridden functions
+#region Overridden functions
         public void DrawText(string pText, Rectangle pRect, Font pFont)
         {
             Context.DrawText(pText, pFont.Format, pRect, pFont.Brush);
@@ -206,33 +226,19 @@ namespace SmallEngine.Graphics
 
         public BitmapResource TileBitmap(BitmapResource pBitmap, int pTileWidth, int pTileHeight, int pXCount, int pYCount)
         {
-            Bitmap b = new Bitmap(Context, 
-                                  new Size2(pXCount * pTileWidth, pYCount * pTileHeight), 
-                                  new BitmapProperties(new PixelFormat(Format.B8G8R8A8_UNorm, SharpDX.Direct2D1.AlphaMode.Premultiplied)));
+            Bitmap b = new Bitmap(Context,
+                                  new Size2(pXCount * pTileWidth, pYCount * pTileHeight),
+                                  new BitmapProperties(pBitmap.DirectXBitmap.PixelFormat));
 
-            var t = Context.Target;
-            var dpi = Factory2D.DesktopDpi;
-            var prop = new BitmapProperties1(new PixelFormat(Format.B8G8R8A8_UNorm, SharpDX.Direct2D1.AlphaMode.Premultiplied), dpi.Height, dpi.Width, BitmapOptions.CannotDraw | BitmapOptions.Target);
-            Context.Target = new Bitmap1(Context, _backBuffer, prop);
-
-            Context.BeginDraw();
             for (int x = 0; x < pXCount; x++)
             {
-                for(int y = 0; y < pYCount; y++)
+                for (int y = 0; y < pYCount; y++)
                 {
                     var posX = x * pTileWidth;
                     var posY = y * pTileHeight;
-                    Context.DrawBitmap(pBitmap.DirectXBitmap,
-                                       new RawRectangleF(posX, posY, posX + pTileWidth, posY + pTileHeight),
-                                       1,
-                                       BitmapInterpolationMode.NearestNeighbor,
-                                       pBitmap.Source);
+                    b.CopyFromBitmap(pBitmap.DirectXBitmap, new RawPoint(posX, posY), pBitmap.Source.Value);
                 }
             }
-            Context.EndDraw();
-
-            b.CopyFromRenderTarget(Context);
-            Context.Target = t;
 
             return new BitmapResource() { DirectXBitmap = b };
         }
@@ -279,13 +285,13 @@ namespace SmallEngine.Graphics
         public void EndDraw()
         {
             Context.EndDraw();
-            _swapChain.Present(_form.Vsync ? 1 : 0, PresentFlags.None);
+            _swapChain.Present(_form.SyncInterval, PresentFlags.None);
         }
 
         public void SetFullScreen(bool pFullScreen)
         {
             _swapChain.SetFullscreenState(pFullScreen, null);
         }
-        #endregion
+#endregion
     }
 }

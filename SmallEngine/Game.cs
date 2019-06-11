@@ -1,4 +1,6 @@
-﻿using System;
+﻿//#define FPS
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,13 +18,14 @@ namespace SmallEngine
 {
     public class Game : IUpdatable, IDisposable
     {
-        readonly RenderSystem _render;
+#if FPS
         float _timeElapsed;
         int _frameCount;
+#endif
+        readonly RenderSystem _render;
         float _physicsStep;
-        float _physicsStepTime;
 
-        #region Properties
+#region Properties
         public static Game Instance { get; private set; }
 
         public static GameForm Form { get; private set; }
@@ -38,7 +41,7 @@ namespace SmallEngine
             set
             {
                 _maxFps = value;
-                _physicsStepTime = 1f / _maxFps;
+                GameTime.PhysicsTime = 1f / _maxFps;
             }
         }
 
@@ -58,7 +61,7 @@ namespace SmallEngine
         }
 
         public static Camera ActiveCamera { get; set; }
-        #endregion  
+#endregion
 
         public Game()
         {
@@ -74,8 +77,11 @@ namespace SmallEngine
             Form.WindowDestory += WindowDestroyed;
             Form.WindowSizeChanged += WindowSizeChanged;
 
-            Graphics = RenderMethod == RenderMethods.DirectX ? new DirectXAdapter() : null;
-            Graphics.Initialize(Form, false);
+            Graphics = GraphicsAdapterFactory.Create(RenderMethod);
+            if(!Graphics.Initialize(Form, false))
+                throw new InvalidOperationException("Unable to initialize graphics adapter. View debug window for details.");
+
+            Form.WindowSizeChanged += Graphics.Resize;
 
             _render = new RenderSystem(Graphics);
             PhysicsHelper.Create();
@@ -83,7 +89,7 @@ namespace SmallEngine
             if (MaxFps == 0) MaxFps = 60;
         }
 
-        #region Overridable game functions
+#region Overridable game functions
         public virtual void Initialize() { }
 
         public virtual void LoadContent() { }
@@ -97,13 +103,13 @@ namespace SmallEngine
             Scene.UpdateAll(pDeltaTime);
         }
 
-        private void Draw(float pDeltaTime)
+        private void Draw()
         {
-            _render.Update(pDeltaTime);
+            _render.Process();
             Scene.DrawAll(Graphics);
             Scene.DrawUI(Graphics);
         }
-        #endregion
+#endregion
 
         public void Run()
         {
@@ -134,7 +140,7 @@ namespace SmallEngine
             AudioPlayer.DisposePlayer();
         }
 
-        #region Messages
+#region Messages
         public static int MessageThreads { get; private set; } = System.Environment.ProcessorCount - 1; //reserve dedicated thread for audio
 
         public static MessageBus Messages { get; private set; }
@@ -144,9 +150,9 @@ namespace SmallEngine
             if (pThreads <= 0) throw new ArgumentException(nameof(pThreads));
             MessageThreads = pThreads;
         }
-        #endregion
+#endregion
 
-        #region Event Handlers
+#region Event Handlers
         private void WindowDestroyed(object sender, WindowEventArgs e)
         {
             Exit();
@@ -183,27 +189,33 @@ namespace SmallEngine
                 Scene.DisposeGameObjectsAll();
                 GameTime.Tick();
 
+                var physicsTime = GameTime.PhysicsTime;
+                var deltaTime = GameTime.PhysicsTime;
+
                 //Cache pressed keys
                 var input = Keyboard.GetInput();
                 Keyboard.SetState(input);
                 Mouse.SetState(input);
 
-                Coroutine.Update(GameTime.DeltaTime);
+                Coroutine.Update(deltaTime);
 
-                Update(GameTime.DeltaTime);
+                Update(deltaTime);
 
-                _physicsStep += GameTime.DeltaTime;
+                _physicsStep += deltaTime;
                 if (_physicsStep > .02f) _physicsStep = .02f;
 
-                while (_physicsStep > _physicsStepTime)
+                while (_physicsStep > physicsTime)
                 {
                     //Update physics
-                    PhysicsHelper.Update(_physicsStepTime);
-                    _physicsStep -= _physicsStepTime;
+                    PhysicsHelper.Update();
+                    _physicsStep -= physicsTime;
                 }
 
                 Graphics.BeginDraw();
-                Draw(_physicsStep / _physicsStepTime);
+
+                GameTime.RenderTime = _physicsStep / physicsTime;
+                Draw();
+
                 Graphics.EndDraw();
 
                 //If the max updates is set and we have cycles, sleep the thread
@@ -217,6 +229,7 @@ namespace SmallEngine
                     }
                 }
 
+#if FPS
                 {//Calculate FPS
                     _frameCount++;
                     if ((_timeElapsed += GameTime.UnscaledDeltaTime) >= 1f)
@@ -227,11 +240,12 @@ namespace SmallEngine
 
                     }
                 }
+#endif
             }
         }
-        #endregion
+#endregion
 
-        #region PeekMessage PInvoke
+#region PeekMessage PInvoke
         [System.Runtime.InteropServices.DllImport("User32.dll", CharSet = System.Runtime.InteropServices.CharSet.Auto)]
         private static extern bool PeekMessage(out NativeMessage pMsg, IntPtr pHWnd, uint pMessageFilterMin, uint pMessageFilterMax, uint pFlags);
 
