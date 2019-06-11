@@ -73,6 +73,7 @@ namespace SmallEngine.Input
         }
 
 
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         internal static void SetState(byte[] pInput)
         {
             _previousState = _inputState;
