@@ -34,7 +34,18 @@ namespace SmallEngine
         public EventHandler<WindowEventArgs> WindowSizeChanged { get; set; }
 
         #region Properties
-        public bool Vsync { get; set; }
+        bool _vsync;
+        public bool Vsync
+        {
+            get { return _vsync; }
+            set
+            {
+                _vsync = value;
+                SyncInterval = value ? 1 : 0;
+            }
+        }
+
+        internal int SyncInterval;
 
         private bool _fullScreen;
         public bool FullScreen
@@ -78,44 +89,26 @@ namespace SmallEngine
             }
         }
 
-        private System.Drawing.Size _size;
-        public new System.Drawing.Size Size
+        private Size _size;
+        public new Size Size
         {
             get { return _size; }
             set
             {
-                if(_size != value)
+                if(_size.Width != value.Width || _size.Height != value.Height)
                 {
                     _size = value;
                     ClientSize = _size;
-                    _width = ClientSize.Width;
-                    _height = ClientSize.Height;
+                    Width = ClientSize.Width;
+                    Height = ClientSize.Height;
                     WindowSizeChanged?.Invoke(this, new WindowEventArgs(Enabled, Activated, Maximized, Size));
                 }
             }
         }
 
-        private int _width;
-        public new int Width
-        {
-            get { return _width; }
-            set
-            {
-                _width = value;
-                Size = new System.Drawing.Size(Width, Height);
-            }
-        }
+        public new int Width { get; private set; }
 
-        private int _height;
-        public new int Height
-        {
-            get { return _height; }
-            set
-            {
-                _height = value;
-                Size = new System.Drawing.Size(Width, Height);
-            }
-        }
+        public new int Height { get; private set; }
 
         private bool _maximized;
         public bool Maximized
