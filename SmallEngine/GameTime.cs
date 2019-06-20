@@ -99,6 +99,10 @@ namespace SmallEngine
             _unscaleDeltaTime = (_currentTime - _lastTime) * _secondsPerCount;
             _deltaTime = _unscaleDeltaTime * TimeScale;
             _lastTime = _currentTime;
+#if DEBUG
+            _unscaleDeltaTime = Math.Min(_unscaleDeltaTime, .02);
+            _deltaTime = Math.Min(_deltaTime, .02);
+#endif
         }
 
         /// <summary>

@@ -23,43 +23,63 @@ namespace SmallEngine.Graphics
             _context = ((DirectXAdapter)Game.Graphics).Context;
         }
 
-        public void AddSaturation(float pValue)
+        public Effect AddSaturation(float pValue)
         {
             _effects.Add(new Saturation(_context) { Value = pValue });
+            return this;
         }
 
-        public void AddHue(float pValue)
+        public Effect AddGrayscale()
+        {
+            _effects.Add(new SharpDX.Direct2D1.Effect(_context, SharpDX.Direct2D1.Effect.Grayscale));
+            return this;
+        }
+
+        public Effect AddHue(float pValue)
         {
             _effects.Add(new HueRotation(_context) { Angle = pValue });
+            return this;
         }
 
-        public void AddShadow(float pAmount, System.Drawing.Color pColor)
+        public Effect AddShadow(float pAmount, System.Drawing.Color pColor)
         {
             _effects.Add(new Shadow(_context)
             {
                 BlurStandardDeviation = pAmount,
                 Color = new SharpDX.Mathematics.Interop.RawColor4(pColor.R, pColor.G, pColor.B, pColor.A)
             });
+            return this;
         }
 
-        public void AddBlur(float pAmount)
+        public Effect AddBlur(float pAmount)
         {
             _effects.Add(new GaussianBlur(_context) { StandardDeviation = pAmount });
+            return this;
         }
 
-        public void Create()
+        public Effect Create()
         {
             _composite = new Composite(_context);
             _composite.InputCount = 2;
+            return this;
         }
 
         public void Draw(BitmapResource pBitmap, Vector2 pPosition)
         {
             Bitmap b = new Bitmap(_context,
                                   new SharpDX.Size2(pBitmap.Width, pBitmap.Height),
-                                  new BitmapProperties(new PixelFormat(Format.B8G8R8A8_UNorm, SharpDX.Direct2D1.AlphaMode.Premultiplied)));
+                                  new BitmapProperties(pBitmap.DirectXBitmap.PixelFormat));
 
-            _effects[0].SetInput(0, pBitmap.DirectXBitmap, true);
+            if(pBitmap.Source.HasValue)
+            {
+                b.CopyFromBitmap(pBitmap.DirectXBitmap, new SharpDX.Mathematics.Interop.RawPoint(0, 0), pBitmap.Source.Value);
+            }
+            else
+            {
+                b.CopyFromBitmap(pBitmap.DirectXBitmap, new SharpDX.Mathematics.Interop.RawPoint(0, 0));
+            }
+
+            _effects[0].SetInput(0, b, true);
             for (int i = 1; i < _effects.Count; i++)
             {
                 _effects[i].SetInput(0, _effects[i - 1].Output, true);

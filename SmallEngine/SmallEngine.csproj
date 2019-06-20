@@ -149,6 +149,7 @@
     <Compile Include="SceneGraph.cs" />
     <Compile Include="Serialization\Setting.cs" />
     <Compile Include="Serialization\SettingsFile.cs" />
+    <Compile Include="Threading\EventTimer.cs" />
     <Compile Include="UI\Alignment.cs" />
     <Compile Include="UI\Button.cs" />
     <Compile Include="UI\Checkbox.cs" />
@@ -156,6 +157,7 @@
     <Compile Include="UI\Image.cs" />
     <Compile Include="UI\Label.cs" />
     <Compile Include="UI\Panel.cs" />
+    <Compile Include="UI\ProgressBar.cs" />
     <Compile Include="UI\Slider.cs" />
     <Compile Include="UI\Textblock.cs" />
     <Compile Include="UI\Textbox.cs" />
@@ -176,7 +178,7 @@
     <Compile Include="Audio\AudioComponent.cs" />
     <Compile Include="Physics\RigidBodyComponent.cs" />
     <Compile Include="Utils\PerlinNoise.cs" />
-    <Compile Include="Utils\Timer.cs" />
+    <Compile Include="Threading\Timer.cs" />
     <Compile Include="Utils\UnknownEnumException.cs" />
     <Compile Include="Vector2.cs" />
   </ItemGroup>

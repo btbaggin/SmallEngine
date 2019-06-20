@@ -4,16 +4,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SmallEngine
+namespace SmallEngine.Threading
 {
     public struct Timer
     {
-        public float TickTime { get; set; }
+        public float Interval { get; set; }
 
         private float _timer;
         public Timer(float pTime)
         {
-            TickTime = pTime;
+            Interval = pTime;
             _timer = pTime;
         }
 
@@ -21,7 +21,7 @@ namespace SmallEngine
         {
             if((_timer -= GameTime.DeltaTime) <= 0)
             {
-                _timer += TickTime;
+                _timer += Interval;
                 return true;
             }
 

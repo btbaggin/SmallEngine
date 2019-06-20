@@ -49,7 +49,7 @@ namespace SmallEngine.Physics
             get { return _body; }
         }
 
-        public short Layer { get; private set; }
+        public short Layer { get; set; }
 
         public bool IsTrigger { get; set; }
 
@@ -57,10 +57,13 @@ namespace SmallEngine.Physics
         bool _triggerExit;
         public bool TriggerOnlyOnce { get; set; }
 
-        internal void Update(float pDeltaTime)
+        internal void UpdateAABB()
         {
             AABB = Mesh.CalculateAABB(Position);
+        }
 
+        internal void Update(float pDeltaTime)
+        {
             _body?.Update(pDeltaTime);
         }
 
@@ -76,7 +79,7 @@ namespace SmallEngine.Physics
                     _triggerEnter = true;
                 }
             }
-            else _event = true;// ce = CollisionEnter;
+            else _event = true;
 
             if (_event)
             {
@@ -110,20 +113,10 @@ namespace SmallEngine.Physics
             }
             else ce = CollisionExit;
 
-            if (ce != null && Colliders.Remove(pCollider))
+            if (Colliders.Remove(pCollider) && ce != null)
             {
                 ce.Invoke(this, new CollisionEventArgs(pCollider, pManifold));
             }
-        }
-
-        public void AddToLayer(short pLayer)
-        {
-            Layer |= pLayer;
-        }
-
-        public void RemoveFromLayer(short pLayer)
-        {
-            Layer &= (short)~(int)pLayer;
         }
 
         public bool HasLayer(short pLayer)

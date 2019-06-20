@@ -40,12 +40,15 @@ namespace SmallEngine.Physics
                 var r = (ColliderComponent)component;
                 if (!r.Active) continue;
 
+                //We have to update the AABB here because otherwise our bounding boxes will be one frame behind
+                r.UpdateAABB();
+
                 //Find all intersections before we insert our new entity
                 foreach (var colliders in _quadTree.Retrieve(r))
                 {
+                    Manifold m = new Manifold(r, colliders);
                     if(colliders.Layer != 0 && r.HasLayer(colliders.Layer))
                     {
-                        Manifold m = new Manifold(r, colliders);
 
                         int rShape = (int)r.Mesh.Shape;
                         int cShape = (int)colliders.Mesh.Shape;
@@ -64,6 +67,11 @@ namespace SmallEngine.Physics
                             m.BodyA.OnCollisionExit(m.BodyB, m);
                             m.BodyB.OnCollisionExit(m.BodyA, m);
                         }
+                    }
+                    else
+                    {
+                        m.BodyA.OnCollisionExit(m.BodyB, m);
+                        m.BodyB.OnCollisionExit(m.BodyA, m);
                     }
                 }
                 

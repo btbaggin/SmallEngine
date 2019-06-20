@@ -23,6 +23,8 @@ namespace SmallEngine.Graphics
 
         public Color Color { get; set; }
 
+        public Effect Effect { get; set; }
+
         public void Draw(IGraphicsAdapter pSystem, float pDeltaTime)
         {
             if(Bitmap != null)
@@ -35,7 +37,10 @@ namespace SmallEngine.Graphics
                 position = Game.ActiveCamera.ToCameraSpace(position);
 
                 var scale = GameObject.Scale * Game.ActiveCamera.Zoom;
-                pSystem.DrawBitmap(Bitmap, Opacity, position, scale);
+
+                if (Effect != null)
+                    Effect.Draw(Bitmap, position);
+                else pSystem.DrawBitmap(Bitmap, Opacity, position, scale);
             }
         }
 
