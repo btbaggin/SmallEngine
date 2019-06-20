@@ -37,6 +37,13 @@ namespace SmallEngine.Graphics
         public SharpDX.DirectWrite.Factory FactoryDWrite { get; private set; }
         #endregion
 
+        static DirectXAdapter()
+        {
+#if DEBUG
+            //SharpDX.Configuration.EnableObjectTracking = true;
+#endif
+        }
+
         #region Creation functions
         //https://www.gamedev.net/forums/topic/648058-sharpdx-direct2d-example-with-devicecontext-and-hwnd/
         private GameForm _form;
@@ -46,17 +53,12 @@ namespace SmallEngine.Graphics
             try
             {
 #if DEBUG
-                var flags = DeviceCreationFlags.Debug | DeviceCreationFlags.BgraSupport;
-#else
-                var flags = DeviceCreationFlags.BgraSupport;
-#endif
-                var defaultDevice = new Device(DriverType.Hardware, flags);
-
-                Device = defaultDevice.QueryInterface<SharpDX.Direct3D11.Device1>();
-#if DEBUG
-                SharpDX.Configuration.EnableObjectTracking = true;
+                Device defaultDevice = new Device(DriverType.Hardware, DeviceCreationFlags.Debug | DeviceCreationFlags.BgraSupport);
                 _debug = defaultDevice.QueryInterface<DeviceDebug>();
+#else
+                Device defaultDevice = new Device(DriverType.Hardware, DeviceCreationFlags.BgraSupport);
 #endif
+                Device = defaultDevice.QueryInterface<SharpDX.Direct3D11.Device1>();
 
                 var dxgiDevice2 = Device.QueryInterface<SharpDX.DXGI.Device2>();
                 var dxgiFactory2 = dxgiDevice2.Adapter.GetParent<SharpDX.DXGI.Factory2>();
