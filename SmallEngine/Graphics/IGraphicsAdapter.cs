@@ -25,7 +25,7 @@ namespace SmallEngine.Graphics
 
         BitmapResource TileBitmap(BitmapResource pBitmap, int pTileWidth, int pTileHeight, int pXCount, int pYCount);
 
-        void DrawLine(Vector2 pPoint1, Vector2 pPoint2, Pen pBrush);
+        void DrawLine(Vector2 pPoint1, Vector2 pPoint2, Pen pPen);
         void DrawRect(Rectangle pRect, Brush pBrush);
         void DrawElipse(Vector2 pPoint, float pRadius, Brush pBrush);
         void SetFullScreen(bool pFullScreen);

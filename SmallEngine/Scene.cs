@@ -238,7 +238,7 @@ namespace SmallEngine
 
         internal static void DrawUI(IGraphicsAdapter pAdapter)
         {
-            for(int i = 0; i < _scenes.Count; i++) //TODO if I end something.................
+            for(int i = 0; i < _scenes.Count; i++)
             {
                 var s = _scenes.PeekAt(i);
                 if (s.Active) s._ui.UpdateAndDraw(pAdapter);
@@ -315,6 +315,7 @@ namespace SmallEngine
                 go.AddComponent(c);
             }
 
+            go.ContainingScene = this;
             go.Initialize();
             AddGameObject(go, pName, null);
             return go;
@@ -347,6 +348,7 @@ namespace SmallEngine
                     go.AddComponent(Component.Create(t));
                 }
 
+                go.ContainingScene = this;
                 go.Initialize();
                 AddGameObject(go, pName, pTemplate);
                 return go;
@@ -364,7 +366,6 @@ namespace SmallEngine
                 s.GameObjectAdded(pTemplate, pGameObject);
             }
             Game.Messages.Register(pGameObject);
-            pGameObject.ContainingScene = this;
         }
 
         /// <summary>

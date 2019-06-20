@@ -190,7 +190,7 @@ namespace SmallEngine
                 GameTime.Tick();
 
                 var physicsTime = GameTime.PhysicsTime;
-                var deltaTime = GameTime.PhysicsTime;
+                var deltaTime = GameTime.DeltaTime;
 
                 //Cache pressed keys
                 var input = Keyboard.GetInput();
