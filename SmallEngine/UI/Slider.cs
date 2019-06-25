@@ -40,17 +40,9 @@ namespace SmallEngine.UI
 
         public int BarHeight { get; set; }
 
-        public Color BarColor
-        {
-            get { return _barBrush.FillColor; }
-            set { _barBrush.FillColor = value; }
-        }
+        public Brush Bar { get; set; }
 
-        public Color SliderColor
-        {
-            get { return _sliderBrush.FillColor; }
-            set { _sliderBrush.FillColor = value; }
-        }
+        public Brush Grip { get; set; }
 
         public Font LabelFont { get; set; }
         #endregion
@@ -59,7 +51,6 @@ namespace SmallEngine.UI
         Rectangle _barBounds;
         float _labelWidth;
         bool _dragging;
-        readonly Brush _barBrush, _sliderBrush;
 
         public Slider(int pMin, int pMax) : this(null, pMin, pMax) { }
 
@@ -74,8 +65,8 @@ namespace SmallEngine.UI
             LabelFont = Font.Create(UIManager.DefaultFontFamily, UIManager.DefaultFontSize, Color.White, Game.Graphics);
             LabelFont.Alignment = Alignments.Center;
 
-            _barBrush = Brush.CreateFillBrush(Color.Gray, Game.Graphics);
-            _sliderBrush = Brush.CreateFillBrush(Color.Red, Game.Graphics);
+            Bar = SolidColorBrush.Create(Color.Gray);
+            Grip = SolidColorBrush.Create(Color.Red);
         }
 
         public override void Draw(IGraphicsAdapter pSystem)
@@ -86,8 +77,8 @@ namespace SmallEngine.UI
             pSystem.DrawText(Max.ToString(), new Rectangle(_barBounds.Right, y, _labelWidth, ActualHeight), LabelFont);
 
             //Draw slider
-            pSystem.DrawRect(_barBounds, _barBrush);
-            pSystem.DrawElipse(_sliderPosition, _sliderRadius, _sliderBrush);
+            pSystem.DrawRect(_barBounds, Bar);
+            pSystem.DrawElipse(_sliderPosition, _sliderRadius, Grip);
 
             //Show value if sliding
             if (_dragging)
@@ -140,8 +131,8 @@ namespace SmallEngine.UI
         public override void Dispose()
         {
             LabelFont.Dispose();
-            _barBrush.Dispose();
-            _sliderBrush.Dispose();
+            Bar.Dispose();
+            Grip.Dispose();
             base.Dispose();
         }
     }

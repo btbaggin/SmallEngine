@@ -9,38 +9,27 @@ namespace SmallEngine.UI
 {
     public class Checkbox : UIElement
     {
-        public Color Background
-        {
-            get { return _backgroundBrush.FillColor; }
-            set { _backgroundBrush.FillColor = value; }
-        }
+        public Brush Background { get; set; }
 
-        public Color Foreground
-        {
-            get { return _foregroundBrush.Color; }
-            set { _foregroundBrush.Color = value; }
-        }
+        public Pen Foreground { get; set; }
 
         public bool IsChecked { get; set; }
-
-        readonly Brush _backgroundBrush;
-        readonly Pen _foregroundBrush;
 
         public Checkbox() : this(null) { }
 
         public Checkbox(string pName) : base(pName)
         {
-            _backgroundBrush = Brush.CreateFillBrush(Color.Gray, Game.Graphics);
-            _foregroundBrush = Pen.Create(Color.Black, 2, Game.Graphics);
+            Background = SolidColorBrush.Create(Color.Gray);
+            Foreground = Pen.Create(Color.Black, 2);
         }
 
         public override void Draw(IGraphicsAdapter pSystem)
         {
-            pSystem.DrawRect(Bounds, _backgroundBrush);
+            pSystem.DrawRect(Bounds, Background);
             if(IsChecked)
             {
-                pSystem.DrawLine(new Vector2(Bounds.Left, Bounds.Top), new Vector2(Bounds.Right, Bounds.Bottom), _foregroundBrush);
-                pSystem.DrawLine(new Vector2(Bounds.Left, Bounds.Bottom), new Vector2(Bounds.Right, Bounds.Top), _foregroundBrush);
+                pSystem.DrawLine(new Vector2(Bounds.Left, Bounds.Top), new Vector2(Bounds.Right, Bounds.Bottom), Foreground);
+                pSystem.DrawLine(new Vector2(Bounds.Left, Bounds.Bottom), new Vector2(Bounds.Right, Bounds.Top), Foreground);
             }
         }
 
@@ -61,8 +50,8 @@ namespace SmallEngine.UI
 
         public override void Dispose()
         {
-            _backgroundBrush.Dispose();
-            _foregroundBrush.Dispose();
+            Background.Dispose();
+            Foreground.Dispose();
             base.Dispose();
         }
     }

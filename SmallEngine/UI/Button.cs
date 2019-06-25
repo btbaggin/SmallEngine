@@ -38,7 +38,7 @@ namespace SmallEngine.UI
         }
 
         ButtonState _state;
-        readonly Brush _brush;
+        readonly SolidColorBrush _brush;
         public Button(string pText) : this(null, new Label(pText) { HorizontalAlignment = HorizontalAlignments.Center }) { }
 
         public Button(UIElement pContent) : this(null, pContent) { }
@@ -51,7 +51,7 @@ namespace SmallEngine.UI
             DisabledColor = Color.GhostWhite;
             MouseOverColor = Color.LightGray;
             MouseDownColor = Color.DarkGray;
-            _brush = Brush.CreateFillBrush(Color, Game.Graphics);
+            _brush = SolidColorBrush.Create(Color);
             _padding = new Thickness(3);
         }
 
@@ -71,21 +71,21 @@ namespace SmallEngine.UI
 
         public override void Draw(IGraphicsAdapter pSystem)
         {
-            if (!Enabled) _brush.FillColor = DisabledColor;
+            if (!Enabled) _brush.Color = DisabledColor;
             else
             {
                 switch(_state)
                 {
                     case ButtonState.Idle:
-                        _brush.FillColor = Color;
+                        _brush.Color = Color;
                         break;
 
                     case ButtonState.MouseDown:
-                        _brush.FillColor = MouseDownColor;
+                        _brush.Color = MouseDownColor;
                         break;
 
                     case ButtonState.MouseOver:
-                        _brush.FillColor = MouseOverColor;
+                        _brush.Color = MouseOverColor;
                         break;
 
                     default:

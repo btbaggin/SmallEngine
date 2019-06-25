@@ -9,19 +9,12 @@ namespace SmallEngine.UI
 {
     public class ProgressBar : UIElement
     {
-        public Color Background
-        {
-            get { return _backgroundBrush.FillColor; }
-            set { _backgroundBrush.FillColor = value; }
-        }
+        public Brush Background { get; set; }
 
-        public Color Foreground
-        {
-            get { return _foregroundBrush.FillColor; }
-            set { _foregroundBrush.FillColor = value; }
-        }
+        public Brush Foreground { get; set; }
 
         public float MaxValue { get; set; }
+
         public float Value { get; set; }
 
         public bool Increment { get; set; }
@@ -33,24 +26,22 @@ namespace SmallEngine.UI
             get { return Value / MaxValue; }
         }
 
-        readonly Brush _backgroundBrush;
-        readonly Brush _foregroundBrush;
         public ProgressBar(float pMax) : this(null, pMax) { }
 
         public ProgressBar(string pName, float pMax) : base(pName)
         {
             MaxValue = pMax;
-            _backgroundBrush = Brush.CreateFillBrush(Color.Gray, Game.Graphics);
-            _foregroundBrush = Brush.CreateFillBrush(Color.Red, Game.Graphics);
+            Background = SolidColorBrush.Create(Color.Gray);
+            Foreground = SolidColorBrush.Create(Color.Red);
         }
 
         public override void Draw(IGraphicsAdapter pSystem)
         {
             var innerPos = new Vector2(Position.X + BorderThickness.Left, Position.Y + BorderThickness.Top);
-            pSystem.DrawRect(new Rectangle(Position, ActualWidth, ActualHeight), _backgroundBrush);
+            pSystem.DrawRect(new Rectangle(Position, ActualWidth, ActualHeight), Background);
 
             var scalar = Increment ? 1 - Progress : Progress;
-            pSystem.DrawRect(new Rectangle(innerPos, (ActualWidth - BorderThickness.Width) * scalar, ActualHeight - BorderThickness.Height), _foregroundBrush);
+            pSystem.DrawRect(new Rectangle(innerPos, (ActualWidth - BorderThickness.Width) * scalar, ActualHeight - BorderThickness.Height), Foreground);
         }
 
         public override void Update() { }
@@ -58,6 +49,13 @@ namespace SmallEngine.UI
         public override Size MeasureOverride(Size pSize)
         {
             return new Size(pSize.Width, Height);
+        }
+
+        public override void Dispose()
+        {
+            base.Dispose();
+            Background.Dispose();
+            Foreground.Dispose();
         }
     }
 }

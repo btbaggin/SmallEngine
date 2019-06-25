@@ -8,24 +8,39 @@ namespace SmallEngine.Threading
 {
     public struct Timer
     {
-        public float Interval { get; set; }
+        float _interval;
+        public float Interval
+        {
+            get { return _interval; }
+            set
+            {
+                _interval = value;
+                Time = value;
+            }
+        }
 
-        private float _timer;
+        public float Time { get; private set; }
+
         public Timer(float pTime)
         {
-            Interval = pTime;
-            _timer = pTime;
+            _interval = pTime;
+            Time = pTime;
         }
 
         public bool Tick()
         {
-            if((_timer -= GameTime.DeltaTime) <= 0)
+            if((Time -= GameTime.DeltaTime) <= 0)
             {
-                _timer += Interval;
+                Time += Interval;
                 return true;
             }
 
             return false;
+        }
+
+        public void Reset()
+        {
+            Time = _interval;
         }
     }
 }

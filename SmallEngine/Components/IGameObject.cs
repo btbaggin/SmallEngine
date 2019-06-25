@@ -33,6 +33,9 @@ namespace SmallEngine
         bool Destroyed { get; }
         #endregion
 
+        //TODO ID
+        //TODO sleep/awake?
+
         IComponent GetComponentOfType(Type pType);
         IComponent GetComponent(Type pType);
         IEnumerable<IComponent> GetComponents();

@@ -113,9 +113,11 @@
     <Compile Include="Graphics\IGraphicsAdapter.cs" />
     <Compile Include="Components\IComponent.cs" />
     <Compile Include="Graphics\Pen.cs" />
+    <Compile Include="Graphics\RadialGradientBrush.cs" />
     <Compile Include="Graphics\RenderComponent.cs" />
     <Compile Include="Graphics\RenderSystem.cs" />
     <Compile Include="Graphics\Size.cs" />
+    <Compile Include="Graphics\SolidColorBrush.cs" />
     <Compile Include="Graphics\SpriteStrip.cs" />
     <Compile Include="Graphics\Transform.cs" />
     <Compile Include="IndexedStack.cs" />
@@ -147,6 +149,7 @@
     <Compile Include="Graphics\Rectangle.cs" />
     <Compile Include="RingBuffer.cs" />
     <Compile Include="SceneGraph.cs" />
+    <Compile Include="Serialization\ConfigFile.cs" />
     <Compile Include="Serialization\Setting.cs" />
     <Compile Include="Serialization\SettingsFile.cs" />
     <Compile Include="Threading\EventTimer.cs" />

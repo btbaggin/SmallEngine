@@ -108,6 +108,7 @@ namespace SmallEngine.Physics
             RigidBodyComponent B = BodyB.Body;
 
             if (A == null || B == null) return;
+            if (A.Mass + B.Mass == 0) return;
 
             //Prevent objects from sinking. Allow things to be slightly overlapping
             const float percent = 0.2f;

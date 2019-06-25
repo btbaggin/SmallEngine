@@ -9,7 +9,7 @@ namespace SmallEngine.Graphics
 {
     public class Pen : IDisposable
     {
-        internal SolidColorBrush DirectXBrush { get; private set; }
+        internal SharpDX.Direct2D1.SolidColorBrush DirectXBrush { get; private set; }
 
         public Color Color
         {
@@ -24,7 +24,7 @@ namespace SmallEngine.Graphics
             if (pTarget.Method == RenderMethods.DirectX)
             {
                 var dx = (DirectXAdapter)pTarget;
-                DirectXBrush = new SolidColorBrush(dx.Context, new SharpDX.Color4(pColor.R / 255f, pColor.G / 255f, pColor.B / 255f, pColor.A / 255f));
+                DirectXBrush = new SharpDX.Direct2D1.SolidColorBrush(dx.Context, new SharpDX.Color4(pColor.R / 255f, pColor.G / 255f, pColor.B / 255f, pColor.A / 255f));
                 DirectXBrush.Opacity = pColor.A / 255f;
             }
             else
@@ -36,9 +36,9 @@ namespace SmallEngine.Graphics
         }
 
 
-        public static Pen Create(Color pColor, float pOutlineSize, IGraphicsAdapter pAdapter)
+        public static Pen Create(Color pColor, float pOutlineSize)
         {
-            return new Pen(pColor, pOutlineSize, pAdapter);
+            return new Pen(pColor, pOutlineSize, Game.Graphics);
         }
 
         public void Dispose()

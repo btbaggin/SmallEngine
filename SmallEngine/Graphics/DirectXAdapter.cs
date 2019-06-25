@@ -32,6 +32,8 @@ namespace SmallEngine.Graphics
 
         public SharpDX.Direct2D1.DeviceContext Context { get; private set; }
 
+        public SharpDX.Direct2D1.DeviceContext SecondaryContext { get; private set; }
+
         public SharpDX.Direct2D1.Factory Factory2D { get; private set; }
 
         public SharpDX.DirectWrite.Factory FactoryDWrite { get; private set; }
@@ -40,7 +42,7 @@ namespace SmallEngine.Graphics
         static DirectXAdapter()
         {
 #if DEBUG
-            //SharpDX.Configuration.EnableObjectTracking = true;
+            SharpDX.Configuration.EnableObjectTracking = true;
 #endif
         }
 
@@ -79,7 +81,8 @@ namespace SmallEngine.Graphics
 
                 _swapChain = new SwapChain1(dxgiFactory2, Device, pForm.Handle, ref desc, null);
                 _2dDevice = new SharpDX.Direct2D1.Device(dxgiDevice2);
-                Context = new SharpDX.Direct2D1.DeviceContext(_2dDevice, DeviceContextOptions.None);
+                Context = new SharpDX.Direct2D1.DeviceContext(_2dDevice, DeviceContextOptions.EnableMultithreadedOptimizations);
+                SecondaryContext = new SharpDX.Direct2D1.DeviceContext(_2dDevice, DeviceContextOptions.None);
 #if DEBUG
                 Factory2D = new SharpDX.Direct2D1.Factory(FactoryType.SingleThreaded, DebugLevel.Information);
 #else
@@ -247,7 +250,7 @@ namespace SmallEngine.Graphics
 
         public void DrawPoint(Vector2 pPoint, Brush pBrush)
         {
-            Context.FillRectangle(new RawRectangleF(pPoint.X - 1, pPoint.Y - 1, pPoint.X + 1, pPoint.Y + 1), pBrush.FillColorBrush);
+            Context.FillRectangle(new RawRectangleF(pPoint.X - 1, pPoint.Y - 1, pPoint.X + 1, pPoint.Y + 1), pBrush.DirectXBrush);
         }
 
         public void DrawLine(Vector2 pPoint1, Vector2 pPoint2, Pen pPen)
@@ -257,15 +260,24 @@ namespace SmallEngine.Graphics
 
         public void DrawRect(Rectangle pRect, Brush pBrush)
         {
-            if(pBrush.FillColorBrush != null) Context.FillRectangle(pRect, pBrush.FillColorBrush);
-            if(pBrush.OutlineColorBrush != null) Context.DrawRectangle(pRect, pBrush.OutlineColorBrush, pBrush.OutlineSize);
+            Context.FillRectangle(pRect, pBrush.DirectXBrush);
+        }
+
+        public void DrawRectOutline(Rectangle pRect, Pen pPen)
+        {
+            Context.DrawRectangle(pRect, pPen.DirectXBrush, pPen.Size);
         }
 
         public void DrawElipse(Vector2 pPoint, float pRadius, Brush pBrush)
         {
             var e = new Ellipse(pPoint, pRadius, pRadius);
-            if (pBrush.FillColorBrush != null) Context.FillEllipse(e, pBrush.FillColorBrush);
-            if(pBrush.OutlineColorBrush != null) Context.DrawEllipse(e, pBrush.OutlineColorBrush);
+            Context.FillEllipse(e, pBrush.DirectXBrush);
+        }
+
+        public void DrawElipseOutline(Vector2 pPoint, float pRadius, Pen pPen)
+        {
+            var e = new Ellipse(pPoint, pRadius, pRadius);
+            Context.DrawEllipse(e, pPen.DirectXBrush, pPen.Size);
         }
 
         public void SetTransform(Transform pTransform)
@@ -287,7 +299,7 @@ namespace SmallEngine.Graphics
         public void EndDraw()
         {
             Context.EndDraw();
-            _swapChain.Present(_form.SyncInterval, PresentFlags.None);
+            _swapChain.Present(_form.SyncInterval, PresentFlags.None, new PresentParameters());
         }
 
         public void SetFullScreen(bool pFullScreen)

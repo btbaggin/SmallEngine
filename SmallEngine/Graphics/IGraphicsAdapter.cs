@@ -27,7 +27,9 @@ namespace SmallEngine.Graphics
 
         void DrawLine(Vector2 pPoint1, Vector2 pPoint2, Pen pPen);
         void DrawRect(Rectangle pRect, Brush pBrush);
+        void DrawRectOutline(Rectangle pRect, Pen pPen);
         void DrawElipse(Vector2 pPoint, float pRadius, Brush pBrush);
+        void DrawElipseOutline(Vector2 pPoint, float pRadius, Pen pPen);
         void SetFullScreen(bool pFullScreen);
         void SetTransform(Transform pTransform);
         void ResetTransform();

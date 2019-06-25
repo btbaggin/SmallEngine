@@ -17,10 +17,11 @@ namespace SmallEngine.Graphics
         readonly DeviceContext _context;
         Composite _composite;
 
+        //TODO move effects over to normal HLSL
         public Effect()
         {
             _effects = new List<SharpDX.Direct2D1.Effect>();
-            _context = ((DirectXAdapter)Game.Graphics).Context;
+            _context = ((DirectXAdapter)Game.Graphics).SecondaryContext;
         }
 
         public Effect AddSaturation(float pValue)
@@ -29,11 +30,21 @@ namespace SmallEngine.Graphics
             return this;
         }
 
+        public Effect AddSepia(float pValue)
+        {
+            var e =new SharpDX.Direct2D1.Effect(_context, SharpDX.Direct2D1.Effect.Sepia);
+            e.SetValue(0, pValue);
+            _effects.Add(e);
+            return this;
+        }
+
         public Effect AddGrayscale()
         {
             _effects.Add(new SharpDX.Direct2D1.Effect(_context, SharpDX.Direct2D1.Effect.Grayscale));
-            return this;
+            return this;    
         }
+
+        //TODO open up guids?
 
         public Effect AddHue(float pValue)
         {
@@ -66,42 +77,6 @@ namespace SmallEngine.Graphics
 
         public void Draw(BitmapResource pBitmap, Vector2 pPosition)
         {
-            Bitmap b = new Bitmap(_context,
-                                  new SharpDX.Size2(pBitmap.Width, pBitmap.Height),
-                                  new BitmapProperties(pBitmap.DirectXBitmap.PixelFormat));
-
-            if(pBitmap.Source.HasValue)
-            {
-                b.CopyFromBitmap(pBitmap.DirectXBitmap, new SharpDX.Mathematics.Interop.RawPoint(0, 0), pBitmap.Source.Value);
-            }
-            else
-            {
-                b.CopyFromBitmap(pBitmap.DirectXBitmap, new SharpDX.Mathematics.Interop.RawPoint(0, 0));
-            }
-
-            _effects[0].SetInput(0, b, true);
-            for (int i = 1; i < _effects.Count; i++)
-            {
-                _effects[i].SetInput(0, _effects[i - 1].Output, true);
-            }
-
-            _composite.SetInput(0, pBitmap.DirectXBitmap, true);
-            _composite.SetInput(1, _effects[_effects.Count - 1].Output, true);
-
-            _context.DrawImage(_composite.Output, pPosition);
-        }
-
-        public BitmapResource ApplyTo(BitmapResource pBitmap)
-        {
-            var t = _context.Target;
-            var b = new Bitmap1(_context,
-                new SharpDX.Size2(pBitmap.Width, pBitmap.Height),
-                new BitmapProperties1()
-                {
-                    PixelFormat = new PixelFormat(SharpDX.DXGI.Format.B8G8R8A8_UNorm, SharpDX.Direct2D1.AlphaMode.Premultiplied),
-                    BitmapOptions = BitmapOptions.Target
-                });
-
             _effects[0].SetInput(0, pBitmap.DirectXBitmap, true);
             for (int i = 1; i < _effects.Count; i++)
             {
@@ -111,14 +86,33 @@ namespace SmallEngine.Graphics
             _composite.SetInput(0, pBitmap.DirectXBitmap, true);
             _composite.SetInput(1, _effects[_effects.Count - 1].Output, true);
 
+            if(pBitmap.Source.HasValue)
+            {
+                _context.DrawImage(_composite.Output, pPosition, pBitmap.Source.Value, InterpolationMode.Linear, CompositeMode.SourceOver);
+            }
+            else
+            {
+                _context.DrawImage(_composite.Output, pPosition);
+            }
+        }
+
+        public BitmapResource ApplyTo(BitmapResource pBitmap)
+        {
+            var b = new Bitmap1(_context,
+                new SharpDX.Size2(pBitmap.Width, pBitmap.Height),
+                new BitmapProperties1() {
+                    PixelFormat = pBitmap.DirectXBitmap.PixelFormat,
+                    BitmapOptions = BitmapOptions.Target
+                });
+
+            var t = _context.Target;
             _context.Target = b;
             _context.BeginDraw();
-            _context.DrawImage(_composite.Output);
+            Draw(pBitmap, Vector2.Zero);
             _context.EndDraw();
             _context.Target = t;
 
-            var retval = new BitmapResource() { DirectXBitmap = b };
-            return retval;
+            return new BitmapResource() { DirectXBitmap = b };
         }
 
         public void Dispose()

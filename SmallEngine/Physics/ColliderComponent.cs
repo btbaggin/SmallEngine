@@ -101,21 +101,21 @@ namespace SmallEngine.Physics
 
         internal void OnCollisionExit(ColliderComponent pCollider, Manifold pManifold)
         {
-            EventHandler<CollisionEventArgs> ce = null;
-            if (IsTrigger)
+            if(Colliders.Remove(pCollider))
             {
-                //Check if we have already triggered this collider
-                if (!TriggerOnlyOnce || !_triggerExit)
+                EventHandler<CollisionEventArgs> ce = null;
+                if (IsTrigger)
                 {
-                    ce = TriggerExit;
-                    _triggerExit = true;
+                    //Check if we have already triggered this collider
+                    if (!TriggerOnlyOnce || !_triggerExit)
+                    {
+                        ce = TriggerExit;
+                        _triggerExit = true;
+                    }
                 }
-            }
-            else ce = CollisionExit;
+                else ce = CollisionExit;
 
-            if (Colliders.Remove(pCollider) && ce != null)
-            {
-                ce.Invoke(this, new CollisionEventArgs(pCollider, pManifold));
+                ce?.Invoke(this, new CollisionEventArgs(pCollider, pManifold));
             }
         }
 

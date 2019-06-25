@@ -421,6 +421,7 @@ namespace SmallEngine
         /// <param name="pName">Name for which to search</param>
         public T FindGameObject<T>(string pName) where T : IGameObject
         {
+            //TODO should this return weak reference? because we could destroy the object or store gameobject ID?
             return (T)FindGameObject(pName);
         }
 

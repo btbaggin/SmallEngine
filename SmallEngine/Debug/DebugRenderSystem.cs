@@ -11,20 +11,13 @@ namespace SmallEngine.Debug
 {
     public class DebugRenderSystem : ComponentSystem
     {
-        public Color DebugColor
-        {
-            get { return _pen.Color; }
-            set { _pen.Color = value; }
-        }
+        public Pen DebugBoxes { get; set; }
 
-        readonly Pen _pen;
-        readonly Brush _brush;
         readonly IGraphicsAdapter _adapter;
         public DebugRenderSystem(IGraphicsAdapter pAdapter)
         {
             _adapter = pAdapter;
-            _pen = Pen.Create(Color.Aqua, 1, _adapter);
-            _brush = Brush.CreateOutlineBrush(Color.Aqua, 1, _adapter);
+            DebugBoxes = Pen.Create(Color.Aqua, 1);
         }
 
         protected override List<IComponent> DiscoverComponents(IGameObject pObject)
@@ -45,7 +38,7 @@ namespace SmallEngine.Debug
                 {
                     case Shapes.Circle:
                         var cir = (CircleMesh)collider.Mesh;
-                        _adapter.DrawElipse(collider.AABB.Center, cir.Radius, _brush);
+                        _adapter.DrawElipseOutline(collider.AABB.Center, cir.Radius, DebugBoxes);
                         break;
 
                     case Shapes.Polygon:
@@ -55,9 +48,9 @@ namespace SmallEngine.Debug
                         {
                             var v1 = p.Verticies[i] + pos;
                             var v2 = p.Verticies[i + 1] + pos;
-                            _adapter.DrawLine(v1, v2, _pen);
+                            _adapter.DrawLine(v1, v2, DebugBoxes);
                         }
-                        _adapter.DrawLine(p.Verticies[p.Verticies.Length - 1] + pos, p.Verticies[0] + pos, _pen);
+                        _adapter.DrawLine(p.Verticies[p.Verticies.Length - 1] + pos, p.Verticies[0] + pos, DebugBoxes);
                         break;
                 }
             }

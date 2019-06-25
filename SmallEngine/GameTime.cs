@@ -66,7 +66,7 @@ namespace SmallEngine
         /// </summary>
         public static long CurrentTime
         {
-            get { return Stopwatch.GetTimestamp(); }
+            get { return _currentTime; }
         }
 
         /// <summary>

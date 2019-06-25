@@ -6,31 +6,43 @@ using System.Threading.Tasks;
 
 namespace SmallEngine.Threading
 {
-    public class TimerElapsedEventArgs : EventArgs
-    {
-
-    }
+    public class TimerElapsedEventArgs : EventArgs { }
 
     public struct EventTimer
     {
         public EventHandler<TimerElapsedEventArgs> Elapsed { get; set; }
-        public float Interval { get; set; }
+        float _interval;
+        public float Interval
+        {
+            get { return _interval; }
+            set
+            {
+                _interval = value;
+                Time = value;
+            }
+        }
 
-        private float _timer;
+        public float Time { get; private set; }
+
         public EventTimer(float pTime, EventHandler<TimerElapsedEventArgs> pElapsed)
         {
-            Interval = pTime;
             Elapsed = pElapsed;
-            _timer = pTime;
+            _interval = pTime;
+            Time = pTime;
         }
 
         public void Tick()
         {
-            if ((_timer -= GameTime.DeltaTime) <= 0)
+            if ((Time -= GameTime.DeltaTime) <= 0)
             {
-                _timer += Interval;
+                Time += Interval;
                 Elapsed.Invoke(this, new TimerElapsedEventArgs());
-             }
+            }
+        }
+
+        public void Reset()
+        {
+            Time = _interval;
         }
     }
 }

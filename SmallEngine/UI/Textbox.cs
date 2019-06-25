@@ -10,17 +10,9 @@ namespace SmallEngine.UI
 {
     public class Textbox : UIElement
     {
-        public Color Background
-        {
-            get { return _backgroundBrush.FillColor; }
-            set { _backgroundBrush.FillColor = value; }
-        }
+        public Brush Background { get; set; }
 
-        public Color Foreground
-        {
-            get { return _foregroundBrush.Color; }
-            set { _foregroundBrush.Color = value; }
-        }
+        public Pen Cursor { get; set; }
 
         public Font Font { get; set; }
 
@@ -40,8 +32,6 @@ namespace SmallEngine.UI
         int _cursorPos;
         float _cursorTick;
         bool _showCursor;
-        readonly Brush _backgroundBrush;
-        readonly Pen _foregroundBrush;
 
         public Textbox() : this(null) { }
 
@@ -50,13 +40,13 @@ namespace SmallEngine.UI
             Font = Font.Create(UIManager.DefaultFontFamily, UIManager.DefaultFontSize, UIManager.DefaultFontColor, Game.Graphics);
             Font.Alignment = Alignments.Leading;
 
-            _backgroundBrush = Brush.CreateFillBrush(Color.Gray, Game.Graphics);
-            _foregroundBrush = Pen.Create(UIManager.DefaultFontColor, 1, Game.Graphics);
+            Background = SolidColorBrush.Create(Color.Gray);
+            Cursor = Pen.Create(UIManager.DefaultFontColor, 1);
         }
 
         public override void Draw(IGraphicsAdapter pSystem)
         {
-            pSystem.DrawRect(Bounds, _backgroundBrush);
+            pSystem.DrawRect(Bounds, Background);
 
             pSystem.DrawText(Text, Bounds, Font, true); //TODO clip and navigation around cursor
 
@@ -64,7 +54,7 @@ namespace SmallEngine.UI
             {
                 var s = Font.MeasureString(Text.Substring(0, _cursorPos), ActualWidth);
                 var x = Bounds.Left + s.Width + 1;
-                pSystem.DrawLine(new Vector2(x, Bounds.Top + 1), new Vector2(x, Bounds.Bottom - 1), _foregroundBrush);
+                pSystem.DrawLine(new Vector2(x, Bounds.Top + 1), new Vector2(x, Bounds.Bottom - 1), Cursor);
             }
         }
 
@@ -137,8 +127,8 @@ namespace SmallEngine.UI
 
         public override void Dispose()
         {
-            _backgroundBrush.Dispose();
-            _foregroundBrush.Dispose();
+            Background.Dispose();
+            Cursor.Dispose();
             Font.Dispose();
             base.Dispose();
         }
