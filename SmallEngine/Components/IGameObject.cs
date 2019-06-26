@@ -36,7 +36,6 @@ namespace SmallEngine
         //TODO ID
         //TODO sleep/awake?
 
-        IComponent GetComponentOfType(Type pType);
         IComponent GetComponent(Type pType);
         IEnumerable<IComponent> GetComponents();
         bool HasComponent<T>() where T : class, IComponent;

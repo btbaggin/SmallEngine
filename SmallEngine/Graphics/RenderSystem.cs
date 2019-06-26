@@ -13,6 +13,7 @@ namespace SmallEngine.Graphics
         public RenderSystem(IGraphicsAdapter pAdapter) : base()
         {
             _adapter = pAdapter;
+            Components = Component.GetComponentsOfType(typeof(RenderComponent));
         }
 
         protected override void DoProcess()
@@ -26,16 +27,6 @@ namespace SmallEngine.Graphics
                     r.Draw(_adapter, deltaTime);
                 }
             }
-        }
-
-        protected override List<IComponent> DiscoverComponents(IGameObject pObject)
-        {
-            var r = pObject.GetComponent(typeof(RenderComponent));
-
-            List<IComponent> components = new List<IComponent>();
-            if (r != null) components.Add(r);
-
-            return components;
         }
     }
 }

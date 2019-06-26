@@ -156,11 +156,6 @@ namespace SmallEngine
             //Dispose of all GameObjects created within the scene
             foreach(var go in GameObjects)
             {
-                foreach (var s in _systems)
-                {
-                    s.GameObjectRemoved(go);
-                }
-
                 if (!string.IsNullOrEmpty(go.Name) && _namedObjects.ContainsKey(go.Name))
                 {
                     _namedObjects.Remove(go.Name);
@@ -258,10 +253,6 @@ namespace SmallEngine
             while (_toRemove.TryTake(out IGameObject go))
             {
                 GameObjects.Remove(go);
-                foreach (var s in _systems)
-                {
-                    s.GameObjectRemoved(go);
-                }
 
                 if (!string.IsNullOrEmpty(go.Name) && _namedObjects.ContainsKey(go.Name))
                 {
@@ -317,7 +308,7 @@ namespace SmallEngine
 
             go.ContainingScene = this;
             go.Initialize();
-            AddGameObject(go, pName, null);
+            AddGameObject(go, pName);
             return go;
         }
 
@@ -350,21 +341,17 @@ namespace SmallEngine
 
                 go.ContainingScene = this;
                 go.Initialize();
-                AddGameObject(go, pName, pTemplate);
+                AddGameObject(go, pName);
                 return go;
             }
 
             return default;
         }
 
-        private void AddGameObject(IGameObject pGameObject, string pName, string pTemplate)
+        private void AddGameObject(IGameObject pGameObject, string pName)
         {
             GameObjects.Add(pGameObject);
             if (pName != null) _namedObjects.Add(pName, pGameObject);
-            foreach (var s in _systems)
-            {
-                s.GameObjectAdded(pTemplate, pGameObject);
-            }
             Game.Messages.Register(pGameObject);
         }
 

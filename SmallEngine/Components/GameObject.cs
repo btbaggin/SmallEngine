@@ -75,19 +75,6 @@ namespace SmallEngine
             return null;
         }
 
-        public IComponent GetComponentOfType(Type pType)
-        {
-            foreach(var kv in _components)
-            {
-                if(pType.IsAssignableFrom(kv.Key))
-                {
-                    return kv.Value;
-                }
-            }
-
-            return null;
-        }
-
         public IEnumerable<IComponent> GetComponents()
         {
             foreach(var c in _components.Values)

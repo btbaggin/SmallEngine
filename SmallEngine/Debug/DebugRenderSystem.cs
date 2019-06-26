@@ -18,14 +18,7 @@ namespace SmallEngine.Debug
         {
             _adapter = pAdapter;
             DebugBoxes = Pen.Create(Color.Aqua, 1);
-        }
-
-        protected override List<IComponent> DiscoverComponents(IGameObject pObject)
-        {
-            var r = pObject.GetComponent(typeof(ColliderComponent));
-            var c = new List<IComponent>();
-            if (r != null) c.Add(r);
-            return c;
+            Components = Component.GetComponentsOfType(typeof(ColliderComponent));
         }
 
         protected override void DoProcess()

@@ -18,16 +18,7 @@ namespace SmallEngine.Physics
         public void CreateQuadTree()
         {
             _quadTree = new QuadTree<ColliderComponent>(PhysicsHelper.WorldBounds);
-        }
-
-        protected override List<IComponent> DiscoverComponents(IGameObject pObject)
-        {
-            var r = pObject.GetComponent(typeof(ColliderComponent));
-
-            List<IComponent> components = new List<IComponent>();
-            if (r != null) components.Add(r);
-
-            return components;
+            Components = Component.GetComponentsOfType(typeof(ColliderComponent));
         }
 
         protected override void DoProcess()
