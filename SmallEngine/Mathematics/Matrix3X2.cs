@@ -4,8 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SmallEngine
+namespace SmallEngine.Mathematics
 {
+    [Serializable]
     public struct Matrix3X2
     {
         public readonly static Matrix3X2 Identity = new Matrix3X2(1, 0, 0, 1, 0, 0);

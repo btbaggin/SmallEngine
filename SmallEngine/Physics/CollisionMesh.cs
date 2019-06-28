@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using SmallEngine.Graphics;
@@ -13,7 +14,7 @@ namespace SmallEngine.Physics
         Polygon
     }
 
-    public abstract class CollisionMesh
+    public abstract class CollisionMesh : ISerializable
     {
         internal ColliderComponent Body { get; set; }
 
@@ -27,6 +28,18 @@ namespace SmallEngine.Physics
             Material = pMaterial;
         }
 
+        protected CollisionMesh(SerializationInfo pInfo, StreamingContext pContext)
+        {
+            Shape = (Shapes)pInfo.GetInt32("Shape");
+            Material = (Material)pInfo.GetValue("Material", typeof(Material));
+        }
+
+        public virtual void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            info.AddValue("Shape", Shape);
+            info.AddValue("Material", Material, typeof(Material));
+        }
+
         public abstract AxisAlignedBoundingBox CalculateAABB(Vector2 pPosition);
 
         public abstract void CalculateMass(out float pMass, out float pInertia);
@@ -38,9 +51,21 @@ namespace SmallEngine.Physics
     public class CircleMesh : CollisionMesh
     {
         public float Radius { get; set; }
+
         public CircleMesh(float pRadius, Material pMaterial) : base(Shapes.Circle, pMaterial)
         {
             Radius = pRadius;
+        }
+
+        public CircleMesh(SerializationInfo pInfo, StreamingContext pContext) : base(pInfo, pContext)
+        {
+            Radius = pInfo.GetSingle("Radius");
+        }
+
+        public override void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            base.GetObjectData(info, context);
+            info.AddValue("Radius", Radius);
         }
 
         public override AxisAlignedBoundingBox CalculateAABB(Vector2 pPosition)
@@ -78,7 +103,7 @@ namespace SmallEngine.Physics
     #region PolygonMesh
     public class PolygonMesh : CollisionMesh
     {
-        public Vector2[] Verticies { get; private set; }
+        public Vector2[] Vertices { get; private set; }
         public Vector2[] Normals { get; private set; }
 
         Vector2 _min, _max;
@@ -87,6 +112,19 @@ namespace SmallEngine.Physics
             _min = new Vector2(float.MaxValue, float.MaxValue);
             _max = new Vector2(-float.MaxValue, -float.MaxValue);
             SetVerticies(pVerticies);
+        }
+
+        public PolygonMesh(SerializationInfo pInfo, StreamingContext pContext) : base(pInfo, pContext)
+        {
+            Vertices = (Vector2[])pInfo.GetValue("Vertices", typeof(Vector2[]));
+            Normals = (Vector2[])pInfo.GetValue("Normals", typeof(Vector2[]));
+        }
+
+        public override void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            base.GetObjectData(info, context);
+            info.AddValue("Vertices", Vertices, typeof(Vector2[]));
+            info.AddValue("Normals", Normals, typeof(Vector2[]));
         }
 
         private void SetVerticies(Vector2[] pVerticies)
@@ -158,11 +196,11 @@ namespace SmallEngine.Physics
             }
 
             // Copy verticies into shape's verticies
-            Verticies = new Vector2[actualVertexCount];
+            Vertices = new Vector2[actualVertexCount];
             for(int i = 0; i < actualVertexCount; i++)
             {
-                Verticies[i] = pVerticies[hull[i]];
-                var v = Verticies[i];
+                Vertices[i] = pVerticies[hull[i]];
+                var v = Vertices[i];
                 if (v.X < _min.X) _min.X = v.X;
                 if (v.Y < _min.Y) _min.Y = v.Y;
                 if (v.X > _max.X) _max.X = v.X;
@@ -174,7 +212,7 @@ namespace SmallEngine.Physics
             for(int i = 0; i < actualVertexCount; i++)
             {
                 int i2 = i + 1 < actualVertexCount ? i + 1 : 0;
-                Vector2 face = Verticies[i2] - Verticies[i];
+                Vector2 face = Vertices[i2] - Vertices[i];
 
                 System.Diagnostics.Debug.Assert(face.LengthSqrd > .0005f);
 
@@ -187,9 +225,9 @@ namespace SmallEngine.Physics
             float best = float.MinValue;
             Vector2 bestVert = default;
 
-            for (int i = 0; i < Verticies.Length; i++)
+            for (int i = 0; i < Vertices.Length; i++)
             {
-                Vector2 v = Verticies[i];
+                Vector2 v = Vertices[i];
                 float proj = Vector2.DotProduct(v, pDirection);
 
                 if(proj > best)
@@ -210,14 +248,14 @@ namespace SmallEngine.Physics
         public override bool Contains(Vector2 pPoint)
         {
             bool result = false;
-            var j = Verticies.Length - 1;
-            for(int i = 0; i < Verticies.Length; i++)
+            var j = Vertices.Length - 1;
+            for(int i = 0; i < Vertices.Length; i++)
             {
                 //Count number of sides that intersect with Y coordinate
-                if(Verticies[i].Y < pPoint.Y && Verticies[j].Y >= pPoint.Y || Verticies[j].Y < pPoint.Y && Verticies[i].Y >= pPoint.Y)
+                if(Vertices[i].Y < pPoint.Y && Vertices[j].Y >= pPoint.Y || Vertices[j].Y < pPoint.Y && Vertices[i].Y >= pPoint.Y)
                 {
                     //Check if they are polygon is to left of point
-                    if(Verticies[i].X + (pPoint.Y - Verticies[i].Y) / (Verticies[j].Y - Verticies[i].Y) * (Verticies[j].X - Verticies[i].X) < pPoint.X)
+                    if(Vertices[i].X + (pPoint.Y - Vertices[i].Y) / (Vertices[j].Y - Vertices[i].Y) * (Vertices[j].X - Vertices[i].X) < pPoint.X)
                     {
                         //An odd amount means point is inside polygon
                         result = !result;
@@ -236,12 +274,12 @@ namespace SmallEngine.Physics
             float I = 0.0f;
             const float k_inv3 = 1.0f / 3.0f;
 
-            for (int i1 = 0; i1 < Verticies.Length; ++i1)
+            for (int i1 = 0; i1 < Vertices.Length; ++i1)
             {
                 // Triangle vertices, third vertex implied as (0, 0)
-                Vector2 p1 = Verticies[i1];
-                int i2 = i1 + 1 < Verticies.Length ? i1 + 1 : 0;
-                Vector2 p2 = Verticies[i2];
+                Vector2 p1 = Vertices[i1];
+                int i2 = i1 + 1 < Vertices.Length ? i1 + 1 : 0;
+                Vector2 p2 = Vertices[i2];
 
                 float D = Vector2.CrossProduct(p1, p2);
                 float triangleArea = 0.5f * D;
@@ -261,8 +299,8 @@ namespace SmallEngine.Physics
             // Translate verticies to centroid (make the centroid (0, 0)
             // for the polygon in model space)
             // Not really necessary, but I like doing this anyway
-            for (int i = 0; i < Verticies.Length; ++i)
-                Verticies[i] -= centroid;
+            for (int i = 0; i < Vertices.Length; ++i)
+                Vertices[i] -= centroid;
 
             pMass = Material.Density * area;
             pInertia = Material.Density * I;

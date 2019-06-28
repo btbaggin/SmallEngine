@@ -107,8 +107,8 @@ namespace SmallEngine.Input
             if (_mode == Mode.PossibleDrag && ButtonDown(MouseButtons.Left))
             {
                 var _dragDistance = _mousePos - _dragStart;
-                if (Math.Abs(_dragDistance.X) > System.Windows.SystemParameters.MinimumHorizontalDragDistance ||
-                   Math.Abs(_dragDistance.Y) > System.Windows.SystemParameters.MinimumVerticalDragDistance)
+                if (System.Math.Abs(_dragDistance.X) > System.Windows.SystemParameters.MinimumHorizontalDragDistance ||
+                   System.Math.Abs(_dragDistance.Y) > System.Windows.SystemParameters.MinimumVerticalDragDistance)
                 {
                     _mode = Mode.Drag;
                 }

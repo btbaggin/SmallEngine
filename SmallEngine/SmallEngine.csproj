@@ -88,14 +88,16 @@
   <ItemGroup>
     <Compile Include="Audio\AudioMessage.cs" />
     <Compile Include="Audio\AudioPlayer.cs" />
-    <Compile Include="Camera.cs" />
+    <Compile Include="Graphics\Camera.cs" />
     <Compile Include="Components\Component.cs" />
     <Compile Include="Components\DependencyComponent.cs" />
     <Compile Include="Components\ComponentSystem.cs" />
+    <Compile Include="Components\GameObjectNotFoundException.cs" />
     <Compile Include="Components\IGameObject.cs" />
     <Compile Include="Components\ImportComponentAttribute.cs" />
     <Compile Include="Audio\AudioResource.cs" />
     <Compile Include="Components\IUpdatable.cs" />
+    <Compile Include="Components\SceneGameObjectList.cs" />
     <Compile Include="Coroutine.cs" />
     <Compile Include="Debug\DebugRenderSystem.cs" />
     <Compile Include="Game.cs" />
@@ -124,8 +126,8 @@
     <Compile Include="Input\KeyMapping.cs" />
     <Compile Include="Input\Keyboard.cs" />
     <Compile Include="Input\Mouse.cs" />
-    <Compile Include="Matrix2X2.cs" />
-    <Compile Include="Matrix3X2.cs" />
+    <Compile Include="Mathematics\Matrix2X2.cs" />
+    <Compile Include="Mathematics\Matrix3X2.cs" />
     <Compile Include="Messages\GameMessage.cs" />
     <Compile Include="Messages\GroupingMessageBus.cs" />
     <Compile Include="Messages\IMessage.cs" />
@@ -168,9 +170,11 @@
     <Compile Include="UI\UIElement.cs" />
     <Compile Include="UI\UIManager.cs" />
     <Compile Include="UI\Visibility.cs" />
+    <Compile Include="UpdateComponent.cs" />
+    <Compile Include="UpdateSystem.cs" />
     <Compile Include="Utils\DiamondSquareNoise.cs" />
     <Compile Include="Utils\Extensions.cs" />
-    <Compile Include="Utils\MathF.cs" />
+    <Compile Include="Mathematics\MathF.cs" />
     <Compile Include="Physics\Material.cs" />
     <Compile Include="Threading\Pool.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -183,7 +187,7 @@
     <Compile Include="Utils\PerlinNoise.cs" />
     <Compile Include="Threading\Timer.cs" />
     <Compile Include="Utils\UnknownEnumException.cs" />
-    <Compile Include="Vector2.cs" />
+    <Compile Include="Mathematics\Vector2.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5.2">

@@ -31,20 +31,20 @@ namespace SmallEngine
             return Count++;
         }
 
-        public T Pop()
+        public ref T Pop()
         {
-            return _items[--Count];
+            return ref _items[--Count];
         }
 
-        public T Peek()
+        public ref T Peek()
         {
-            return _items[Count - 1];
+            return ref _items[Count - 1];
         }
 
-        public T PeekAt(int pIndex)
+        public ref T PeekAt(int pIndex)
         {
             if (pIndex >= Count) throw new ArgumentException("pIndex must be greater than 0 and less than Count");
-            return _items[pIndex];
+            return ref _items[pIndex];
         }
 
         public void Clear()

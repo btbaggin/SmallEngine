@@ -54,9 +54,9 @@ namespace SmallEngine.Physics
 
             float maxSeparation = float.MinValue;
             int faceNormal = 0;
-            for(int i = 0; i < p.Verticies.Length; i++)
+            for(int i = 0; i < p.Vertices.Length; i++)
             {
-                float sep = Vector2.DotProduct(p.Normals[i], center - p.Verticies[i]);
+                float sep = Vector2.DotProduct(p.Normals[i], center - p.Vertices[i]);
                 if (sep > c.Radius) return false;
 
                 if(sep > maxSeparation)
@@ -66,9 +66,9 @@ namespace SmallEngine.Physics
                 }
             }
 
-            Vector2 v1 = p.Verticies[faceNormal];
-            int nextFace = faceNormal + 1 < p.Verticies.Length ? faceNormal + 1 : 0;
-            Vector2 v2 = p.Verticies[nextFace];
+            Vector2 v1 = p.Vertices[faceNormal];
+            int nextFace = faceNormal + 1 < p.Vertices.Length ? faceNormal + 1 : 0;
+            Vector2 v2 = p.Vertices[nextFace];
 
             if (maxSeparation < .00005f)
             {
@@ -159,9 +159,9 @@ namespace SmallEngine.Physics
 
             FindIncidentFace(out Vector2[] incidentFace, reference, incident, referenceIndex);
 
-            Vector2 v1 = reference.Verticies[referenceIndex];
-            referenceIndex = referenceIndex + 1 == reference.Verticies.Length ? 0 : referenceIndex + 1;
-            Vector2 v2 = reference.Verticies[referenceIndex];
+            Vector2 v1 = reference.Vertices[referenceIndex];
+            referenceIndex = referenceIndex + 1 == reference.Vertices.Length ? 0 : referenceIndex + 1;
+            Vector2 v2 = reference.Vertices[referenceIndex];
 
             var rMat = reference.Body.GameObject.RotationMatrix;
             v1 = rMat * v1 + reference.Body.AABB.Center;
@@ -209,17 +209,17 @@ namespace SmallEngine.Physics
 
             var aMat = pA.Body.GameObject.RotationMatrix;
             var bMat = pB.Body.GameObject.RotationMatrix;
-            for(int i = 0; i < pA.Verticies.Length; i++)
+            for(int i = 0; i < pA.Vertices.Length; i++)
             {
                 Vector2 normal = pA.Normals[i];
                 Vector2 orientedNormal = aMat * normal;
 
-                Matrix2X2 buT = bMat.Transpose();
+                Mathematics.Matrix2X2 buT = bMat.Transpose();
                 normal = buT * orientedNormal;
 
                 Vector2 support = pB.GetSupport(-normal);
 
-                Vector2 vertex = pA.Verticies[i];
+                Vector2 vertex = pA.Vertices[i];
                 vertex = aMat * vertex + pA.Body.AABB.Center;
                 vertex -= pB.Body.AABB.Center;
                 vertex = buT * vertex;
@@ -246,7 +246,7 @@ namespace SmallEngine.Physics
 
             int incidentFace = 0;
             float min = float.MaxValue;
-            for(int i = 0; i < pInc.Verticies.Length; i++)
+            for(int i = 0; i < pInc.Vertices.Length; i++)
             {
                 float dot = Vector2.DotProduct(referenceNormal, pInc.Normals[i]);
                 if(dot < min)
@@ -257,10 +257,10 @@ namespace SmallEngine.Physics
             }
 
             pV = new Vector2[2];
-            pV[0] = iMat * pInc.Verticies[incidentFace] + pInc.Body.AABB.Center;
+            pV[0] = iMat * pInc.Vertices[incidentFace] + pInc.Body.AABB.Center;
 
-            incidentFace = incidentFace + 1 >= pInc.Verticies.Length ? 0 : incidentFace + 1;
-            pV[1] = iMat * pInc.Verticies[incidentFace] + pInc.Body.AABB.Center;
+            incidentFace = incidentFace + 1 >= pInc.Vertices.Length ? 0 : incidentFace + 1;
+            pV[1] = iMat * pInc.Vertices[incidentFace] + pInc.Body.AABB.Center;
         }
 
         private static int Clip(Vector2 n, float c, ref Vector2[] pFace)

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace SmallEngine.Graphics
 {
+    [Serializable]
     public struct Rectangle
     {
         #region Properties
@@ -49,9 +50,9 @@ namespace SmallEngine.Graphics
             get { return Y + Height; }
         }
 
-        public Vector2 Location { get; set; }
+        public Vector2 Location;
 
-        public Size Size { get; set; }
+        public Size Size;
         #endregion
 
         #region Constructors

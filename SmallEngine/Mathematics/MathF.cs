@@ -7,25 +7,25 @@ namespace SmallEngine
     {
         public static float PI
         {
-            get { return (float)Math.PI; }
+            get { return (float)System.Math.PI; }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float Sin(double pA)
         {
-            return (float)Math.Sin(pA);
+            return (float)System.Math.Sin(pA);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float Cos(double pA)
         {
-            return (float)Math.Cos(pA);
+            return (float)System.Math.Cos(pA);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float Tan(double pA)
         {
-            return (float)Math.Tan(pA);
+            return (float)System.Math.Tan(pA);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -45,37 +45,37 @@ namespace SmallEngine
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float Log(double pA)
         {
-            return (float)Math.Log(pA);
+            return (float)System.Math.Log(pA);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float Pow(double pX, double pY)
         {
-            return (float)Math.Pow(pX, pY);
+            return (float)System.Math.Pow(pX, pY);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float Sqrt(double pD)
         {
-            return (float)Math.Sqrt(pD);
+            return (float)System.Math.Sqrt(pD);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float DegreesToRadians(float pAngle)
         {
-            return (float)(pAngle * (Math.PI / 180));
+            return (float)(pAngle * (System.Math.PI / 180));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float RadiansToDegrees(float pRadians)
         {
-            return (float)(pRadians * (180 / Math.PI));
+            return (float)(pRadians * (180 / System.Math.PI));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float Round(float a, int pPlaces)
         {
-            return (float)Math.Round(a, pPlaces);
+            return (float)System.Math.Round(a, pPlaces);
         }
     }
 

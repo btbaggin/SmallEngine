@@ -22,6 +22,7 @@ namespace SmallEngine
         float _timeElapsed;
         int _frameCount;
 #endif
+        readonly UpdateSystem _update;
         readonly RenderSystem _render;
         float _physicsStep;
 
@@ -84,6 +85,7 @@ namespace SmallEngine
             Form.WindowSizeChanged += Graphics.Resize;
 
             _render = new RenderSystem(Graphics);
+            _update = new UpdateSystem();
             PhysicsHelper.Create();
 
             if (MaxFps == 0) MaxFps = 60;
@@ -100,6 +102,7 @@ namespace SmallEngine
         {
             ActiveCamera.Update(pDeltaTime);
 
+            _update.Process();
             Scene.UpdateAll(pDeltaTime);
         }
 
@@ -186,7 +189,6 @@ namespace SmallEngine
                     return;
                 }
 
-                Scene.DisposeGameObjectsAll();
                 GameTime.Tick();
 
                 var physicsTime = GameTime.PhysicsTime;
@@ -217,6 +219,8 @@ namespace SmallEngine
                 Draw();
 
                 Graphics.EndDraw();
+
+                Scene.DisposeDestroyedGameObjects();
 
                 //If the max updates is set and we have cycles, sleep the thread
                 if (MaxFps > 0)

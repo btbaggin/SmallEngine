@@ -1,13 +1,38 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Runtime.Serialization;
 
 namespace SmallEngine.Components
 {
     public abstract class DependencyComponent : Component
     {
-        readonly Dictionary<FieldInfo, ImportComponentAttribute> _dependencies = new Dictionary<FieldInfo, ImportComponentAttribute>();
+        struct ImportFieldInfo
+        {
+            public FieldInfo Field;
+            public ImportComponentAttribute Info;
+
+            public ImportFieldInfo(FieldInfo pField, ImportComponentAttribute pInfo)
+            {
+                Field = pField;
+                Info = pInfo;
+            }
+        }
+
+        static readonly Dictionary<Type, List<ImportFieldInfo>> _dependencies = new Dictionary<Type, List<ImportFieldInfo>>();
+        List<ImportFieldInfo> _fields = new List<ImportFieldInfo>();
         protected DependencyComponent()
+        {
+            var t = GetType();
+            DetermineDepencencies(t);
+
+            while ((t = t.BaseType) != null && IsComponent(t))
+            {
+                DetermineDepencencies(t);
+            }
+        }
+
+        protected DependencyComponent(SerializationInfo pInfo, StreamingContext pContext) : base(pInfo, pContext)
         {
             var t = GetType();
             DetermineDepencencies(t);
@@ -21,16 +46,18 @@ namespace SmallEngine.Components
         public override void OnAdded(IGameObject pGameObject)
         {
             base.OnAdded(pGameObject);
-            GameObject = pGameObject;
-            foreach (var d in _dependencies)
+
+            //TODO inherited stuff
+            foreach (var d in _fields)
             {
                 IComponent component = null;
-                if (d.Value.AllowInheritedTypes)
+                var type = d.Field.FieldType;
+                if (d.Info.AllowInheritedTypes)
                 {
                     //Look for any inherited types
                     foreach(var c in pGameObject.GetComponents())
                     {
-                        if(d.Key.FieldType.IsInstanceOfType(c))
+                        if(type.IsInstanceOfType(c))
                         {
                             component = c;
                             break;
@@ -40,37 +67,48 @@ namespace SmallEngine.Components
                 else
                 {
                     //Get actual type
-                    component = pGameObject.GetComponent(d.Key.FieldType);
+                    component = pGameObject.GetComponent(type);
                 }
 
-                if(component == null && d.Value.Required)
+                if(component == null && d.Info.Required)
                 {
                     //Create if required
-                    component = Create(d.Key.FieldType);
+                    component = Create(type);
                     pGameObject.AddComponent(component);
                 }
 
                 if (component == null) continue;
 
-                d.Key.SetValue(this, component);
+                d.Field.SetValue(this, component);
             }
         }
 
         private void DetermineDepencencies(Type pType)
         {
-            var fields = pType.GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
-
-            foreach (FieldInfo f in fields)
+            var importFields = new List<ImportFieldInfo>();
+            if(!_dependencies.ContainsKey(pType))
             {
-                var type = f.FieldType;
-                var att = f.GetCustomAttribute<ImportComponentAttribute>();
-                if (att != null)
+                var fields = pType.GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+
+                foreach (FieldInfo f in fields)
                 {
-                    System.Diagnostics.Debug.Assert(IsComponent(type) && type.GetConstructor(Type.EmptyTypes) != null, 
-                                                    "ImportComponent must be IComponent and have an empty constructor");
-                    _dependencies.Add(f, att);
+                    var type = f.FieldType;
+                    var att = f.GetCustomAttribute<ImportComponentAttribute>();
+                    if (att != null)
+                    {
+                        System.Diagnostics.Debug.Assert(IsComponent(type) && type.GetConstructor(Type.EmptyTypes) != null,
+                                                        "ImportComponent must be IComponent and have an empty constructor");
+                        importFields.Add(new ImportFieldInfo(f, att));
+                    }
                 }
+                _dependencies.Add(pType, importFields);
             }
+            else
+            {
+                importFields = _dependencies[pType];
+            }
+
+            _fields.AddRange(importFields);
         }
     }
 }

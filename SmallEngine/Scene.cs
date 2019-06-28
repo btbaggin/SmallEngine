@@ -38,9 +38,10 @@ namespace SmallEngine
         //https://gamedevelopment.tutsplus.com/tutorials/spaces-useful-game-object-containers--gamedev-14091
 
         readonly Dictionary<string, IGameObject> _namedObjects;
-        readonly ConcurrentBag<IGameObject> _toRemove = new ConcurrentBag<IGameObject>();
         readonly UIManager _ui;
 
+        static readonly ConcurrentBag<IGameObject> _toRemove = new ConcurrentBag<IGameObject>();
+        static SceneGameObjectList _gameobjects = new SceneGameObjectList();
         static List<ComponentSystem> _systems = new List<ComponentSystem>();
         //It should be fine to just iterate to the count for updates
         //if something gets added it shouldn't be updated until the next frame anyway
@@ -50,18 +51,16 @@ namespace SmallEngine
         internal readonly static Dictionary<string, List<Type>> _definitions = new Dictionary<string, List<Type>>();
 
         #region Properties
-        public List<IGameObject> GameObjects { get; }
-
         public bool Active { get; set; } = true;
         #endregion  
 
         #region Constructors
         protected Scene()
         {
-            GameObjects = new List<IGameObject>();
             _namedObjects = new Dictionary<string, IGameObject>();
             _ui = new UIManager();
         }
+        #endregion
 
         /// <summary>
         /// Loads a new scene using the specified SceneLoadModes
@@ -73,20 +72,19 @@ namespace SmallEngine
             //TODO allow creating scene that isn't registered to all systems
             var scene = (T)Activator.CreateInstance(typeof(T));
             scene._mode = pMode;
-            if(_scenes.Count > 0)
+            if (_scenes.Count > 0)
             {
-                switch(pMode)
+                switch (pMode)
                 {
                     case SceneLoadModes.Replace:
                         _scenes.Pop();
                         break;
 
                     case SceneLoadModes.Additive:
-                        var peek = _scenes.Peek();
-                        peek.Suspend();
                         break;
 
                     case SceneLoadModes.LoadOver:
+                        //TODO should LoadOver go over additive scenes? or should it load over the current scene?
                         var load = _scenes.Peek();
                         load.Suspend();
                         load.Active = false;
@@ -94,12 +92,12 @@ namespace SmallEngine
                 }
             }
 
+            _gameobjects.StartScene(pMode);
             _scenes.Push(scene);
             scene.Begin();
 
             return scene;
         }
-        #endregion
 
         /// <summary>
         /// Ends the current scene and, if necessary, restores existing scenes
@@ -107,9 +105,20 @@ namespace SmallEngine
         public void Unload()
         {
             End();
-            if(_scenes.Count > 0)
+            //Dispose of all GameObjects created within the scene
+            foreach (var go in _gameobjects.GetGameObjects())
+            {
+                if (!string.IsNullOrEmpty(go.Name))
+                {
+                    _namedObjects.Remove(go.Name);
+                }
+                go.Dispose();
+            }
+
+            if (_scenes.Count > 0)
             {
                 //Remove current scene
+                //TODO why isn't this just _ui.DisposeElements() like the gameobject stuff?
                 var scene = _scenes.Pop();
                 scene._ui.DisposeElements();
 
@@ -127,19 +136,12 @@ namespace SmallEngine
                         break;
                 }
             }
+
+            _gameobjects.EndScene();
         }
 
         #region Overridable Methods
-        public virtual void Update(float pDeltaTime)
-        {
-            //It's Ok to go until count because GameObjects aren't destroyed until the end of frame
-            //Any new objects won't get updated until the frame they are created
-            var count = GameObjects.Count;
-            for(int i = 0; i < count; i++) 
-            {
-                GameObjects[i].Update(pDeltaTime);
-            }
-        }
+        public virtual void Update(float pDeltaTime) { }
 
         public virtual void Draw(IGraphicsAdapter pAdapter) { }
 
@@ -151,20 +153,7 @@ namespace SmallEngine
         /// <summary>
         /// Called when the scene is unloaded
         /// </summary>
-        protected virtual void End()
-        {
-            //Dispose of all GameObjects created within the scene
-            foreach(var go in GameObjects)
-            {
-                if (!string.IsNullOrEmpty(go.Name) && _namedObjects.ContainsKey(go.Name))
-                {
-                    _namedObjects.Remove(go.Name);
-                }
-                go.Dispose();
-            }
-
-            GameObjects.Clear();
-        }
+        protected virtual void End() { }
 
         /// <summary>
         /// Called when a scene is loaded over the current scene using <see cref="SceneLoadModes.LoadOver"/> 
@@ -185,7 +174,16 @@ namespace SmallEngine
         #region Internal methods
         internal static void UpdateAll(float pDeltaTime)
         {
-            for(int i = 0; i < _scenes.Count; i++)
+            //It's OK to go until count because GameObjects aren't destroyed until the end of frame
+            //Any new objects won't get updated until the frame they are created
+            var go = _gameobjects.GetGameObjects();
+            var count = go.Count;
+            for (int i = 0; i < count; i++)
+            {
+                go[i]?.Update(pDeltaTime);
+            }
+
+            for (int i = 0; i < _scenes.Count; i++)
             {
                 var s = _scenes.PeekAt(i);
                 if (s.Active) s.Update(pDeltaTime);
@@ -201,11 +199,17 @@ namespace SmallEngine
             }
         }
 
-        internal static void DisposeGameObjectsAll()
+        internal static void DisposeDestroyedGameObjects()
         {
-            for (int i = 0; i < _scenes.Count; i++)
+            while (_toRemove.TryTake(out IGameObject go))
             {
-                _scenes.PeekAt(i).DisposeDestroyedGameObjects();
+                _gameobjects.Remove(go);
+
+                if (!string.IsNullOrEmpty(go.Name))
+                {
+                    go.ContainingScene._namedObjects.Remove(go.Name);
+                }
+                go.Dispose();
             }
         }
 
@@ -247,21 +251,6 @@ namespace SmallEngine
                 _scenes.PeekAt(i).InvalidateMeasure();
             }
         }
-
-        private void DisposeDestroyedGameObjects()
-        {
-            while (_toRemove.TryTake(out IGameObject go))
-            {
-                GameObjects.Remove(go);
-
-                if (!string.IsNullOrEmpty(go.Name) && _namedObjects.ContainsKey(go.Name))
-                {
-                    _namedObjects.Remove(go.Name);
-                }
-                go.Dispose();
-            }
-        }
-
         #endregion
 
         #region GameObject Creation
@@ -272,14 +261,7 @@ namespace SmallEngine
         /// <param name="pComponents">Components that will be attached to the IGameObject when it is created</param>
         public static void Define(string pName, params Type[] pComponents)
         {
-            if (!_definitions.ContainsKey(pName))
-            {
-                _definitions.Add(pName, pComponents.ToList());
-            }
-            else
-            {
-                _definitions[pName] = pComponents.ToList();
-            }
+            _definitions[pName] = pComponents.ToList();
         }
 
         /// <summary>
@@ -341,6 +323,7 @@ namespace SmallEngine
 
                 go.ContainingScene = this;
                 go.Initialize();
+
                 AddGameObject(go, pName);
                 return go;
             }
@@ -350,7 +333,7 @@ namespace SmallEngine
 
         private void AddGameObject(IGameObject pGameObject, string pName)
         {
-            GameObjects.Add(pGameObject);
+            _gameobjects.Add(pGameObject);
             if (pName != null) _namedObjects.Add(pName, pGameObject);
             Game.Messages.Register(pGameObject);
         }
@@ -379,37 +362,43 @@ namespace SmallEngine
         {
             for(int i = 0; i < _scenes.Count; i++)
             {
-                var go = _scenes.PeekAt(i).FindGameObject<IGameObject>(pName);
-                if (go != null) return go;
+                var scene = _scenes.PeekAt(i);
+                if(scene._namedObjects.ContainsKey(pName))
+                {
+                    return scene._namedObjects[pName];
+                }
             }
 
-            return null;
+            throw new GameObjectNotFoundException(pName);
         }
 
         /// <summary>
         /// Finds a IGameObject within the scene with the specified name.
-        /// Will return null if no IGameObject is found
-        /// </summary>
-        /// <param name="pName">Name for which to search</param>
-        public IGameObject FindGameObject(string pName)
-        {
-            if (_namedObjects.ContainsKey(pName))
-            {
-                return _namedObjects[pName];
-            }
-
-            return default;
-        }
-
-        /// <summary>
-        /// Finds a IGameObject within the scene with the specified name.
-        /// Will return null if no IGameObject is found
         /// </summary>
         /// <param name="pName">Name for which to search</param>
         public T FindGameObject<T>(string pName) where T : IGameObject
         {
-            //TODO should this return weak reference? because we could destroy the object or store gameobject ID?
-            return (T)FindGameObject(pName);
+            if (_namedObjects.ContainsKey(pName))
+            {
+                return (T)_namedObjects[pName];
+            }
+
+            throw new GameObjectNotFoundException(pName);
+        }
+
+        public long CreatePointerToObject(string pName)
+        {
+            if(_namedObjects.ContainsKey(pName))
+            {
+                return _namedObjects[pName].GetPointer();
+            }
+
+            throw new GameObjectNotFoundException(pName);
+        }
+
+        public bool TryGetGameObject(long pPointer, out IGameObject pObject)
+        {
+            return _gameobjects.GetByPointer(pPointer, out pObject);
         }
 
         /// <summary>
@@ -418,7 +407,12 @@ namespace SmallEngine
         /// <param name="pTag">Tag for which to search</param>
         public IEnumerable<IGameObject> FindGameObjectsWithTag(string pTag)
         {
-            return GameObjects.WithTag(pTag);
+            return _gameobjects.GetGameObjects().WithTag(pTag);
+        }
+
+        public IList<IGameObject> GetGameObjects()
+        {
+            return _gameobjects.GetGameObjects();
         }
         #endregion
 
@@ -433,19 +427,9 @@ namespace SmallEngine
         /// Will return null if no UIElement is found
         /// </summary>
         /// <param name="pName">Name for which to search</param>
-        public UIElement FindUIElement(string pName)
-        {
-            return _ui.GetElement(pName);
-        }
-
-        /// <summary>
-        /// Finds a UIElement within the scene with the specified name.
-        /// Will return null if no UIElement is found
-        /// </summary>
-        /// <param name="pName">Name for which to search</param>
         public T FindUIElement<T>(string pName) where T : UIElement
         {
-            return (T)FindUIElement(pName);
+            return (T)_ui.GetElement(pName);
         }
 
         /// <summary>

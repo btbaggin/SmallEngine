@@ -49,7 +49,7 @@ namespace SmallEngine
         public static SceneGraph CreateFrom(Scene pScene)
         {
             var g = new SceneGraph(0, Physics.PhysicsHelper.WorldBounds);
-            foreach(var go in pScene.GameObjects)
+            foreach(var go in pScene.GetGameObjects())
             {
                 g.Insert(go);
             }
@@ -61,7 +61,7 @@ namespace SmallEngine
         public void Update(Scene pScene)
         {
             Clear();
-            foreach (var go in pScene.GameObjects)
+            foreach (var go in pScene.GetGameObjects())
             {
                 Insert(go);
             }

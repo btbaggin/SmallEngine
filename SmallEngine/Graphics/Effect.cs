@@ -30,6 +30,19 @@ namespace SmallEngine.Graphics
             return this;
         }
 
+        public Effect AddTint(Color pColor)
+        {
+            var e =  new SharpDX.Direct2D1.Effects.ColorMatrix(_context);
+            var m = new SharpDX.Mathematics.Interop.RawMatrix5x4();
+            m.M11 = pColor.R * (pColor.A / 255f); //TODO not sure this is working
+            m.M12 = pColor.G * (pColor.A / 255f);
+            m.M13 = pColor.B * (pColor.A / 255f);
+            m.M14 = 1;
+            e.SetValue(0, m);
+            _effects.Add(e);
+            return this;
+        }
+
         public Effect AddSepia(float pValue)
         {
             var e =new SharpDX.Direct2D1.Effect(_context, SharpDX.Direct2D1.Effect.Sepia);

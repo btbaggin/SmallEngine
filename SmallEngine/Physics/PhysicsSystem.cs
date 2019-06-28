@@ -29,7 +29,6 @@ namespace SmallEngine.Physics
             foreach(var component in Components)
             {
                 var r = (ColliderComponent)component;
-                if (!r.Active) continue;
 
                 //We have to update the AABB here because otherwise our bounding boxes will be one frame behind
                 r.UpdateAABB();

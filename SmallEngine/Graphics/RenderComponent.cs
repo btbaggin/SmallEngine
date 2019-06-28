@@ -5,15 +5,14 @@ using System.Text;
 using System.Threading.Tasks;
 using SmallEngine.Input;
 using SmallEngine.Components;
+using System.Runtime.Serialization;
 
 namespace SmallEngine.Graphics
 {
     public sealed class RenderComponent : DependencyComponent
     {
         [ImportComponent(false)]
-        private Physics.RigidBodyComponent _body;
-
-        public bool Visible { get; set; } = true;
+        Physics.RigidBodyComponent _body;
 
         public float Opacity { get; set; } = 1f;
 
@@ -21,7 +20,31 @@ namespace SmallEngine.Graphics
 
         public BitmapResource Bitmap { get; set; }
 
-        public Color Color { get; set; }
+        #region Constructor
+        public RenderComponent() : base() { }
+
+        public RenderComponent(BitmapResource pResource, int pZIndex) : base()
+        {
+            Bitmap = pResource;
+            ZIndex = pZIndex;
+        }
+
+        public RenderComponent(SerializationInfo pInfo, StreamingContext pContext) : base(pInfo, pContext)
+        {
+            Opacity = pInfo.GetSingle("Opacity");
+            ZIndex = pInfo.GetInt32("ZIndex");
+            Bitmap = ResourceManager.Request<BitmapResource>(pInfo.GetString("Bitmap"));
+        }
+
+        public override void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            base.GetObjectData(info, context);
+
+            info.AddValue("Opacity", Opacity);
+            info.AddValue("ZIndex", ZIndex);
+            info.AddValue("Bitmap", Bitmap.Alias);
+        }
+        #endregion
 
         public void Draw(IGraphicsAdapter pSystem, float pDeltaTime)
         {
@@ -43,7 +66,7 @@ namespace SmallEngine.Graphics
         public bool IsVisible()
         {
             var onScreen = Game.ActiveCamera.IsVisible(GameObject);
-            return onScreen && Visible && Opacity > 0f;
+            return onScreen && Opacity > 0f;
         }
 
         public override int CompareTo(IComponent other)
@@ -51,6 +74,13 @@ namespace SmallEngine.Graphics
             if (!(other is RenderComponent rc)) return 0;
 
             return ZIndex.CompareTo(rc.ZIndex);
+        }
+
+        public override void Dispose()
+        {
+            base.Dispose();
+
+            Bitmap.Dispose();
         }
     }
 }

@@ -37,13 +37,13 @@ namespace SmallEngine.Debug
                     case Shapes.Polygon:
                         var p = (PolygonMesh)collider.Mesh;
                         var pos = collider.AABB.Center;
-                        for (int i = 0; i < p.Verticies.Length - 1; i++)
+                        for (int i = 0; i < p.Vertices.Length - 1; i++)
                         {
-                            var v1 = p.Verticies[i] + pos;
-                            var v2 = p.Verticies[i + 1] + pos;
+                            var v1 = p.Vertices[i] + pos;
+                            var v2 = p.Vertices[i + 1] + pos;
                             _adapter.DrawLine(v1, v2, DebugBoxes);
                         }
-                        _adapter.DrawLine(p.Verticies[p.Verticies.Length - 1] + pos, p.Verticies[0] + pos, DebugBoxes);
+                        _adapter.DrawLine(p.Vertices[p.Vertices.Length - 1] + pos, p.Vertices[0] + pos, DebugBoxes);
                         break;
                 }
             }

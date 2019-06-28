@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using SmallEngine.Components;
@@ -17,6 +18,7 @@ namespace SmallEngine.Physics
         public EventHandler <CollisionEventArgs> TriggerStay { get; set; }
         public EventHandler<CollisionEventArgs> TriggerExit { get; set; }
 
+        #region Properties
         public AxisAlignedBoundingBox AABB { get; private set; }
 
         public Vector2 Position
@@ -56,6 +58,46 @@ namespace SmallEngine.Physics
         bool _triggerEnter;
         bool _triggerExit;
         public bool TriggerOnlyOnce { get; set; }
+        #endregion
+
+        #region Constructors
+        public ColliderComponent() : base() { }
+
+        public ColliderComponent(CollisionMesh pMesh) : base()
+        {
+            Mesh = pMesh;
+        }
+
+        public ColliderComponent(SerializationInfo pInfo, StreamingContext pContext) : base(pInfo, pContext)
+        {
+            Mesh = (CollisionMesh)pInfo.GetValue("Mesh", typeof(CollisionMesh));
+            Layer = pInfo.GetInt16("Layer");
+            IsTrigger = pInfo.GetBoolean("IsTrigger");
+            TriggerOnlyOnce = pInfo.GetBoolean("TriggerOnlyOnce");
+        }
+
+        public override void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            base.GetObjectData(info, context);
+
+            info.AddValue("Mesh", Mesh, typeof(CollisionMesh));
+            info.AddValue("Layer", Layer);
+            info.AddValue("IsTrigger", IsTrigger);
+            info.AddValue("TriggerOnlyOnce", TriggerOnlyOnce);
+        }
+        #endregion
+
+        public override void OnAdded(IGameObject pGameObject)
+        {
+            base.OnAdded(pGameObject);
+
+            if (Mesh != null)
+            {
+                _mesh.CalculateMass(out float mass, out float inertia);
+                _body.Mass = mass;
+                _body.Inertia = inertia;
+            }
+        }
 
         internal void UpdateAABB()
         {
@@ -70,7 +112,8 @@ namespace SmallEngine.Physics
         internal void OnCollisionEnter(ColliderComponent pCollider, Manifold pManifold)
         {
             bool _event = false;
-            if (IsTrigger)
+            bool isTrigger = IsTrigger || pCollider.IsTrigger;
+            if (isTrigger)
             {
                 //Check if we have already triggered this collider
                 if (!TriggerOnlyOnce || !_triggerEnter)
@@ -86,12 +129,12 @@ namespace SmallEngine.Physics
                 EventHandler<CollisionEventArgs> ce = null;
                 if (Colliders.Add(pCollider))
                 {
-                    if (IsTrigger) ce = TriggerEnter;
+                    if (isTrigger) ce = TriggerEnter;
                     else ce = CollisionEnter;
                 }
                 else
                 {
-                    if (IsTrigger) ce = TriggerStay;
+                    if (isTrigger) ce = TriggerStay;
                     else ce = CollisionStay;
                 }
 

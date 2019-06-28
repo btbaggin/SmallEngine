@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace SmallEngine
 {
+    [Serializable]
     public struct Vector2
     {
         #region Properties

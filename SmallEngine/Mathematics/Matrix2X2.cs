@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 using SmallEngine.Graphics;
 using SharpDX;
 
-namespace SmallEngine
+namespace SmallEngine.Mathematics
 {
+    [Serializable]
     public struct Matrix2X2
     {
         public static Matrix2X2 Identity { get; } = new Matrix2X2(1, 0, 0, 1);

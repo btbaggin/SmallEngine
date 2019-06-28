@@ -1,7 +1,7 @@
 ﻿using SmallEngine.Input;
 using SmallEngine.Graphics;
 
-namespace SmallEngine
+namespace SmallEngine.Graphics
 {
     public class Camera : IUpdatable
     {

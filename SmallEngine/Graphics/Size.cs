@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace SmallEngine.Graphics
 {
+    [Serializable]
     public struct Size
     {
         public float Width { get; set; }

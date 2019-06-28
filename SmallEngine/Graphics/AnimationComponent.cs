@@ -23,13 +23,7 @@ namespace SmallEngine.Graphics
         }
 
         public AnimationUpdateDelegate Evaluator { get; set; }
-
-        public int ZIndex
-        {
-            get { return _render.ZIndex; }
-            set { _render.ZIndex = value; }
-        }
-
+        
         public void Update(float pDeltaTime)
         {
             Evaluator?.Invoke(this, ref _current);
@@ -48,6 +42,7 @@ namespace SmallEngine.Graphics
         {
             _animations.Add(pName, pAnim);
             Current = pAnim;
+            _render.Bitmap = Current.Bitmap.CreateSubBitmap(Current.Frame);
         }
 
         public Animation GetAnimation(string pName)

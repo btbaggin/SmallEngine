@@ -6,15 +6,13 @@ using System.Threading.Tasks;
 
 namespace SmallEngine.Physics
 {
+    [Serializable]
     public class Material
     {
-        public float Restitution { get; private set; }
-
-        public float Density { get; private set; }
-
-        public float StaticFriction { get; private set; }
-
-        public float DynamicFriction { get; private set; }
+        public float Restitution;
+        public float Density;
+        public float StaticFriction;
+        public float DynamicFriction;
 
         private Material(float pRestitution, float pDensity, float pStaticFriction, float pDynamicFriction)
         {
