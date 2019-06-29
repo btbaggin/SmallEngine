@@ -16,9 +16,9 @@ namespace SmallEngine
 
         protected override void DoProcess()
         {
-            foreach(var c in Components)
+            for(int i = 0; i < Components.Count; i++)
             {
-                var u = (UpdateComponent)c;
+                var u = (UpdateComponent)Components[i];
                 u.Update(GameTime.DeltaTime);
             }
         }

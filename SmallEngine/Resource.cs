@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace SmallEngine
 {
-    public abstract class Resource : IDisposable
+    [Serializable]
+    public abstract class Resource : IDisposable, ISerializable
     {
         #region Public properties
         /// <summary>
@@ -22,7 +24,7 @@ namespace SmallEngine
         public bool Disposed { get; private set; }
         #endregion
 
-        private int _refCount;
+        protected int _refCount;
 
         /// <summary>
         /// Increment the reference count and return the resource.
@@ -54,6 +56,20 @@ namespace SmallEngine
         /// <param name="pPath">Path to the file to load</param>
         /// <returns></returns>
         internal abstract void Create();
+
+        protected Resource() { }
+
+        protected Resource(SerializationInfo pInfo, StreamingContext pContext)
+        {
+            Path = pInfo.GetString("Path");
+            Alias = pInfo.GetString("Alias");
+        }
+
+        public virtual void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            info.AddValue("Path", Path);
+            info.AddValue("Alias", Alias);
+        }
 
         /// <summary>
         /// Decrement the reference count and if nothing is referencing it, dispose of the resource.

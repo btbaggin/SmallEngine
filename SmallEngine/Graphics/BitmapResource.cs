@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace SmallEngine.Graphics
 {
-    public class BitmapResource : Resource
+    [Serializable]
+    public sealed class BitmapResource : Resource
     {
         SharpDX.Direct2D1.Bitmap _bitmap;
         public SharpDX.Direct2D1.Bitmap DirectXBitmap
@@ -47,26 +49,50 @@ namespace SmallEngine.Graphics
                 Width = (int)pRectangle.Width,
                 Height = (int)pRectangle.Height,
                 _bitmap = DirectXBitmap,
-                Source = pRectangle
+                Source = pRectangle,
+                Alias = Alias,
+                _refCount = _refCount + 1
             };
         }
 
         internal override void Create()
         {
-            if(Game.RenderMethod == RenderMethods.DirectX)
+            switch(Game.RenderMethod)
             {
-                var dx = (DirectXAdapter)Game.Graphics;
-                DirectXBitmap = dx.LoadBitmap(Path);
-            }
-            else
-            {
-                throw new NotImplementedException();
+                case RenderMethods.DirectX:
+                    var dx = (DirectXAdapter)Game.Graphics;
+                    DirectXBitmap = dx.LoadBitmap(Path);
+                    break;
+
+                case RenderMethods.OpenGL:
+                    throw new NotImplementedException();
+
+                default:
+                    throw new UnknownEnumException(typeof(RenderMethods), Game.RenderMethod);
+
             }
         }
 
         internal override Task CreateAsync()
         {
             return Task.Run(() => Create());
+        }
+
+        public BitmapResource() { }
+
+        private BitmapResource(SerializationInfo pInfo, StreamingContext pContext) : base(pInfo, pContext)
+        {
+            if (!ResourceManager.ResourceLoaded(Alias))
+                throw new Serialization.ResourceNotLoadedException(Alias);
+
+            Source = (Rectangle?)pInfo.GetValue("Source", typeof(Rectangle?));
+            DirectXBitmap = ResourceManager.Request<BitmapResource>(Alias).DirectXBitmap;
+        }
+
+        public override void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            base.GetObjectData(info, context);
+            info.AddValue("Source", Source, typeof(Rectangle?));
         }
 
         protected override void DisposeResource()

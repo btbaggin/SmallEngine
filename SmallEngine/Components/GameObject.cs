@@ -10,6 +10,7 @@ using System.Runtime.Serialization;
 
 namespace SmallEngine
 {
+    [Serializable]
     public class GameObject : IGameObject
     {
         #region Properties
@@ -39,14 +40,18 @@ namespace SmallEngine
 
         public Mathematics.Matrix3X2 TransformMatrix { get; set; } = Mathematics.Matrix3X2.Identity;
 
+        [field: NonSerialized]
         public bool Destroyed { get; private set; }
 
         public string Tag { get; set; }
 
+        [field: NonSerialized]
         int IGameObject.Index { get; set; }
 
+        [field: NonSerialized]
         ushort IGameObject.Version { get; set; }
 
+        [field: NonSerialized]
         public Scene ContainingScene { get; set; }
         #endregion  
 
@@ -58,36 +63,6 @@ namespace SmallEngine
         public GameObject(string pName)
         {
             Name = pName;
-        }
-
-        protected GameObject(SerializationInfo pInfo, StreamingContext pContext)
-        {
-            Name = pInfo.GetString("Name");
-            Tag = pInfo.GetString("Tag");
-            Position = (Vector2)pInfo.GetValue("Position", typeof(Vector2));
-            Scale = (Size)pInfo.GetValue("Scale", typeof(Size));
-            Rotation = pInfo.GetSingle("Rotation");
-            TransformMatrix = (Mathematics.Matrix3X2)pInfo.GetValue("Transform", typeof(Mathematics.Matrix3X2));
-
-            var components = (List<IComponent>)pInfo.GetValue("Components", typeof(List<IComponent>));
-            foreach(var c in components)
-            {
-                _components.Add(c.GetType(), c);
-                c.OnAdded(this);
-            }
-        }
-
-        public void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            info.AddValue("Name", Name);
-            info.AddValue("Tag", Tag);
-            info.AddValue("Position", Position, typeof(Vector2));
-            info.AddValue("Scale", Scale, typeof(Size));
-            info.AddValue("Rotation", Rotation);
-            info.AddValue("Transform", TransformMatrix, typeof(Mathematics.Matrix3X2));
-
-            var components = _components.Values.ToList();
-            info.AddValue("Components", components, typeof(List<IComponent>));
         }
         #endregion
 
@@ -130,7 +105,6 @@ namespace SmallEngine
             if(!_components.ContainsKey(pComponent.GetType()))
             {
                 _components.Add(pComponent.GetType(), pComponent);
-                //TODO I can remove? Component.RegisterComponent(pComponent);
                 pComponent.OnAdded(this);
             }
         }
@@ -144,8 +118,6 @@ namespace SmallEngine
 
         #region Overridable Methods
         public virtual void Initialize() { }
-
-        public virtual void Update(float pDeltaTime) { }
 
         public virtual void ReceiveMessage(IMessage pMessage) { }
         #endregion

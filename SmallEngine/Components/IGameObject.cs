@@ -11,7 +11,7 @@ using System.Runtime.Serialization;
 
 namespace SmallEngine
 {
-    public interface IGameObject : IMessageReceiver, IDisposable, ISerializable
+    public interface IGameObject : IMessageReceiver, IDisposable//, ISerializable
     {
         //TODO? http://archive.gamedev.net/archive/reference/programming/features/scenegraph/page2.html
         #region Properties
@@ -48,7 +48,6 @@ namespace SmallEngine
         void RemoveComponent(Type pComponent);
 
         void Initialize();
-        void Update(float pDeltaTime);
         void Destroy();
 
         long GetPointer();

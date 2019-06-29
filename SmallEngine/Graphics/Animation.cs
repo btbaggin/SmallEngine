@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace SmallEngine.Graphics
 {
-    public class Animation
+    public sealed class Animation
     {
         public BitmapResource Bitmap { get; private set; }
 
@@ -22,7 +23,7 @@ namespace SmallEngine.Graphics
             get { return _index == _end; }
         }
 
-        readonly Size _frame;
+        readonly Size _frameSize;
         readonly int _start;
         readonly int _end;
         readonly int _columns;
@@ -35,16 +36,38 @@ namespace SmallEngine.Graphics
         public Animation(SpriteStrip pStrip, int pStartIndex, int pEndIndex, float pFrameDuration)
         {
             Bitmap = pStrip.Bitmap;
-            _frame = pStrip.FrameSize;
+            _frameSize = pStrip.FrameSize;
             _start = pStartIndex;
             _end = pEndIndex;
             _frameDuration = pFrameDuration;
 
-            _columns = (int)(Bitmap.Width / _frame.Width);
+            _columns = (int)(Bitmap.Width / _frameSize.Width);
 
             _index = pStartIndex;
             SetFrame();
         }
+
+        //private Animation(SerializationInfo pInfo, StreamingContext pContext)
+        //{
+        //    Bitmap = ResourceManager.Request<BitmapResource>(pInfo.GetString("Bitmap"));
+        //    _frameSize = (Size)pInfo.GetValue("Size", typeof(Size));
+        //    _start = pInfo.GetInt32("Start");
+        //    _end = pInfo.GetInt32("End");
+        //    _frameDuration = pInfo.GetSingle("Duration");
+        //    _columns = (int)(Bitmap.Width / _frameSize.Width);
+
+        //    _index = _start;
+        //    SetFrame();
+        //}
+
+        //public void GetObjectData(SerializationInfo info, StreamingContext context)
+        //{
+        //    info.AddValue("Bitmap", Bitmap.Alias);
+        //    info.AddValue("Size", _frameSize, typeof(Size));
+        //    info.AddValue("Start", _start);
+        //    info.AddValue("End", _end);
+        //    info.AddValue("Duration", _frameDuration);
+        //}
 
         public void Update(float pDeltaTime)
         {
@@ -89,7 +112,7 @@ namespace SmallEngine.Graphics
                 column = _index % _columns; 
             }
 
-            Frame = new Rectangle(column * _frame.Width, row * _frame.Height, _frame.Width, _frame.Height);
+            Frame = new Rectangle(column * _frameSize.Width, row * _frameSize.Height, _frameSize.Width, _frameSize.Height);
         }
     }
 }

@@ -36,7 +36,7 @@
     <DefineConstants>TRACE;DEBUG;WINDOWS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <LangVersion>7.2</LangVersion>
+    <LangVersion>7.3</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -152,6 +152,8 @@
     <Compile Include="RingBuffer.cs" />
     <Compile Include="SceneGraph.cs" />
     <Compile Include="Serialization\ConfigFile.cs" />
+    <Compile Include="Serialization\GameObjectSerializer.cs" />
+    <Compile Include="Serialization\ResourceNotLoadedException.cs" />
     <Compile Include="Serialization\Setting.cs" />
     <Compile Include="Serialization\SettingsFile.cs" />
     <Compile Include="Threading\EventTimer.cs" />

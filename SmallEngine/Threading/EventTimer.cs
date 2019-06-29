@@ -8,6 +8,7 @@ namespace SmallEngine.Threading
 {
     public class TimerElapsedEventArgs : EventArgs { }
 
+    [Serializable]
     public struct EventTimer
     {
         public EventHandler<TimerElapsedEventArgs> Elapsed { get; set; }

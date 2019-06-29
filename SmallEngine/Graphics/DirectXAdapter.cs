@@ -3,7 +3,6 @@
 using SharpDX;
 using SharpDX.Direct3D;
 using SharpDX.Direct3D11;
-using SharpDX.D3DCompiler;
 using SharpDX.DXGI;
 using Device = SharpDX.Direct3D11.Device;
 using Factory = SharpDX.DXGI.Factory;

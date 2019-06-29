@@ -14,6 +14,7 @@ namespace SmallEngine.Physics
         Polygon
     }
 
+    [Serializable]
     public abstract class CollisionMesh : ISerializable
     {
         internal ColliderComponent Body { get; set; }
@@ -48,7 +49,8 @@ namespace SmallEngine.Physics
     }
 
     #region CircleMesh
-    public class CircleMesh : CollisionMesh
+    [Serializable]
+    public sealed class CircleMesh : CollisionMesh
     {
         public float Radius { get; set; }
 
@@ -57,7 +59,7 @@ namespace SmallEngine.Physics
             Radius = pRadius;
         }
 
-        public CircleMesh(SerializationInfo pInfo, StreamingContext pContext) : base(pInfo, pContext)
+        private CircleMesh(SerializationInfo pInfo, StreamingContext pContext) : base(pInfo, pContext)
         {
             Radius = pInfo.GetSingle("Radius");
         }
@@ -87,26 +89,30 @@ namespace SmallEngine.Physics
     #endregion
 
     #region SquareMesh
-    public class SquareMesh : PolygonMesh
+    [Serializable]
+    public sealed class SquareMesh : PolygonMesh
     {
         public SquareMesh(Size pSize, Material pMaterial) : this(Vector2.Zero, pSize, pMaterial) { }
 
         public SquareMesh(Vector2 pPosition, Size pSize, Material pMaterial) : base(new Vector2[] { pPosition,
-                                                                                 new Vector2(pSize.Width, 0) + pPosition,
-                                                                                 new Vector2(pSize.Width, pSize.Height) + pPosition,
-                                                                                 new Vector2(0, pSize.Height) + pPosition}, pMaterial)
+                                                                                    new Vector2(pSize.Width, 0) + pPosition,
+                                                                                    new Vector2(pSize.Width, pSize.Height) + pPosition,
+                                                                                    new Vector2(0, pSize.Height) + pPosition}, pMaterial)
         {
         }
+
+        private SquareMesh(SerializationInfo pInfo, StreamingContext pContext) : base(pInfo, pContext) { }
     }
     #endregion
 
     #region PolygonMesh
+    [Serializable]
     public class PolygonMesh : CollisionMesh
     {
         public Vector2[] Vertices { get; private set; }
         public Vector2[] Normals { get; private set; }
 
-        Vector2 _min, _max;
+        [NonSerialized] Vector2 _min, _max;
         public PolygonMesh(Vector2[] pVerticies, Material pMaterial) : base(Shapes.Polygon, pMaterial)
         {
             _min = new Vector2(float.MaxValue, float.MaxValue);
@@ -114,7 +120,7 @@ namespace SmallEngine.Physics
             SetVerticies(pVerticies);
         }
 
-        public PolygonMesh(SerializationInfo pInfo, StreamingContext pContext) : base(pInfo, pContext)
+        protected PolygonMesh(SerializationInfo pInfo, StreamingContext pContext) : base(pInfo, pContext)
         {
             Vertices = (Vector2[])pInfo.GetValue("Vertices", typeof(Vector2[]));
             Normals = (Vector2[])pInfo.GetValue("Normals", typeof(Vector2[]));

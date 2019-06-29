@@ -8,17 +8,19 @@ using SmallEngine.Components;
 
 namespace SmallEngine.Physics
 {
+    [Serializable]
     public sealed class ColliderComponent : DependencyComponent, IPhysicsBody
     {
-        readonly  HashSet<ColliderComponent> Colliders = new HashSet<ColliderComponent>();
-        public EventHandler<CollisionEventArgs> CollisionEnter { get; set; }
-        public EventHandler<CollisionEventArgs> CollisionStay { get; set; }
-        public EventHandler<CollisionEventArgs> CollisionExit { get; set; }
-        public EventHandler<CollisionEventArgs> TriggerEnter { get; set; }
-        public EventHandler <CollisionEventArgs> TriggerStay { get; set; }
-        public EventHandler<CollisionEventArgs> TriggerExit { get; set; }
+        [NonSerialized] readonly  HashSet<ColliderComponent> Colliders = new HashSet<ColliderComponent>();
+        [field: NonSerialized] public EventHandler<CollisionEventArgs> CollisionEnter { get; set; }
+        [field: NonSerialized] public EventHandler<CollisionEventArgs> CollisionStay { get; set; }
+        [field: NonSerialized] public EventHandler<CollisionEventArgs> CollisionExit { get; set; }
+        [field: NonSerialized] public EventHandler<CollisionEventArgs> TriggerEnter { get; set; }
+        [field: NonSerialized] public EventHandler <CollisionEventArgs> TriggerStay { get; set; }
+        [field: NonSerialized] public EventHandler<CollisionEventArgs> TriggerExit { get; set; }
 
         #region Properties
+        [field: NonSerialized]
         public AxisAlignedBoundingBox AABB { get; private set; }
 
         public Vector2 Position
@@ -44,7 +46,7 @@ namespace SmallEngine.Physics
             }
         }
 
-        [ImportComponent(false)]
+        [ImportComponent(false)][NonSerialized]
         RigidBodyComponent _body;
         public RigidBodyComponent Body
         {
@@ -55,8 +57,8 @@ namespace SmallEngine.Physics
 
         public bool IsTrigger { get; set; }
 
-        bool _triggerEnter;
-        bool _triggerExit;
+        [NonSerialized] bool _triggerEnter;
+        [NonSerialized] bool _triggerExit;
         public bool TriggerOnlyOnce { get; set; }
         #endregion
 
@@ -66,24 +68,6 @@ namespace SmallEngine.Physics
         public ColliderComponent(CollisionMesh pMesh) : base()
         {
             Mesh = pMesh;
-        }
-
-        public ColliderComponent(SerializationInfo pInfo, StreamingContext pContext) : base(pInfo, pContext)
-        {
-            Mesh = (CollisionMesh)pInfo.GetValue("Mesh", typeof(CollisionMesh));
-            Layer = pInfo.GetInt16("Layer");
-            IsTrigger = pInfo.GetBoolean("IsTrigger");
-            TriggerOnlyOnce = pInfo.GetBoolean("TriggerOnlyOnce");
-        }
-
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            base.GetObjectData(info, context);
-
-            info.AddValue("Mesh", Mesh, typeof(CollisionMesh));
-            info.AddValue("Layer", Layer);
-            info.AddValue("IsTrigger", IsTrigger);
-            info.AddValue("TriggerOnlyOnce", TriggerOnlyOnce);
         }
         #endregion
 

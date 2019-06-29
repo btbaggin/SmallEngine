@@ -9,7 +9,7 @@ namespace SmallEngine.Components
 {
     public abstract class ComponentSystem
     {
-        protected IEnumerable<IComponent> Components { get; set; } = new List<IComponent>();
+        protected List<IComponent> Components { get; set; } = new List<IComponent>();
 
         protected ComponentSystem()
         {

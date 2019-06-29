@@ -5,34 +5,26 @@ using System.Runtime.Serialization;
 
 namespace SmallEngine.Components
 {
+    [Serializable]
     public abstract class DependencyComponent : Component
     {
         struct ImportFieldInfo
         {
             public FieldInfo Field;
             public ImportComponentAttribute Info;
+            public object SerializingValue;
 
             public ImportFieldInfo(FieldInfo pField, ImportComponentAttribute pInfo)
             {
                 Field = pField;
                 Info = pInfo;
+                SerializingValue = null;
             }
         }
 
-        static readonly Dictionary<Type, List<ImportFieldInfo>> _dependencies = new Dictionary<Type, List<ImportFieldInfo>>();
-        List<ImportFieldInfo> _fields = new List<ImportFieldInfo>();
+        [NonSerialized] static readonly Dictionary<Type, List<ImportFieldInfo>> _dependencies = new Dictionary<Type, List<ImportFieldInfo>>();
+        [NonSerialized] List<ImportFieldInfo> _fields = new List<ImportFieldInfo>();
         protected DependencyComponent()
-        {
-            var t = GetType();
-            DetermineDepencencies(t);
-
-            while ((t = t.BaseType) != null && IsComponent(t))
-            {
-                DetermineDepencencies(t);
-            }
-        }
-
-        protected DependencyComponent(SerializationInfo pInfo, StreamingContext pContext) : base(pInfo, pContext)
         {
             var t = GetType();
             DetermineDepencencies(t);
@@ -47,7 +39,6 @@ namespace SmallEngine.Components
         {
             base.OnAdded(pGameObject);
 
-            //TODO inherited stuff
             foreach (var d in _fields)
             {
                 IComponent component = null;
@@ -110,5 +101,53 @@ namespace SmallEngine.Components
 
             _fields.AddRange(importFields);
         }
+
+        #region Serialization
+        //These methods will null out any fields with the ImportComponent attribute
+        //Since these fields are references to other components that are being serializing
+        //storing the reference is pointless
+
+        //OnSerializing will null them out
+        //OnSerialized will reset the values back
+        //OnDeserializing will determine the dependencies so they can be added back when OnAdded is called
+        [OnSerializing]
+        private void OnSerializing(StreamingContext pContext)
+        {
+            var fields = _dependencies[GetType()];
+            for(int i = 0; i < fields.Count; i++)
+            {
+                ImportFieldInfo field = fields[i];
+                field.SerializingValue = fields[i].Field.GetValue(this);
+                field.Field.SetValue(this, null);
+                fields[i] = field;
+            }
+        }
+
+        [OnSerialized]
+        private void OnSerialized(StreamingContext pContext)
+        {
+            var fields = _dependencies[GetType()];
+            for (int i = 0; i < fields.Count; i++)
+            {
+                var field = fields[i];
+                field.Field.SetValue(this, null);
+                field.SerializingValue = null;
+                fields[i] = field;
+            }
+        }
+
+        [OnDeserializing]
+        private void OnDeserializing(StreamingContext pContext)
+        {
+            _fields = new List<ImportFieldInfo>();
+            var t = GetType();
+            DetermineDepencencies(t);
+
+            while ((t = t.BaseType) != null && IsComponent(t))
+            {
+                DetermineDepencencies(t);
+            }
+        }
+        #endregion
     }
 }

@@ -61,7 +61,7 @@ namespace SmallEngine.Graphics
         {
             if(IsFollowing)
             {
-                _position = _followObject.Position - new Vector2(Width / 2, Height / 2);
+                Position = _followObject.Position - new Vector2(Width / 2, Height / 2);
             }
 
             if(AllowZoom)
@@ -79,10 +79,10 @@ namespace SmallEngine.Graphics
             }
 
             var bounds = Physics.PhysicsHelper.WorldBounds;
-            if (_position.X < bounds.Left) _position.X = bounds.Left;
-            if (_position.Y < bounds.Top) _position.Y = bounds.Top;
-            if (_position.X + Width > bounds.Right) _position.X = bounds.Right - Width;
-            if (_position.Y + Height > bounds.Bottom) _position.Y = bounds.Bottom - Height;
+            if (Position.X < bounds.Left) _position.X = bounds.Left;
+            if (Position.Y < bounds.Top) _position.Y = bounds.Top;
+            if (Position.X + Width > bounds.Right) _position.X = bounds.Right - Width;
+            if (Position.Y + Height > bounds.Bottom) _position.Y = bounds.Bottom - Height;
         }
 
         public void MoveLeft()

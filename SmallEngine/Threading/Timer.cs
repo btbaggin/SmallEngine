@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace SmallEngine.Threading
 {
+    [Serializable]
     public struct Timer
     {
         float _interval;

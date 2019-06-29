@@ -19,11 +19,6 @@ namespace SmallEngine.UI
         public string Text
         {
             get { return _text.ToString(); }
-            set
-            {
-                _text.Clear();
-                _text.Append(value);
-            }
         }
 
         public bool IsFocused { get; private set; }

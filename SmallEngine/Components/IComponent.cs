@@ -7,7 +7,7 @@ using System.Runtime.Serialization;
 
 namespace SmallEngine.Components
 {
-    public interface IComponent : IDisposable, IComparable<IComponent>, ISerializable
+    public interface IComponent : IDisposable, IComparable<IComponent>//, ISerializable
     {
         bool Active { get; set; }
         IGameObject GameObject { get; }

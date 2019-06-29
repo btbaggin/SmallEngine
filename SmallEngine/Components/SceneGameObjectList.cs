@@ -30,7 +30,7 @@ namespace SmallEngine
             switch(pMode)
             {
                 case SceneLoadModes.Additive:
-                    _sceneIndexes.Push(_startIndex); //TODO is this right?
+                    _sceneIndexes.Push(_startIndex);
                     break;
 
                 case SceneLoadModes.LoadOver:
@@ -41,6 +41,9 @@ namespace SmallEngine
                 case SceneLoadModes.Replace:
                     _endIndex = _startIndex;
                     break;
+
+                default:
+                    throw new UnknownEnumException(typeof(SceneLoadModes), pMode);
             }
         }
 

@@ -1,11 +1,14 @@
-﻿using SmallEngine.Components;
+﻿using System;
+using System.Runtime.Serialization;
+using SmallEngine.Components;
 
 namespace SmallEngine.Audio
 {
+    [Serializable]
     public sealed class AudioComponent : Component
     {
-        private int _id;
-        private AudioResource _sound;
+        int _id;
+        AudioResource _sound;
 
         public float Volume { get; set; }
 

@@ -9,6 +9,7 @@ using SmallEngine.Components;
 
 namespace SmallEngine.Physics
 {
+    [Serializable]
     public sealed class RigidBodyComponent : DependencyComponent
     {
         #region "Properties"
@@ -61,30 +62,6 @@ namespace SmallEngine.Physics
         public RigidBodyComponent(bool pIsKinematic) : base()
         {
             IsKinematic = pIsKinematic;
-        }
-
-        public RigidBodyComponent(SerializationInfo pInfo, StreamingContext pContext) : base(pInfo, pContext)
-        {
-            Mass = pInfo.GetSingle("Mass");
-            Inertia = pInfo.GetSingle("Inertia");
-            Velocity = (Vector2)pInfo.GetValue("Velocity", typeof(Vector2));
-            Force = (Vector2)pInfo.GetValue("Force", typeof(Vector2));
-            AngularVelocity = pInfo.GetSingle("AngularVelocity");
-            Torque = pInfo.GetSingle("Torque");
-            IsKinematic = pInfo.GetBoolean("IsKinematic");
-        }
-
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            base.GetObjectData(info, context);
-
-            info.AddValue("Mass", Mass);
-            info.AddValue("Inertia", Inertia);
-            info.AddValue("Velocity", Velocity, typeof(Vector2));
-            info.AddValue("Force", Force, typeof(Vector2));
-            info.AddValue("AngularVelocity", AngularVelocity);
-            info.AddValue("Torque", Torque);
-            info.AddValue("IsKinematic", IsKinematic);
         }
         #endregion
 

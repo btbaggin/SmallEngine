@@ -10,12 +10,12 @@ namespace SmallEngine
         /// <summary>
         /// X component of the Vector2
         /// </summary>
-        public float X { get; set; }
+        public float X;
 
         /// <summary>
         /// Y component of the Vector2
         /// </summary>
-        public float Y { get; set; }
+        public float Y;
 
         /// <summary>
         /// Returns if the vector is normalized
@@ -411,7 +411,7 @@ namespace SmallEngine
 
         public override int GetHashCode()
         {
-            return X.GetHashCode() + Y.GetHashCode();
+            unchecked { return (X.GetHashCode() * 397) ^ Y.GetHashCode(); }
         }
 
         public static explicit operator System.Drawing.Point(Vector2 pVector)

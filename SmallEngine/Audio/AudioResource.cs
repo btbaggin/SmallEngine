@@ -4,13 +4,15 @@ using System.Threading.Tasks;
 
 using SharpDX.XAudio2;
 using SharpDX.Multimedia;
+using System.Runtime.Serialization;
 
 namespace SmallEngine.Audio
 {
-    public class AudioResource : Resource
+    [Serializable]
+    public sealed class AudioResource : Resource
     {
-        private AudioBuffer _buffer;
-        internal WaveFormat Stream;
+        [NonSerialized] AudioBuffer _buffer;
+        [NonSerialized] internal WaveFormat Stream;
 
         #region Resource Functions
         internal override void Create()
@@ -35,6 +37,18 @@ namespace SmallEngine.Audio
         }
         #endregion
 
+        public AudioResource() { }
+
+        private AudioResource(SerializationInfo pInfo, StreamingContext pContext) : base(pInfo, pContext)
+        {
+            if (!ResourceManager.ResourceLoaded(Alias))
+                throw new Serialization.ResourceNotLoadedException(Alias);
+
+            var a = ResourceManager.Request<AudioResource>(Alias);
+            _buffer = a._buffer;
+            Stream = a.Stream;
+        }
+
         #region Public properties
         /// <summary>
         /// Returns the sample rate of the audio clip.
@@ -54,19 +68,31 @@ namespace SmallEngine.Audio
         {
             System.Diagnostics.Debug.Assert(System.IO.File.Exists(pFileName));
 
-            System.IO.FileStream s= System.IO.File.OpenRead(pFileName);
-            SoundStream soundStream = new SoundStream(s);
+            System.IO.FileStream s = System.IO.File.OpenRead(pFileName);
 
-            //Create a audio buffer from the file data
-            _buffer = new AudioBuffer()
+            switch(Game.RenderMethod)
             {
-                Stream = soundStream,
-                AudioBytes = (int)soundStream.Length,
-                Flags = BufferFlags.EndOfStream
-            };
+                case Graphics.RenderMethods.DirectX:
+                    SoundStream soundStream = new SoundStream(s);
 
-            DecodedPacketsInfo = soundStream.DecodedPacketsInfo;
-            Stream = soundStream.Format;
+                    //Create a audio buffer from the file data
+                    _buffer = new AudioBuffer()
+                    {
+                        Stream = soundStream,
+                        AudioBytes = (int)soundStream.Length,
+                        Flags = BufferFlags.EndOfStream
+                    };
+
+                    DecodedPacketsInfo = soundStream.DecodedPacketsInfo;
+                    Stream = soundStream.Format;
+                    break;
+
+                case Graphics.RenderMethods.OpenGL:
+                    throw new NotImplementedException();
+
+                default:
+                    throw new UnknownEnumException(typeof(Graphics.RenderMethods), Game.RenderMethod);
+            }
         }
 
         internal bool Play(SourceVoice pVoice)

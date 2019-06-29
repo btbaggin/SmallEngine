@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using SmallEngine.Graphics;
 using SmallEngine.Components;
 using SmallEngine.UI;
+using System.Runtime.Serialization;
 
 namespace SmallEngine
 {
@@ -33,7 +34,8 @@ namespace SmallEngine
         Replace
     }
 
-    public class Scene : IUpdatable
+    [Serializable]
+    public class Scene : IUpdatable, ISerializable
     {
         //https://gamedevelopment.tutsplus.com/tutorials/spaces-useful-game-object-containers--gamedev-14091
 
@@ -59,6 +61,28 @@ namespace SmallEngine
         {
             _namedObjects = new Dictionary<string, IGameObject>();
             _ui = new UIManager();
+        }
+
+        protected Scene(SerializationInfo pInfo, StreamingContext pContext)
+        {
+            var objects = (IList<IGameObject>)pInfo.GetValue("GameObjects", typeof(IList<IGameObject>));
+            foreach(var go in objects)
+            {
+                foreach(var c in go.GetComponents())
+                {
+                    c.OnAdded(go);
+                }
+                go.Initialize();
+                AddGameObject(go);
+            }
+            _mode = (SceneLoadModes)pInfo.GetInt32("Mode");
+            _ui = new UIManager();
+        }
+
+        public virtual void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            info.AddValue("GameObjects", _gameobjects.GetGameObjects(), typeof(IList<IGameObject>));
+            info.AddValue("Mode", _mode);
         }
         #endregion
 
@@ -115,13 +139,13 @@ namespace SmallEngine
                 go.Dispose();
             }
 
+            //Dispose UI elements
+            _ui.DisposeElements();
+
             if (_scenes.Count > 0)
             {
                 //Remove current scene
-                //TODO why isn't this just _ui.DisposeElements() like the gameobject stuff?
                 var scene = _scenes.Pop();
-                scene._ui.DisposeElements();
-
                 switch(scene._mode)
                 {
                     case SceneLoadModes.Additive:
@@ -174,15 +198,6 @@ namespace SmallEngine
         #region Internal methods
         internal static void UpdateAll(float pDeltaTime)
         {
-            //It's OK to go until count because GameObjects aren't destroyed until the end of frame
-            //Any new objects won't get updated until the frame they are created
-            var go = _gameobjects.GetGameObjects();
-            var count = go.Count;
-            for (int i = 0; i < count; i++)
-            {
-                go[i]?.Update(pDeltaTime);
-            }
-
             for (int i = 0; i < _scenes.Count; i++)
             {
                 var s = _scenes.PeekAt(i);
@@ -290,7 +305,7 @@ namespace SmallEngine
 
             go.ContainingScene = this;
             go.Initialize();
-            AddGameObject(go, pName);
+            AddGameObject(go);
             return go;
         }
 
@@ -324,17 +339,17 @@ namespace SmallEngine
                 go.ContainingScene = this;
                 go.Initialize();
 
-                AddGameObject(go, pName);
+                AddGameObject(go);
                 return go;
             }
 
             return default;
         }
 
-        private void AddGameObject(IGameObject pGameObject, string pName)
+        private void AddGameObject(IGameObject pGameObject)
         {
             _gameobjects.Add(pGameObject);
-            if (pName != null) _namedObjects.Add(pName, pGameObject);
+            if (pGameObject.Name != null) _namedObjects.Add(pGameObject.Name, pGameObject);
             Game.Messages.Register(pGameObject);
         }
 

@@ -9,9 +9,10 @@ using System.Runtime.Serialization;
 
 namespace SmallEngine.Graphics
 {
+    [Serializable]
     public sealed class RenderComponent : DependencyComponent
     {
-        [ImportComponent(false)]
+        [ImportComponent(false)][NonSerialized]
         Physics.RigidBodyComponent _body;
 
         public float Opacity { get; set; } = 1f;
@@ -20,6 +21,8 @@ namespace SmallEngine.Graphics
 
         public BitmapResource Bitmap { get; set; }
 
+        public Effect Effect { get; set; }
+
         #region Constructor
         public RenderComponent() : base() { }
 
@@ -27,22 +30,6 @@ namespace SmallEngine.Graphics
         {
             Bitmap = pResource;
             ZIndex = pZIndex;
-        }
-
-        public RenderComponent(SerializationInfo pInfo, StreamingContext pContext) : base(pInfo, pContext)
-        {
-            Opacity = pInfo.GetSingle("Opacity");
-            ZIndex = pInfo.GetInt32("ZIndex");
-            Bitmap = ResourceManager.Request<BitmapResource>(pInfo.GetString("Bitmap"));
-        }
-
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            base.GetObjectData(info, context);
-
-            info.AddValue("Opacity", Opacity);
-            info.AddValue("ZIndex", ZIndex);
-            info.AddValue("Bitmap", Bitmap.Alias);
         }
         #endregion
 
@@ -59,7 +46,8 @@ namespace SmallEngine.Graphics
 
                 var scale = GameObject.Scale * Game.ActiveCamera.Zoom;
 
-                pSystem.DrawBitmap(Bitmap, Opacity, position, scale);
+                if (Effect != null) Effect.Draw(Bitmap, position, scale);
+                else pSystem.DrawBitmap(Bitmap, Opacity, position, scale);
             }
         }
 
