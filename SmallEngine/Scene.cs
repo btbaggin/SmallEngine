@@ -72,7 +72,6 @@ namespace SmallEngine
                 {
                     c.OnAdded(go);
                 }
-                go.Initialize();
                 AddGameObject(go);
             }
             _mode = (SceneLoadModes)pInfo.GetInt32("Mode");
@@ -250,12 +249,22 @@ namespace SmallEngine
             return s;
         }
 
+        internal static void UpdateUI()
+        {
+            //Input.Mouse.CursorOverUI = false;
+            for (int i = 0; i < _scenes.Count; i++)
+            {
+                var s = _scenes.PeekAt(i);
+                if (s.Active) s._ui.Update();
+            }
+        }
+
         internal static void DrawUI(IGraphicsAdapter pAdapter)
         {
             for(int i = 0; i < _scenes.Count; i++)
             {
                 var s = _scenes.PeekAt(i);
-                if (s.Active) s._ui.UpdateAndDraw(pAdapter);
+                if (s.Active) s._ui.Draw(pAdapter);
             }
         }
 
@@ -303,8 +312,6 @@ namespace SmallEngine
                 go.AddComponent(c);
             }
 
-            go.ContainingScene = this;
-            go.Initialize();
             AddGameObject(go);
             return go;
         }
@@ -336,9 +343,6 @@ namespace SmallEngine
                     go.AddComponent(Component.Create(t));
                 }
 
-                go.ContainingScene = this;
-                go.Initialize();
-
                 AddGameObject(go);
                 return go;
             }
@@ -346,8 +350,24 @@ namespace SmallEngine
             return default;
         }
 
-        private void AddGameObject(IGameObject pGameObject)
+        public IGameObject CreateGameObject(Type pType)
         {
+            var go = Activator.CreateInstance(pType) as IGameObject;
+            if (go == null) throw new Exception("Type must be assignable from IGameObject");
+
+            AddGameObject(go);
+            return go;
+        }
+
+        /// <summary>
+        /// Adds a specified IGameObject to the scene.
+        /// Should only be used by the scene itself and GameObjectSerializer
+        /// </summary>
+        internal void AddGameObject(IGameObject pGameObject)
+        {
+            pGameObject.ContainingScene = this;
+            pGameObject.Initialize();
+
             _gameobjects.Add(pGameObject);
             if (pGameObject.Name != null) _namedObjects.Add(pGameObject.Name, pGameObject);
             Game.Messages.Register(pGameObject);
@@ -462,6 +482,16 @@ namespace SmallEngine
 
             return null;
         }
+
+        //public static bool IsMouseOverUIElement() //TODO yuck?
+        //{
+        //    for (int i = 0; i < _scenes.Count; i++)
+        //    {
+        //        if (_scenes.PeekAt(i)._ui.IsMouseOver()) return true;
+        //    }
+
+        //    return false;
+        //}
         #endregion
     }
 }

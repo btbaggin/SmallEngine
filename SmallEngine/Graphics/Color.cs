@@ -184,7 +184,7 @@ namespace SmallEngine.Graphics
 
         public static implicit operator Color(SharpDX.Mathematics.Interop.RawColor4 pColor)
         {
-            return new Color((byte)(pColor.R * 255), (byte)(pColor.G * 255), (byte)(pColor.B * 255), (byte)(pColor.A * 255));
+            return new Color((byte)(pColor.A * 255), (byte)(pColor.R * 255), (byte)(pColor.G * 255), (byte)(pColor.B * 255));
         }
 
         public static bool operator ==(Color pV1, Color pV2)

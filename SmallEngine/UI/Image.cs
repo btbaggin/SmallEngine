@@ -15,6 +15,7 @@ namespace SmallEngine.UI
         public Image(string pName, string pAlias) : base(pName)
         {
             _bitmap = ResourceManager.Request<BitmapResource>(pAlias);
+            Enabled = false;
         }
 
         public override void Draw(IGraphicsAdapter pSystem)

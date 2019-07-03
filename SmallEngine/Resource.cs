@@ -47,7 +47,8 @@ namespace SmallEngine
         /// </summary>
         /// <param name="pPath">Path to the file to load</param>
         /// <returns></returns>
-        internal abstract Task CreateAsync();
+        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+        public abstract Task CreateAsync();
 
         /// <summary>
         /// Synchronously load the resource requested.
@@ -55,7 +56,8 @@ namespace SmallEngine
         /// </summary>
         /// <param name="pPath">Path to the file to load</param>
         /// <returns></returns>
-        internal abstract void Create();
+        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+        public abstract void Create();
 
         protected Resource() { }
 

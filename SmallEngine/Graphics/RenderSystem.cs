@@ -10,13 +10,12 @@ namespace SmallEngine.Graphics
     class RenderSystem : ComponentSystem
     {
         readonly IGraphicsAdapter _adapter;
-        public RenderSystem(IGraphicsAdapter pAdapter) : base()
+        public RenderSystem(IGraphicsAdapter pAdapter) : base(typeof(RenderComponent))
         {
             _adapter = pAdapter;
-            Components = Component.GetComponentsOfType(typeof(RenderComponent));
         }
 
-        protected override void DoProcess()
+        public override void Process()
         {
             var deltaTime = GameTime.RenderTime;
             foreach (var c in Components)

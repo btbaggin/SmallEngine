@@ -11,12 +11,12 @@ namespace SmallEngine.Physics
     [Serializable]
     public sealed class ColliderComponent : DependencyComponent, IPhysicsBody
     {
-        [NonSerialized] readonly  HashSet<ColliderComponent> Colliders = new HashSet<ColliderComponent>();
-        [field: NonSerialized] public EventHandler<CollisionEventArgs> CollisionEnter { get; set; }
-        [field: NonSerialized] public EventHandler<CollisionEventArgs> CollisionStay { get; set; }
+        [NonSerialized] Dictionary<ColliderComponent, bool> Colliders;
+        [field: NonSerialized] public EventHandler<CollisionBeginEventArgs> CollisionEnter { get; set; }
+        [field: NonSerialized] public EventHandler<CollisionBeginEventArgs> CollisionStay { get; set; }
         [field: NonSerialized] public EventHandler<CollisionEventArgs> CollisionExit { get; set; }
-        [field: NonSerialized] public EventHandler<CollisionEventArgs> TriggerEnter { get; set; }
-        [field: NonSerialized] public EventHandler <CollisionEventArgs> TriggerStay { get; set; }
+        [field: NonSerialized] public EventHandler<CollisionBeginEventArgs> TriggerEnter { get; set; }
+        [field: NonSerialized] public EventHandler<CollisionBeginEventArgs> TriggerStay { get; set; }
         [field: NonSerialized] public EventHandler<CollisionEventArgs> TriggerExit { get; set; }
 
         #region Properties
@@ -74,12 +74,17 @@ namespace SmallEngine.Physics
         public override void OnAdded(IGameObject pGameObject)
         {
             base.OnAdded(pGameObject);
+            Colliders = new Dictionary<ColliderComponent, bool>();
 
             if (Mesh != null)
             {
+                //TODO split this up
                 _mesh.CalculateMass(out float mass, out float inertia);
-                _body.Mass = mass;
-                _body.Inertia = inertia;
+                if (_body != null)
+                {
+                    _body.Mass = mass;
+                    _body.Inertia = inertia;
+                }
             }
         }
 
@@ -93,7 +98,7 @@ namespace SmallEngine.Physics
             _body?.Update(pDeltaTime);
         }
 
-        internal void OnCollisionEnter(ColliderComponent pCollider, Manifold pManifold)
+        internal bool OnCollisionEnter(ColliderComponent pCollider, Manifold pManifold)
         {
             bool _event = false;
             bool isTrigger = IsTrigger || pCollider.IsTrigger;
@@ -108,26 +113,46 @@ namespace SmallEngine.Physics
             }
             else _event = true;
 
+            bool resolve = true;
             if (_event)
             {
-                EventHandler<CollisionEventArgs> ce = null;
-                if (Colliders.Add(pCollider))
+                EventHandler<CollisionBeginEventArgs> ce = null;
+                if (!Colliders.ContainsKey(pCollider))
                 {
+                    //By default we will collide with everything
+                    Colliders.Add(pCollider, false);
+
                     if (isTrigger) ce = TriggerEnter;
                     else ce = CollisionEnter;
                 }
-                else
+                else if (!Colliders[pCollider])
                 {
                     if (isTrigger) ce = TriggerStay;
                     else ce = CollisionStay;
                 }
+                else
+                {
+                    //We have this collider and we are ignoring it
+                    resolve = false;
+                }
 
-                if(ce != null) ce.Invoke(this, new CollisionEventArgs(pCollider, pManifold));
+                if (ce != null)
+                {
+                    var args = new CollisionBeginEventArgs(pCollider, pManifold);
+                    ce.Invoke(this, args);
+
+                    //Cancelling the collision means we ignore this collider
+                    Colliders[pCollider] = args.Cancel;
+                    return !args.Cancel;
+                }
             }
+
+            return resolve;
         }
 
         internal void OnCollisionExit(ColliderComponent pCollider, Manifold pManifold)
         {
+            //TODO need to check ignored
             if(Colliders.Remove(pCollider))
             {
                 EventHandler<CollisionEventArgs> ce = null;

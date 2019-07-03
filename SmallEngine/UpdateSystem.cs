@@ -9,16 +9,13 @@ namespace SmallEngine
 {
     public class UpdateSystem : ComponentSystem
     {
-        public UpdateSystem()
-        {
-            Components = Component.GetComponentsOfType(typeof(UpdateComponent));
-        }
+        public UpdateSystem() : base(typeof(UpdateComponent)) { }
 
-        protected override void DoProcess()
+        public override void Process()
         {
-            for(int i = 0; i < Components.Count; i++)
+            foreach(var c in Components.ToList())//TODO improve? Can't use normal for loop because items could get inserted before i causing an infinite loop
             {
-                var u = (UpdateComponent)Components[i];
+                var u = (UpdateComponent)c;
                 u.Update(GameTime.DeltaTime);
             }
         }

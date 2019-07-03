@@ -18,7 +18,6 @@ namespace SmallEngine.Input
 
         public bool IsPressed(Keys pKey)
         {
-
             var code = GetVirtualKeyCode((int)pKey);
             return (_keys[code] & 0x80) != 0;
         }
@@ -29,10 +28,29 @@ namespace SmallEngine.Input
             return (_keys[code] & 0x80) != 0;
         }
 
-        private static byte GetVirtualKeyCode(int pKey)
+        protected static byte GetVirtualKeyCode(int pKey)
         {
             int value = pKey;
             return (byte)(value & 0xFF);
+        }
+
+        internal void Handle(Keys pKey)
+        {
+            var code = GetVirtualKeyCode((int)pKey);
+            _keys[code] = 0;
+        }
+
+        internal void Handle(MouseButtons pButton)
+        {
+            var code = GetVirtualKeyCode((int)pButton);
+            _keys[code] = 0;
+        }
+
+        public InputState Copy()
+        {
+            byte[] data = new byte[256];
+            Array.Copy(_keys, data, 256);
+            return new InputState(data);
         }
     }
 }

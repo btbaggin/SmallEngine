@@ -23,4 +23,19 @@ namespace SmallEngine.Physics
             return Collision.BodyA == Collider;
         }
     }
+
+    public class CollisionBeginEventArgs : EventArgs
+    {
+        public ColliderComponent Collider { get; private set; }
+
+        public Manifold Collision { get; private set; }
+
+        public bool Cancel { get; set; }
+
+        public CollisionBeginEventArgs(ColliderComponent pCollider, Manifold pCollision)
+        {
+            Collider = pCollider;
+            Collision = pCollision;
+        }
+    }
 }

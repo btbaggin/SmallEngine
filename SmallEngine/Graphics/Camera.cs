@@ -53,6 +53,7 @@ namespace SmallEngine.Graphics
             Height = Game.Form.Height;
             AllowZoom = true;
             Zoom = 1;
+            _inverseZoom = 1;
             ZoomSpeed = .05f;
             MoveSpeed = 1000;
         }
@@ -70,6 +71,7 @@ namespace SmallEngine.Graphics
                 Zoom += mw * ZoomSpeed * pDeltaTime;
                 Zoom = MathF.Clamp(Zoom, _minZoom, _maxZoom);
                 _inverseZoom = (_maxZoom - _minZoom) / Zoom;
+                if (_inverseZoom == 0) _inverseZoom = 1;
 
                 var oldWidth = Width;
                 var oldHeight = Height;
@@ -77,12 +79,6 @@ namespace SmallEngine.Graphics
                 Height = Game.Form.Height / Zoom;
                 Position += new Vector2((oldWidth - Width) / 2, (oldHeight - Height) / 2);
             }
-
-            var bounds = Physics.PhysicsHelper.WorldBounds;
-            if (Position.X < bounds.Left) _position.X = bounds.Left;
-            if (Position.Y < bounds.Top) _position.Y = bounds.Top;
-            if (Position.X + Width > bounds.Right) _position.X = bounds.Right - Width;
-            if (Position.Y + Height > bounds.Bottom) _position.Y = bounds.Bottom - Height;
         }
 
         public void MoveLeft()
@@ -117,9 +113,15 @@ namespace SmallEngine.Graphics
             return p * Zoom;
         }
 
+        public Rectangle ToCameraSpace(Rectangle pWorldRect)
+        {
+            var pos = ToCameraSpace(pWorldRect.Location);
+            return new Rectangle(pos.X, pos.Y, pWorldRect.Width * Zoom, pWorldRect.Height * Zoom);
+        }
+
         public bool IsVisible(IGameObject pGameObject)
         {
-            var p = pGameObject.Position - _position;
+            var p = ToCameraSpace(pGameObject.Position);
             return p.X + (pGameObject.Scale.Width * Zoom) > 0 && p.X <= Width &&
                    p.Y + (pGameObject.Scale.Height * Zoom) > 0 && p.Y <= Height;
         }

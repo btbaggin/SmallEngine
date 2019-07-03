@@ -33,12 +33,14 @@ namespace SmallEngine.Physics
         {
             Shape = (Shapes)pInfo.GetInt32("Shape");
             Material = (Material)pInfo.GetValue("Material", typeof(Material));
+            Body = (ColliderComponent)pInfo.GetValue("Body", typeof(ColliderComponent));
         }
 
         public virtual void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             info.AddValue("Shape", Shape);
             info.AddValue("Material", Material, typeof(Material));
+            info.AddValue("Body", Body, typeof(ColliderComponent));
         }
 
         public abstract AxisAlignedBoundingBox CalculateAABB(Vector2 pPosition);
@@ -112,18 +114,20 @@ namespace SmallEngine.Physics
         public Vector2[] Vertices { get; private set; }
         public Vector2[] Normals { get; private set; }
 
-        [NonSerialized] Vector2 _min, _max;
+        Vector2 _min, _max;
         public PolygonMesh(Vector2[] pVerticies, Material pMaterial) : base(Shapes.Polygon, pMaterial)
         {
             _min = new Vector2(float.MaxValue, float.MaxValue);
             _max = new Vector2(-float.MaxValue, -float.MaxValue);
-            SetVerticies(pVerticies);
+            SetVertices(pVerticies);
         }
 
         protected PolygonMesh(SerializationInfo pInfo, StreamingContext pContext) : base(pInfo, pContext)
         {
             Vertices = (Vector2[])pInfo.GetValue("Vertices", typeof(Vector2[]));
             Normals = (Vector2[])pInfo.GetValue("Normals", typeof(Vector2[]));
+            _min = (Vector2)pInfo.GetValue("Min", typeof(Vector2));
+            _max = (Vector2)pInfo.GetValue("Max", typeof(Vector2));
         }
 
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
@@ -131,9 +135,11 @@ namespace SmallEngine.Physics
             base.GetObjectData(info, context);
             info.AddValue("Vertices", Vertices, typeof(Vector2[]));
             info.AddValue("Normals", Normals, typeof(Vector2[]));
+            info.AddValue("Min", _min, typeof(Vector2));
+            info.AddValue("Max", _max, typeof(Vector2));
         }
 
-        private void SetVerticies(Vector2[] pVerticies)
+        private void SetVertices(Vector2[] pVerticies)
         {
             int actualVertexCount = 0;
             int vertexCount = pVerticies.Length;

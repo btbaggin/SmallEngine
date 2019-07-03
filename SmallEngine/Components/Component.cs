@@ -13,9 +13,14 @@ namespace SmallEngine.Components
         static Dictionary<Type, List<IComponent>> _components = new Dictionary<Type, List<IComponent>>();
 
         #region Properties
+        /// <summary>
+        /// Indicates the type that will be registered with systems.
+        /// If you wish to provide a type that can be inherited from set the RegistrationType to the base class
+        /// </summary>
         protected virtual Type RegistrationType => GetType();
 
         private bool _active = true;
+        /// <inheritdoc/>
         public bool Active
         {
             get { return _active; }
@@ -29,6 +34,7 @@ namespace SmallEngine.Components
             }
         }
 
+        /// <inheritdoc/>
         public IGameObject GameObject { get; protected set; }
         #endregion
 
@@ -48,18 +54,21 @@ namespace SmallEngine.Components
         }
         #endregion
 
+        /// <inheritdoc/>
         public virtual void OnAdded(IGameObject pGameObject)
         {
             GameObject = pGameObject;
-            _components[RegistrationType].AddOrdered(this);
+            if(Active) _components[RegistrationType].AddOrdered(this);
         }
 
+        /// <inheritdoc/>
         public virtual void OnRemoved()
         {
             _components[RegistrationType].Remove(this);
             GameObject = null;
         }
 
+        /// <inheritdoc/>
         public virtual void OnActiveChanged(bool pActive)
         {
             if(pActive)
@@ -74,16 +83,27 @@ namespace SmallEngine.Components
 
         public virtual void Dispose() { }
 
+        /// <summary>
+        /// Returns true if the type is an IComponent
+        /// </summary>
+        /// <param name="pType"></param>
+        /// <returns></returns>
         public static bool IsComponent(Type pType)
         {
             return typeof(IComponent).IsAssignableFrom(pType);
         }
 
+        /// <summary>
+        /// Allows setting distinct processing order for components that require it
+        /// </summary>
         public virtual int CompareTo(IComponent other)
         {
             return 0;
         }
 
+        /// <summary>
+        /// Returns all registered components of the specified type
+        /// </summary>
         public static List<IComponent> GetComponentsOfType(Type pType)
         {
             if (!_components.ContainsKey(pType)) _components.Add(pType, new List<IComponent>());

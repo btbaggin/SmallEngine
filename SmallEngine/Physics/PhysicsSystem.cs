@@ -14,14 +14,15 @@ namespace SmallEngine.Physics
         readonly CollisionResolutionDelegate[,] _resolvers = { { CollisionDetection.CircleVsCircle, CollisionDetection.CirclevsPolygon },
                                                                { CollisionDetection.PolygonvsCircle, CollisionDetection.PolygonvsPolygon } };
 
+        public PhysicsSystem() : base(typeof(ColliderComponent)) { } //TODO do I need to register colliders in CreateQuadTree?
+
         QuadTree<ColliderComponent> _quadTree;
         public void CreateQuadTree()
         {
             _quadTree = new QuadTree<ColliderComponent>(PhysicsHelper.WorldBounds);
-            Components = Component.GetComponentsOfType(typeof(ColliderComponent));
         }
 
-        protected override void DoProcess()
+        public override void Process()
         {
             _quadTree.Clear();
             var deltaTime = GameTime.PhysicsTime;
@@ -46,11 +47,11 @@ namespace SmallEngine.Physics
 
                         if (resolve)
                         {
-                            m.Resolve();
-                            m.CorrectPositions();
-
-                            m.BodyA.OnCollisionEnter(m.BodyB, m);
-                            m.BodyB.OnCollisionEnter(m.BodyA, m);
+                            if(m.BodyA.OnCollisionEnter(m.BodyB, m) && m.BodyB.OnCollisionEnter(m.BodyA, m))
+                            {
+                                m.Resolve();
+                                m.CorrectPositions();
+                            }
                         }
                         else
                         {

@@ -14,6 +14,7 @@ namespace SmallEngine
     public class GameObject : IGameObject
     {
         #region Properties
+        /// <inheritdoc/>
         public string Name { get; set; }
 
         public Vector2 Center
@@ -21,36 +22,47 @@ namespace SmallEngine
             get { return new Vector2(Position.X + Scale.Width / 2, Position.Y + Scale.Height / 2); }
         }
 
+        /// <inheritdoc/>
         public Vector2 Position { get; set; }
 
+        /// <inheritdoc/>
         public Size Scale { get; set; }
 
         float _rotation;
+        /// <inheritdoc/>
         public float Rotation
         {
             get { return _rotation; }
             set
             {
                 _rotation = value;
-                ((IGameObject)this).RotationMatrix = new Mathematics.Matrix2X2(_rotation);
+                _rotationMatrix = new Mathematics.Matrix2X2(_rotation);
             }
         }
 
-        Mathematics.Matrix2X2 IGameObject.RotationMatrix { get; set; } = Mathematics.Matrix2X2.Identity;
+        Mathematics.Matrix2X2 _rotationMatrix = Mathematics.Matrix2X2.Identity;
+        /// <inheritdoc/>
+        Mathematics.Matrix2X2 IGameObject.RotationMatrix { get { return _rotationMatrix; } } 
 
+        /// <inheritdoc/>
         public Mathematics.Matrix3X2 TransformMatrix { get; set; } = Mathematics.Matrix3X2.Identity;
 
+        /// <inheritdoc/>
         [field: NonSerialized]
         public bool Destroyed { get; private set; }
 
+        /// <inheritdoc/>
         public string Tag { get; set; }
 
+        /// <inheritdoc/>
         [field: NonSerialized]
         int IGameObject.Index { get; set; }
 
+        /// <inheritdoc/>
         [field: NonSerialized]
         ushort IGameObject.Version { get; set; }
 
+        /// <inheritdoc/>
         [field: NonSerialized]
         public Scene ContainingScene { get; set; }
         #endregion  
@@ -67,6 +79,7 @@ namespace SmallEngine
         #endregion
 
         #region Components
+        /// <inheritdoc/>
         public T GetComponent<T>()
         {
             if (_components.ContainsKey(typeof(T)))
@@ -77,6 +90,7 @@ namespace SmallEngine
             return default;
         }
 
+        /// <inheritdoc/>
         public IComponent GetComponent(Type pType)
         {
             if (_components.ContainsKey(pType))
@@ -87,6 +101,7 @@ namespace SmallEngine
             return null;
         }
 
+        /// <inheritdoc/>
         public IEnumerable<IComponent> GetComponents()
         {
             foreach(var c in _components.Values)
@@ -95,11 +110,13 @@ namespace SmallEngine
             }
         }
 
+        /// <inheritdoc/>
         bool IGameObject.HasComponent<T>()
         {
             return _components.ContainsKey(typeof(T));
         }
 
+        /// <inheritdoc/>
         public void AddComponent(IComponent pComponent)
         {
             if(!_components.ContainsKey(pComponent.GetType()))
@@ -109,6 +126,7 @@ namespace SmallEngine
             }
         }
 
+        /// <inheritdoc/>
         public void RemoveComponent(Type pComponent)
         {
             _components[pComponent].OnRemoved();
@@ -117,22 +135,33 @@ namespace SmallEngine
         #endregion
 
         #region Overridable Methods
+        /// <inheritdoc/>
         public virtual void Initialize() { }
 
+        /// <inheritdoc/>
         public virtual void ReceiveMessage(IMessage pMessage) { }
         #endregion
 
         #region Messages
+        /// <summary>
+        /// Sends a message to the games default message queue
+        /// </summary>
         protected void SendMessage(string pType, object pData)
         {
             SendMessage(pType, pData, null);
         }
 
+        /// <summary>
+        /// Sends a message to the games default message queue
+        /// </summary>
         protected void SendMessage(string pType, object pData, IMessageReceiver pRecipient)
         {
             Game.Messages.SendMessage(new GameMessage(pType, pData, this, pRecipient));
         }
 
+        /// <summary>
+        /// Sends a message to the games default message queue
+        /// </summary>
         protected void SendMessage(IMessage pMessage)
         {
             Game.Messages.SendMessage(pMessage);
@@ -140,6 +169,7 @@ namespace SmallEngine
         #endregion
 
         #region Pointer
+        /// <inheritdoc/>
         public long GetPointer()
         {
             var go = (IGameObject)this;
@@ -158,12 +188,14 @@ namespace SmallEngine
         }
         #endregion
 
+        /// <inheritdoc/>
         public void Destroy()
         {
             Destroyed = true;
             ContainingScene.Destroy(this);
         }
 
+        /// <inheritdoc/>
         public virtual void Dispose()
         {
             foreach(var c in _components.Values)

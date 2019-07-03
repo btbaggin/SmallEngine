@@ -8,6 +8,7 @@ namespace SmallEngine.Components
     [Serializable]
     public abstract class DependencyComponent : Component
     {
+        #region ImportFieldInfo
         struct ImportFieldInfo
         {
             public FieldInfo Field;
@@ -21,6 +22,7 @@ namespace SmallEngine.Components
                 SerializingValue = null;
             }
         }
+        #endregion
 
         [NonSerialized] static readonly Dictionary<Type, List<ImportFieldInfo>> _dependencies = new Dictionary<Type, List<ImportFieldInfo>>();
         [NonSerialized] List<ImportFieldInfo> _fields = new List<ImportFieldInfo>();
@@ -35,6 +37,10 @@ namespace SmallEngine.Components
             }
         }
 
+        /// <summary>
+        /// Determines dependencies for the component and imports all fields marked with ImportComponentAttribute
+        /// </summary>
+        /// <param name="pGameObject"></param>
         public override void OnAdded(IGameObject pGameObject)
         {
             base.OnAdded(pGameObject);
@@ -74,6 +80,9 @@ namespace SmallEngine.Components
             }
         }
 
+        /// <summary>
+        /// Looks for any fields marked with ImportComponentAttribute
+        /// </summary>
         private void DetermineDepencencies(Type pType)
         {
             var importFields = new List<ImportFieldInfo>();
@@ -107,9 +116,10 @@ namespace SmallEngine.Components
         //Since these fields are references to other components that are being serializing
         //storing the reference is pointless
 
-        //OnSerializing will null them out
-        //OnSerialized will reset the values back
-        //OnDeserializing will determine the dependencies so they can be added back when OnAdded is called
+        /// <summary>
+        /// Null out any import fields since they will be handled
+        /// separately upon deserialization
+        /// </summary>
         [OnSerializing]
         private void OnSerializing(StreamingContext pContext)
         {
@@ -123,6 +133,9 @@ namespace SmallEngine.Components
             }
         }
 
+        /// <summary>
+        /// Replace the original field values after serialization is complete
+        /// </summary>
         [OnSerialized]
         private void OnSerialized(StreamingContext pContext)
         {
@@ -136,6 +149,10 @@ namespace SmallEngine.Components
             }
         }
 
+        /// <summary>
+        /// Import dependencies from other components that have been deserialized
+        /// </summary>
+        /// <param name="pContext"></param>
         [OnDeserializing]
         private void OnDeserializing(StreamingContext pContext)
         {

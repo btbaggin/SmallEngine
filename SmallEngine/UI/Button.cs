@@ -64,7 +64,6 @@ namespace SmallEngine.UI
 
         public override void ArrangeOverride(Rectangle pBounds)
         {
-            base.ArrangeOverride(pBounds);
             var content = Children[0];
             content.Arrange(new Rectangle(pBounds.X + Padding.Left, pBounds.Y + Padding.Top, pBounds.Width - Padding.Width, pBounds.Height - Padding.Height));
         }
@@ -98,7 +97,7 @@ namespace SmallEngine.UI
 
         public override void Update()
         {
-            if(IsMouseOver())
+            if(Bounds.Contains(Input.Mouse.Position))
             {
                 if (Input.Mouse.ButtonPressed(Input.MouseButtons.Left) && _state == ButtonState.MouseOver)
                 {

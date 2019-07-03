@@ -14,14 +14,13 @@ namespace SmallEngine.Debug
         public Pen DebugBoxes { get; set; }
 
         readonly IGraphicsAdapter _adapter;
-        public DebugRenderSystem(IGraphicsAdapter pAdapter)
+        public DebugRenderSystem(IGraphicsAdapter pAdapter) : base(typeof(ColliderComponent))
         {
             _adapter = pAdapter;
             DebugBoxes = Pen.Create(Color.Aqua, 1);
-            Components = Component.GetComponentsOfType(typeof(ColliderComponent));
         }
 
-        protected override void DoProcess()
+        public override void Process()
         {
             foreach(var c in Components)
             {

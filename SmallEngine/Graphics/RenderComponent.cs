@@ -21,6 +21,7 @@ namespace SmallEngine.Graphics
 
         public BitmapResource Bitmap { get; set; }
 
+        [field: NonSerialized]
         public Effect Effect { get; set; }
 
         #region Constructor
@@ -69,6 +70,7 @@ namespace SmallEngine.Graphics
             base.Dispose();
 
             Bitmap.Dispose();
+            Effect?.Dispose();
         }
     }
 }

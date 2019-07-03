@@ -20,7 +20,7 @@ namespace SmallEngine.UI
             set
             {
                 _width = value;
-                _containingScene.InvalidateMeasure(); //TODO make better
+                ContainingScene.InvalidateMeasure(); //TODO make better
             }
         }
 
@@ -31,7 +31,7 @@ namespace SmallEngine.UI
             set
             {
                 _height = value;
-                _containingScene.InvalidateMeasure();
+                ContainingScene.InvalidateMeasure();
             }
         }
 
@@ -42,7 +42,7 @@ namespace SmallEngine.UI
             set
             {
                 _margin = value;
-                _containingScene.InvalidateMeasure();
+                ContainingScene.InvalidateMeasure();
             }
         }
 
@@ -56,9 +56,9 @@ namespace SmallEngine.UI
 
         protected UIElement Parent { get; private set; }
 
-        protected List<UIElement> Children { get; private set; }
+        public List<UIElement> Children { get; private set; }
 
-        protected Rectangle Bounds { get; private set; }
+        public Rectangle Bounds { get; private set; }
 
         public float ActualHeight
         {
@@ -85,13 +85,12 @@ namespace SmallEngine.UI
             }
         }
 
-        public bool AllowFocus { get; set; }
-
         public string Name { get; private set; }
+
+        public Scene ContainingScene { get; private set; }
         #endregion
 
         bool _disposed;
-        readonly Scene _containingScene;
         readonly List<UIElement> _orderedItems = new List<UIElement>();
         protected UIElement(string pName)
         {
@@ -99,10 +98,9 @@ namespace SmallEngine.UI
             _margin = new Thickness(5);
             Visible = Visibility.Visible;
             Enabled = true;
-            AllowFocus = true;
             Name = pName;
             HorizontalAlignment = HorizontalAlignments.Center;
-            _containingScene = Scene.OnUIElementCreated(this);
+            ContainingScene = Scene.OnUIElementCreated(this);
         }
 
         protected void InvalidateMeasure()
@@ -128,10 +126,14 @@ namespace SmallEngine.UI
             //ZIndex shouldn't affect how the children are displayed within container controls so we keep 2 lists
             _orderedItems.AddOrdered(pElement); 
         }
+        protected void HandleInputEvent(Keys pKey)
+        {
+            Keyboard.MarkUIEventHandled(pKey);
+        }
 
         public bool IsMouseOver()
         {
-            if(AllowFocus && Bounds.Contains(Mouse.Position))
+            if(Bounds.Contains(Mouse.Position))
             {
                 foreach(var c in Children)
                 {
@@ -201,7 +203,7 @@ namespace SmallEngine.UI
             //TODO these don't work with children
             if (HorizontalAlignment == HorizontalAlignments.Center)
             {
-                x += (pBounds.Width - Margin.Width- width) / 2; 
+                x += (pBounds.Width - width) / 2; 
             }
             else if (HorizontalAlignment == HorizontalAlignments.Right)
             {
@@ -210,7 +212,7 @@ namespace SmallEngine.UI
 
             if(VerticalAlignment == VerticalAlignments.Center)
             {
-                y += (pBounds.Height - Margin.Height - height) / 2;
+                y += (pBounds.Height - height) / 2;
             }
             else if(VerticalAlignment == VerticalAlignments.Bottom)
             {
@@ -255,11 +257,19 @@ namespace SmallEngine.UI
 
         internal void UpdateInternal()
         {
-            Update();
             foreach (var e in Children)
             {
                 e.UpdateInternal();
             }
+
+            Update();
+
+            if (Enabled && Bounds.Contains(Mouse.Position))
+            {
+                Mouse.MarkButtonHandled(MouseButtons.Left);
+                Mouse.MarkButtonHandled(MouseButtons.Right);
+            }
+
         }
         #endregion  
 

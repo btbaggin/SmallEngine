@@ -39,20 +39,41 @@ namespace SmallEngine.UI
             return null;
         }
 
+        //public bool IsMouseOver()
+        //{
+        //    foreach(var e in _elements)
+        //    {
+        //        if (e.Bounds.Contains(Input.Mouse.Position)) return true;
+        //    }
+
+        //    return false;
+
+        //}
+
         #region Internal Methods
-        internal void UpdateAndDraw(IGraphicsAdapter pSystem)
+        internal void Update()
+        {
+            var size = new Size(Game.Form.Width, Game.Form.Height);
+
+            Input.Keyboard.SwapUIStates();
+            foreach (var e in _elements)
+            {
+                if (_measureInvalid) e.Measure(size);
+                e.UpdateInternal();
+            }
+            _measureInvalid = false;
+            Input.Keyboard.SwapUIStates();
+        }
+        internal void Draw(IGraphicsAdapter pSystem)
         {
             //We update and draw at the same time because GameObjects will often manipulate UI elements
             //So if we arrange before those updates can happen it can cause a frame of misplaced items
             var bounds = new Rectangle(0, 0, Game.Form.Width, Game.Form.Height);
-            var size = new Size(Game.Form.Width, Game.Form.Height);
             pSystem.ResetTransform();
 
             foreach (var e in _elements)
             {
-                if (_measureInvalid) e.Measure(size);
                 e.Arrange(bounds);
-                e.UpdateInternal();
 
                 if (e.Visible == Visibility.Visible)
                 {

@@ -102,6 +102,7 @@ namespace SmallEngine
         {
             ActiveCamera.Update(pDeltaTime);
 
+            Scene.UpdateUI();
             _update.Process();
             Scene.UpdateAll(pDeltaTime);
         }
@@ -221,6 +222,7 @@ namespace SmallEngine
                 Graphics.EndDraw();
 
                 Scene.DisposeDestroyedGameObjects();
+                Mouse.WheelDelta = 0;
 
                 //If the max updates is set and we have cycles, sleep the thread
                 if (MaxFps > 0)

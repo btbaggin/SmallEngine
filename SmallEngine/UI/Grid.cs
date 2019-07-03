@@ -46,6 +46,7 @@ namespace SmallEngine.UI
 
             base.AddChild(pElement);
             _info.Add(pElement, new GridInfo(pRow, pColumn, pRowSpan, pColumnSpan));
+            InvalidateMeasure();
         }
 
         public override Size MeasureOverride(Size pSize)

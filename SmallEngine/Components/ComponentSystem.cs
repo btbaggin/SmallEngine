@@ -9,6 +9,9 @@ namespace SmallEngine.Components
 {
     public abstract class ComponentSystem
     {
+        /// <summary>
+        /// List of components that is registered to this system
+        /// </summary>
         protected List<IComponent> Components { get; set; } = new List<IComponent>();
 
         protected ComponentSystem()
@@ -16,13 +19,19 @@ namespace SmallEngine.Components
             Scene.Register(this);
         }
 
-        public void Process()
+        /// <summary>
+        /// Creates a new system to process components and registers all components of type pType
+        /// </summary>
+        /// <param name="pType">The type of components to register for processing</param>
+        protected ComponentSystem(Type pType)
         {
-            lock(Components)
-            {
-                DoProcess();
-            }
+            Scene.Register(this);
+            Components = Component.GetComponentsOfType(pType);
         }
-        protected abstract void DoProcess();
+
+        /// <summary>
+        /// Implement logic for processing components
+        /// </summary>
+        public abstract void Process();
     }
 }

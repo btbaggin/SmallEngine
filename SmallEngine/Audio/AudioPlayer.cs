@@ -176,38 +176,38 @@ namespace SmallEngine.Audio
                 case "Loop":
                     System.Diagnostics.Debug.Assert(!resource.Disposed, "Audio resource has been disposed");
 
-                    GetVoice(resource, m.Id, pMessage.Type == "Loop", out voice);
+                    GetVoice(resource, m.ID, pMessage.Type == "Loop", out voice);
                     if (voice.Volume != volume)
                     {
                         voice.SetVolume(volume);
                         Device.CommitChanges();
                     }
                     resource.Play(voice);
-                    _playingSounds.Add(m.Id, voice);
+                    _playingSounds.Add(m.ID, voice);
                     break;
 
                 case "Stop":
-                    if(_playingSounds.ContainsKey(m.Id))
+                    if(_playingSounds.ContainsKey(m.ID))
                     {
-                        voice = _playingSounds[m.Id];
+                        voice = _playingSounds[m.ID];
                         voice.Stop();
                         voice.FlushSourceBuffers();
-                        _playingSounds.Remove(m.Id);
+                        _playingSounds.Remove(m.ID);
                     }
                     break;
 
                 case "Pause":
-                    if(_playingSounds.ContainsKey(m.Id))
+                    if(_playingSounds.ContainsKey(m.ID))
                     {
-                        voice = _playingSounds[m.Id];
+                        voice = _playingSounds[m.ID];
                         voice.Stop();
                     }
                     break;
 
                 case "Resume":
-                    if(_playingSounds.ContainsKey(m.Id))
+                    if(_playingSounds.ContainsKey(m.ID))
                     {
-                        voice = _playingSounds[m.Id];
+                        voice = _playingSounds[m.ID];
                         voice.Start();
                     }
                     break;

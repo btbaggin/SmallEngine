@@ -55,7 +55,7 @@ namespace SmallEngine.Graphics
             };
         }
 
-        internal override void Create()
+        public override void Create()
         {
             switch(Game.RenderMethod)
             {
@@ -73,7 +73,7 @@ namespace SmallEngine.Graphics
             }
         }
 
-        internal override Task CreateAsync()
+        public override Task CreateAsync()
         {
             return Task.Run(() => Create());
         }

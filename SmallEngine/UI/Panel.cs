@@ -15,6 +15,8 @@ namespace SmallEngine.UI
 
     public class Panel : UIElement
     {
+        public Brush Background { get; set; }
+
         public bool FillParent { get; set; }
 
         public PanelOrientation Orientation { get; set; }
@@ -27,13 +29,27 @@ namespace SmallEngine.UI
             FillParent = true;
         }
 
-        public override void Draw(IGraphicsAdapter pSystem) { }
+        public override void Draw(IGraphicsAdapter pSystem)
+        {
+            if (Background != null) pSystem.DrawRect(Bounds, Background);
+        }
 
         public override void Update() { }
 
         public void AddElement(UIElement pElement)
         {
             base.AddChild(pElement);
+            InvalidateMeasure();
+        }
+
+        public void ClearElements()
+        {
+            //TODO doesn't work with named elements
+            foreach(var c in Children)
+            {
+                c.Dispose();
+            }
+            Children.Clear();
         }
 
         public override Size MeasureOverride(Size pSize)
@@ -43,22 +59,36 @@ namespace SmallEngine.UI
             switch(Orientation)
             {
                 case PanelOrientation.Vertical:
-                    if (FillParent) width = pSize.Width;
+                    if (FillParent)
+                    {
+                        width = Width == 0 ? pSize.Width : Width;
+                        height = Height == 0 ? pSize.Height : Height;
+                        foreach (var c in Children) c.Measure(pSize);
+                        return new Size(width, height);
+                    }
+
                     foreach (var c in Children)
                     {
                         c.Measure(pSize);
                         height += c.DesiredSize.Height;
-                        if (!FillParent) width = Math.Max(width, c.DesiredSize.Width);
+                        width = Math.Max(width, c.DesiredSize.Width);
                     }
                     break;
 
                 case PanelOrientation.Horizontal:
-                    if (FillParent) height = pSize.Height;
+                    if (FillParent)
+                    {
+                        width = Width == 0 ? pSize.Width : Width;
+                        height = Height == 0 ? pSize.Height : Height;
+                        foreach (var c in Children) c.Measure(pSize);
+                        return new Size(width, height);
+                    }
+
                     foreach (var c in Children)
                     {
                         c.Measure(pSize);
                         width += c.DesiredSize.Width;
-                        if (!FillParent) height = Math.Max(height, c.DesiredSize.Height);
+                        height = Math.Max(height, c.DesiredSize.Height);
                     }
                     break;
             }

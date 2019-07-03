@@ -38,16 +38,20 @@ namespace SmallEngine
         }
     }
 
-    public class WaitForFrame : WaitEvent
+    public class WaitForFrames : WaitEvent
     {
+        int _frames;
         /// <summary>
         /// An object that can be yielded to wait for the next frame before continuing
         /// </summary>
-        public WaitForFrame() { }
+        public WaitForFrames(int pFrames)
+        {
+            _frames = pFrames;
+        }
 
         public override bool Update(float pDeltaTime)
         {
-            return true;
+            return (--_frames) <= 0;
         }
     }
 

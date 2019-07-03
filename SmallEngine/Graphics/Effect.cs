@@ -72,14 +72,15 @@ namespace SmallEngine.Graphics
         public static Guid Transform3D => new Guid("e8467b04-ec61-4b8a-b5de-d4d73debea5a");
 
         readonly List<SharpDX.Direct2D1.Effect> _effects;
-        DeviceContext _context;
-        Composite _composite;
+        readonly DeviceContext _context;
+        bool _requiresScale = true;
 
         //TODO move effects over to normal HLSL
         public Effect()
         {
             _effects = new List<SharpDX.Direct2D1.Effect>();
             _context = ((DirectXAdapter)Game.Graphics).SecondaryContext;
+            _effects.Add(new SharpDX.Direct2D1.Effect(_context, Scale));
         }
 
         public Effect AddSaturation(float pValue)
@@ -123,26 +124,30 @@ namespace SmallEngine.Graphics
             return this;
         }
 
-        public Effect AddEffect(Guid pEffect, params object[] pValues)
+        public Effect AddTile(BitmapResource pResource)
         {
-            var e = new SharpDX.Direct2D1.Effect(_context, pEffect);
-            for(int i = 0; i < pValues.Length; i++)
+            var e = new SharpDX.Direct2D1.Effect(_context, Tile);
+            if(pResource.Source.HasValue)
             {
-                dynamic v = pValues[i];
-                e.SetValue(i, v);
+                e.SetValue(0, pResource.Source.Value);
+            }
+            else
+            {
+                e.SetValue(0, new Rectangle(0, 0, pResource.Width, pResource.Height));
             }
             _effects.Add(e);
+            _requiresScale = false;
             return this;
         }
 
+        public Effect AddEffect(Guid pEffect) //TODO values
+        {
+            var e = new SharpDX.Direct2D1.Effect(_context, pEffect);
+            _effects.Add(e);
+            return this;
+        }
         public Effect Create()
         {
-            _composite = new Composite(_context);
-            _composite.InputCount = 1;
-
-            var scale = new SharpDX.Direct2D1.Effect(_context, Scale);
-            _effects.Insert(0, scale);
-
             for (int i = 1; i < _effects.Count; i++)
             {
                 _effects[i].SetInput(0, _effects[i - 1].Output, false);
@@ -180,9 +185,10 @@ namespace SmallEngine.Graphics
         {
             _effects[0].SetInput(0, pBitmap.DirectXBitmap, false);
 
+            ////0 is scale effect
             var widthFactor = pSize.Width / pBitmap.Width;
             var heightFactor = pSize.Height / pBitmap.Height;
-            _effects[0].SetValue(0, new SharpDX.Mathematics.Interop.RawVector2(widthFactor, heightFactor));
+            if(_requiresScale) _effects[0].SetValue(0, new SharpDX.Mathematics.Interop.RawVector2(widthFactor, heightFactor));
 
             if (pBitmap.Source.HasValue)
             {
@@ -201,7 +207,6 @@ namespace SmallEngine.Graphics
             {
                 e.Dispose();
             }
-            _composite.Dispose();
         }
     }
 }

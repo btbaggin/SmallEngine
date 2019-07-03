@@ -38,6 +38,7 @@ namespace SmallEngine.UI
             Font = Font.Create(UIManager.DefaultFontFamily, UIManager.DefaultFontSize, UIManager.DefaultFontColor, Game.Graphics);
             Font.Alignment = Alignments.Center;
             Text = pText;
+            Enabled = false;
         }
 
         public override void Draw(IGraphicsAdapter pSystem)

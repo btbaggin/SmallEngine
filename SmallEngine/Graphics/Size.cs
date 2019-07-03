@@ -40,5 +40,10 @@ namespace SmallEngine.Graphics
         {
             return new Size(pV1.Width * pScalar, pV1.Height * pScalar);
         }
+
+        public override string ToString()
+        {
+            return $"Width: {Width} Height: {Height}";
+        }
     }
 }

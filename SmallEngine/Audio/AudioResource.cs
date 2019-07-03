@@ -8,19 +8,39 @@ using System.Runtime.Serialization;
 
 namespace SmallEngine.Audio
 {
+    /// <summary>
+    /// Provides a way to play audio files
+    /// </summary>
     [Serializable]
     public sealed class AudioResource : Resource
     {
         [NonSerialized] AudioBuffer _buffer;
         [NonSerialized] internal WaveFormat Stream;
 
+        #region Public properties
+        /// <summary>
+        /// Returns the sample rate of the audio clip.
+        /// </summary>
+        public int SampleRate
+        {
+            get { return Stream.SampleRate; }
+        }
+
+        /// <summary>
+        /// Packets info of the sound
+        /// </summary>
+        public uint[] DecodedPacketsInfo { get; private set; }
+        #endregion
+
         #region Resource Functions
-        internal override void Create()
+        /// <inheritdoc/>
+        public override void Create()
         {
             LoadSound(Path);
         }
 
-        internal override Task CreateAsync()
+        /// <inheritdoc/>
+        public override Task CreateAsync()
         {
             return Task.Run(() => LoadSound(Path));
         }
@@ -48,21 +68,6 @@ namespace SmallEngine.Audio
             _buffer = a._buffer;
             Stream = a.Stream;
         }
-
-        #region Public properties
-        /// <summary>
-        /// Returns the sample rate of the audio clip.
-        /// </summary>
-        public int SampleRate
-        {
-            get { return Stream.SampleRate; }
-        }
-
-        /// <summary>
-        /// Packets info of the sound
-        /// </summary>
-        public uint[] DecodedPacketsInfo { get; private set; }
-        #endregion
 
         private void Initialize(string pFileName)
         {

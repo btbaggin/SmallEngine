@@ -10,6 +10,8 @@ namespace SmallEngine.UI
 {
     public class Textbox : UIElement
     {
+        public EventHandler<FocusChangedEventArgs> FocusChanged { get; set; }
+
         public Brush Background { get; set; }
 
         public Pen Cursor { get; set; }
@@ -19,6 +21,11 @@ namespace SmallEngine.UI
         public string Text
         {
             get { return _text.ToString(); }
+            set
+            {
+                _text.Clear();
+                _text.Append(value);
+            }
         }
 
         public bool IsFocused { get; private set; }
@@ -53,12 +60,19 @@ namespace SmallEngine.UI
             }
         }
 
+        InputState _currentState;
+        InputState _previousState;
         public override void Update()
         {
             //TODO caret navigation using mouse
             if(Mouse.ButtonPressed(MouseButtons.Left))
             {
-                IsFocused = IsMouseOver();
+                var isFocused = IsMouseOver();
+                if(isFocused != IsFocused)
+                {
+                    IsFocused = isFocused;
+                    FocusChanged?.Invoke(this, new FocusChangedEventArgs(IsFocused));
+                }
             }
 
             if (!IsFocused) return;
@@ -71,12 +85,47 @@ namespace SmallEngine.UI
                 _cursorTick = 0;
             }
 
+            _previousState = _currentState;
+            _currentState = Keyboard.GetInputState().Copy();
+
+            //Cursor navigation
+            //Always show cursor when navigating
+            if (_cursorPos > 0 && KeyPressed(Keys.Left))
+            {
+                _cursorPos--;
+                _cursorTick = 0;
+                _showCursor = true;
+                HandleInputEvent(Keys.Left);
+            }
+            else if (_cursorPos < _text.Length && KeyPressed(Keys.Right))
+            {
+                _cursorPos++;
+                _cursorTick = 0;
+                _showCursor = true;
+                HandleInputEvent(Keys.Right);
+            }
+
+            //TODO enter event?
+
+            //Text deletion
+            if (KeyPressed(Keys.Backspace) && _cursorPos > 0)
+            {
+                _text = _text.Remove(_cursorPos - 1, 1);
+                _cursorPos--;
+                HandleInputEvent(Keys.Backspace);
+            }
+            if (KeyPressed(Keys.Delete) && _cursorPos < _text.Length)
+            {
+                _text = _text.Remove(_cursorPos, 1);
+                HandleInputEvent(Keys.Delete);
+            }
+
             //Text input
             var keys = Enum.GetValues(typeof(Keys));
             for(int i = 0; i < keys.Length; i++)
             {
                 var k = (Keys)keys.GetValue(i);
-                if (Keyboard.KeyPressed(k))
+                if (KeyPressed(k))
                 {
                     var text = Keyboard.ToUnicode(k);
                     if(text != "\b")
@@ -84,34 +133,15 @@ namespace SmallEngine.UI
                         _text = _text.Insert(_cursorPos, text);
                         _cursorPos += text.Length;
                     }
+                    HandleInputEvent(k);
                 }
             }
+        }
 
-            //Cursor navigation
-            //Always show cursor when navigating
-            if (_cursorPos > 0 && Keyboard.KeyPressed(Keys.Left))
-            {
-                _cursorPos--;
-                _cursorTick = 0;
-                _showCursor = true;
-            }
-            else if (_cursorPos < _text.Length && Keyboard.KeyPressed(Keys.Right))
-            {
-                _cursorPos++;
-                _cursorTick = 0;
-                _showCursor = true;
-            }
-
-            //Text deletion
-            if(Keyboard.KeyPressed(Keys.Backspace) && _cursorPos > 0)
-            {
-                _text = _text.Remove(_cursorPos - 1, 1);
-                _cursorPos--;
-            }
-            if(Keyboard.KeyPressed(Keys.Delete) && _cursorPos < _text.Length)
-            {
-                _text = _text.Remove(_cursorPos, 1);
-            }
+        private bool KeyPressed(Keys pKey)
+        {
+            if (_previousState == null) return false;
+            return _currentState.IsPressed(pKey) && !_previousState.IsPressed(pKey);
         }
 
         public override Size MeasureOverride(Size pSize)
