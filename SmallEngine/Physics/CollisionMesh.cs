@@ -23,6 +23,10 @@ namespace SmallEngine.Physics
 
         public Material Material { get; set; }
 
+        public float Mass { get; protected set; }
+
+        public float Inertia { get; protected set; }
+
         protected CollisionMesh(Shapes pShape, Material pMaterial)
         {
             Shape = pShape;
@@ -45,7 +49,7 @@ namespace SmallEngine.Physics
 
         public abstract AxisAlignedBoundingBox CalculateAABB(Vector2 pPosition);
 
-        public abstract void CalculateMass(out float pMass, out float pInertia);
+        public abstract void CalculateMass();
 
         public abstract bool Contains(Vector2 pPoint);
     }
@@ -54,7 +58,16 @@ namespace SmallEngine.Physics
     [Serializable]
     public sealed class CircleMesh : CollisionMesh
     {
-        public float Radius { get; set; }
+        float _radius;
+        public float Radius
+        {
+            get { return _radius; }
+            set
+            {
+                _radius = value;
+                CalculateMass();
+            }
+        }
 
         public CircleMesh(float pRadius, Material pMaterial) : base(Shapes.Circle, pMaterial)
         {
@@ -64,6 +77,7 @@ namespace SmallEngine.Physics
         private CircleMesh(SerializationInfo pInfo, StreamingContext pContext) : base(pInfo, pContext)
         {
             Radius = pInfo.GetSingle("Radius");
+            CalculateMass();
         }
 
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
@@ -77,10 +91,10 @@ namespace SmallEngine.Physics
             return new AxisAlignedBoundingBox(pPosition, pPosition + Radius * 2);
         }
 
-        public override void CalculateMass(out float pMass, out float pInertia)
+        public sealed override void CalculateMass()
         {
-            pMass = Material.Density * MathF.PI * Radius * Radius;
-            pInertia = pMass * Radius * Radius;
+            Mass = Material.Density * MathF.PI * Radius * Radius;
+            Inertia = Mass * Radius * Radius;
         }
 
         public override bool Contains(Vector2 pPoint)
@@ -94,13 +108,30 @@ namespace SmallEngine.Physics
     [Serializable]
     public sealed class SquareMesh : PolygonMesh
     {
+        [NonSerialized] Vector2 _offset;
+        Size _size;
+        public Size Size
+        {
+            get { return _size; }
+            set
+            {
+                _size = value;
+                SetVertices(new Vector2[] { _offset,
+                                            new Vector2(_offset.X + value.Width, _offset.Y),
+                                            new Vector2(_offset.X + value.Width, _offset.Y + value.Height),
+                                            new Vector2(_offset.X, _offset.Y + value.Height) });
+                CalculateMass();
+            }
+        }
         public SquareMesh(Size pSize, Material pMaterial) : this(Vector2.Zero, pSize, pMaterial) { }
 
-        public SquareMesh(Vector2 pPosition, Size pSize, Material pMaterial) : base(new Vector2[] { pPosition,
-                                                                                    new Vector2(pSize.Width, 0) + pPosition,
-                                                                                    new Vector2(pSize.Width, pSize.Height) + pPosition,
-                                                                                    new Vector2(0, pSize.Height) + pPosition}, pMaterial)
+        public SquareMesh(Vector2 pOffset, Size pSize, Material pMaterial) : base(new Vector2[] { pOffset,
+                                                                                    new Vector2(pSize.Width, 0) + pOffset,
+                                                                                    new Vector2(pSize.Width, pSize.Height) + pOffset,
+                                                                                    new Vector2(0, pSize.Height) + pOffset}, pMaterial)
         {
+            _size = pSize;
+            _offset = pOffset;
         }
 
         private SquareMesh(SerializationInfo pInfo, StreamingContext pContext) : base(pInfo, pContext) { }
@@ -117,9 +148,8 @@ namespace SmallEngine.Physics
         Vector2 _min, _max;
         public PolygonMesh(Vector2[] pVerticies, Material pMaterial) : base(Shapes.Polygon, pMaterial)
         {
-            _min = new Vector2(float.MaxValue, float.MaxValue);
-            _max = new Vector2(-float.MaxValue, -float.MaxValue);
             SetVertices(pVerticies);
+            CalculateMass();
         }
 
         protected PolygonMesh(SerializationInfo pInfo, StreamingContext pContext) : base(pInfo, pContext)
@@ -139,8 +169,11 @@ namespace SmallEngine.Physics
             info.AddValue("Max", _max, typeof(Vector2));
         }
 
-        private void SetVertices(Vector2[] pVerticies)
+        protected void SetVertices(Vector2[] pVerticies)
         {
+            _min = new Vector2(float.MaxValue, float.MaxValue);
+            _max = new Vector2(-float.MaxValue, -float.MaxValue);
+
             int actualVertexCount = 0;
             int vertexCount = pVerticies.Length;
             System.Diagnostics.Debug.Assert(vertexCount > 2);
@@ -279,7 +312,7 @@ namespace SmallEngine.Physics
             return result;
         }
 
-        public override void CalculateMass(out float pMass, out float pInertia)
+        public sealed override void CalculateMass()
         {
             Vector2 centroid = new Vector2();
             float area = 0.0f;
@@ -314,8 +347,8 @@ namespace SmallEngine.Physics
             for (int i = 0; i < Vertices.Length; ++i)
                 Vertices[i] -= centroid;
 
-            pMass = Material.Density * area;
-            pInertia = Material.Density * I;
+            Mass = Material.Density * area;
+            Inertia = Material.Density * I;
         }
     }
     #endregion

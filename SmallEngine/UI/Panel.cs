@@ -13,10 +13,8 @@ namespace SmallEngine.UI
         Vertical
     }
 
-    public class Panel : UIElement
+    public class Panel : ContainerElement
     {
-        public Brush Background { get; set; }
-
         public bool FillParent { get; set; }
 
         public PanelOrientation Orientation { get; set; }
@@ -29,28 +27,7 @@ namespace SmallEngine.UI
             FillParent = true;
         }
 
-        public override void Draw(IGraphicsAdapter pSystem)
-        {
-            if (Background != null) pSystem.DrawRect(Bounds, Background);
-        }
-
         public override void Update() { }
-
-        public void AddElement(UIElement pElement)
-        {
-            base.AddChild(pElement);
-            InvalidateMeasure();
-        }
-
-        public void ClearElements()
-        {
-            //TODO doesn't work with named elements
-            foreach(var c in Children)
-            {
-                c.Dispose();
-            }
-            Children.Clear();
-        }
 
         public override Size MeasureOverride(Size pSize)
         {
@@ -100,30 +77,63 @@ namespace SmallEngine.UI
         {
             float width = 0;
             float height = 0;
-            if(Orientation == PanelOrientation.Horizontal)
+            Vector2 p;
+            switch(Orientation)
             {
-                height = (int)pBounds.Height;
-                width = (int)(DesiredSize.Width < pBounds.Width ? DesiredSize.Width : pBounds.Width);
+                case PanelOrientation.Horizontal:
+                    var childWidth = Children.Sum((e) => e.DesiredSize.Width + e.Margin.Width);
+                    height = (int)pBounds.Height;
+                    width = (int)(DesiredSize.Width < pBounds.Width ? DesiredSize.Width : pBounds.Width);
 
-            } else if (Orientation == PanelOrientation.Vertical)
-            {
-                width = (int)pBounds.Width;
-                height = (int)(DesiredSize.Height < pBounds.Height ? DesiredSize.Height : pBounds.Height);
+                    var x = Position.X;
+                    switch (HorizontalContentAlignment)
+                    {
+                        case HorizontalAlignments.Center:
+                            x += (pBounds.Width - childWidth) / 2;
+                            break;
+
+                        case HorizontalAlignments.Right:
+                            x += (Bounds.Width - childWidth);
+                            break;
+                    }
+                    p = new Vector2(x, Position.Y);
+                    break;
+
+                case PanelOrientation.Vertical:
+                    var childHeight = Children.Sum((e) => e.DesiredSize.Height + e.Margin.Height);
+                    width = (int)pBounds.Width;
+                    height = (int)(DesiredSize.Height < pBounds.Height ? DesiredSize.Height : pBounds.Height);
+
+                    var y = Position.Y;
+                    switch(HorizontalContentAlignment)
+                    {
+                        case HorizontalAlignments.Center:
+                            y += (pBounds.Height - childHeight) / 2;
+                            break;
+
+                        case HorizontalAlignments.Right:
+                            y += (Bounds.Height - childHeight);
+                            break;
+                    }
+                    p = new Vector2(Position.X, y);
+                    break;
+
+                default:
+                    throw new UnknownEnumException(typeof(PanelOrientation), Orientation);
             }
 
-            var p = Position;
             foreach(var c in Children)
             {
                 c.Arrange(new Rectangle(p, width, height));
                 if(Orientation == PanelOrientation.Horizontal)
                 {
-                    p.X += c.ActualWidth;
-                    width -= c.ActualWidth;
+                    p.X += c.ActualWidth + c.Margin.Width;
+                    width -= c.ActualWidth + c.Margin.Width;
                 }
                 else if(Orientation == PanelOrientation.Vertical)
                 {
-                    p.Y += c.ActualHeight;
-                    height -= c.ActualHeight;
+                    p.Y += c.ActualHeight + c.Margin.Height;
+                    height -= c.ActualHeight + c.Margin.Height;
                 }
             }
         }

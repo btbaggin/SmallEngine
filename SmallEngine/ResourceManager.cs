@@ -128,6 +128,16 @@ namespace SmallEngine
         }
 
         /// <summary>
+        /// Used be the deserialization constructor to maintain the current ref count;
+        /// </summary>
+        /// <param name="pAlias"></param>
+        /// <returns></returns>
+        internal static int GetRefCount(string pAlias)
+        {
+            return _resources[pAlias].ReferenceCount;
+        }
+
+        /// <summary>
         /// Request a resource from the manager
         /// </summary>
         /// <typeparam name="T">Type of the resource to request</typeparam>

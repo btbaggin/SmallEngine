@@ -14,7 +14,7 @@ namespace SmallEngine.Physics
         readonly CollisionResolutionDelegate[,] _resolvers = { { CollisionDetection.CircleVsCircle, CollisionDetection.CirclevsPolygon },
                                                                { CollisionDetection.PolygonvsCircle, CollisionDetection.PolygonvsPolygon } };
 
-        public PhysicsSystem() : base(typeof(ColliderComponent)) { } //TODO do I need to register colliders in CreateQuadTree?
+        public PhysicsSystem() : base(typeof(ColliderComponent)) { }
 
         QuadTree<ColliderComponent> _quadTree;
         public void CreateQuadTree()

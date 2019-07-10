@@ -21,7 +21,7 @@ namespace SmallEngine.Graphics
             foreach (var c in Components)
             {
                 var r = (RenderComponent)c;
-                if (r.IsVisible() && r.GameObject.ContainingScene.Active)
+                if (r.IsVisible() && r.GameObject.ContainingScene.Active) //TODO invalidate components when a scene is inactivated
                 {
                     r.Draw(_adapter, deltaTime);
                 }

@@ -111,10 +111,62 @@ namespace SmallEngine.Graphics
             }
         }
 
+        public FixedText FixText(string pText, float pWidth)
+        {
+            return new FixedText(_factory, this, pText, pWidth);
+        }
+
+        public bool HitTest(Vector2 pPoint, string pText, float pWidth, out int pIndex)
+        {
+            pIndex = -1;
+            if (pText == null) return false;
+
+            using (TextLayout l = new TextLayout(_factory, pText, Format, pWidth, Format.FontSize))
+            {
+                var metrics = l.HitTestPoint(pPoint.X, pPoint.Y, out SharpDX.Mathematics.Interop.RawBool isTrailing, out SharpDX.Mathematics.Interop.RawBool isInside);
+
+                if (isInside)
+                {
+                    pIndex = metrics.TextPosition;
+                    return true;
+                }
+                else if (isTrailing)
+                {
+                    pIndex = pText.Length;
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         public void Dispose()
         {
             Brush.Dispose();
             Format.Dispose();
+        }
+    }
+
+    public class FixedText : IDisposable
+    {
+        internal TextLayout Layout { get; private set; }
+
+        internal SharpDX.Direct2D1.SolidColorBrush Brush { get; private set; }
+
+        public FixedText(Factory pFactory, Font pFont, string pText, float pWidth)
+        {
+            Layout = new TextLayout(pFactory, pText, pFont.Format, pWidth, pFont.Format.FontSize);
+            Brush = pFont.Brush;
+        }
+
+        public Size GetSize()
+        {
+            return new Size(Layout.Metrics.Width, Layout.Metrics.Height);
+        }
+
+        public void Dispose()
+        {
+            Layout.Dispose();
         }
     }
 }

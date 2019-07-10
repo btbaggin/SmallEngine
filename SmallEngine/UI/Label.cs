@@ -27,9 +27,12 @@ namespace SmallEngine.UI
             set
             {
                 _text = value;
+                _fixed.Dispose();
+                _fixed = null;
                 InvalidateMeasure();
             }
         }
+        FixedText _fixed;
 
         public Label(string pText) : this(null, pText) { }
 
@@ -37,7 +40,7 @@ namespace SmallEngine.UI
         {
             _font = Font.Create(UIManager.DefaultFontFamily, UIManager.DefaultFontSize, UIManager.DefaultFontColor, Game.Graphics);
             Font.Alignment = Alignments.Center;
-            Text = pText;
+            _text = pText;
             Enabled = false;
         }
 
@@ -50,7 +53,8 @@ namespace SmallEngine.UI
 
         public override Size MeasureOverride(Size pSize)
         {
-            return Font.MeasureString(Text, pSize.Width);
+            if (_fixed == null) _fixed = _font.FixText(Text, pSize.Width);
+            return _fixed.GetSize();
         }
 
         public override void Dispose()

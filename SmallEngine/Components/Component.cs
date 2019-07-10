@@ -58,7 +58,12 @@ namespace SmallEngine.Components
         public virtual void OnAdded(IGameObject pGameObject)
         {
             GameObject = pGameObject;
-            if(Active) _components[RegistrationType].AddOrdered(this);
+            if (Active)
+            {
+                //TODO need this for serialization? idk...
+                if (!_components.ContainsKey(RegistrationType)) _components.Add(RegistrationType, new List<IComponent>());
+                _components[RegistrationType].AddOrdered(this);
+            }
         }
 
         /// <inheritdoc/>
@@ -73,7 +78,7 @@ namespace SmallEngine.Components
         {
             if(pActive)
             {
-                _components[RegistrationType].Add(this);
+                _components[RegistrationType].AddOrdered(this);
             }
             else
             {

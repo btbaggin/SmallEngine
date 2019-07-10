@@ -12,6 +12,8 @@ namespace SmallEngine.UI
     {
         public EventHandler<FocusChangedEventArgs> FocusChanged { get; set; }
 
+        public EventHandler<EventArgs> Enter { get; set; }
+
         public Brush Background { get; set; }
 
         public Pen Cursor { get; set; }
@@ -50,7 +52,7 @@ namespace SmallEngine.UI
         {
             pSystem.DrawRect(Bounds, Background);
 
-            pSystem.DrawText(Text, Bounds, Font, true); //TODO clip and navigation around cursor
+            pSystem.DrawText(Text, Bounds, Font, true); //TODO clip, DrawTextLayout?
 
             if(_showCursor && IsFocused)
             {
@@ -60,11 +62,8 @@ namespace SmallEngine.UI
             }
         }
 
-        InputState _currentState;
-        InputState _previousState;
         public override void Update()
         {
-            //TODO caret navigation using mouse
             if(Mouse.ButtonPressed(MouseButtons.Left))
             {
                 var isFocused = IsMouseOver();
@@ -72,6 +71,11 @@ namespace SmallEngine.UI
                 {
                     IsFocused = isFocused;
                     FocusChanged?.Invoke(this, new FocusChangedEventArgs(IsFocused));
+                }
+
+                if(IsFocused && Font.HitTest(Mouse.Position - Position, Text, ActualWidth, out int i))
+                { 
+                        _cursorPos = i;
                 }
             }
 
@@ -85,19 +89,16 @@ namespace SmallEngine.UI
                 _cursorTick = 0;
             }
 
-            _previousState = _currentState;
-            _currentState = Keyboard.GetInputState().Copy();
-
             //Cursor navigation
             //Always show cursor when navigating
-            if (_cursorPos > 0 && KeyPressed(Keys.Left))
+            if (_cursorPos > 0 && Keyboard.KeyPressed(Keys.Left))
             {
                 _cursorPos--;
                 _cursorTick = 0;
                 _showCursor = true;
                 HandleInputEvent(Keys.Left);
             }
-            else if (_cursorPos < _text.Length && KeyPressed(Keys.Right))
+            else if (_cursorPos < _text.Length && Keyboard.KeyPressed(Keys.Right))
             {
                 _cursorPos++;
                 _cursorTick = 0;
@@ -105,16 +106,20 @@ namespace SmallEngine.UI
                 HandleInputEvent(Keys.Right);
             }
 
-            //TODO enter event?
+            if(Keyboard.KeyPressed(Keys.Enter))
+            {
+                Enter?.Invoke(this, new EventArgs());
+                HandleInputEvent(Keys.Enter);
+            }
 
             //Text deletion
-            if (KeyPressed(Keys.Backspace) && _cursorPos > 0)
+            if (Keyboard.KeyPressed(Keys.Backspace) && _cursorPos > 0)
             {
                 _text = _text.Remove(_cursorPos - 1, 1);
                 _cursorPos--;
                 HandleInputEvent(Keys.Backspace);
             }
-            if (KeyPressed(Keys.Delete) && _cursorPos < _text.Length)
+            if (Keyboard.KeyPressed(Keys.Delete) && _cursorPos < _text.Length)
             {
                 _text = _text.Remove(_cursorPos, 1);
                 HandleInputEvent(Keys.Delete);
@@ -125,7 +130,7 @@ namespace SmallEngine.UI
             for(int i = 0; i < keys.Length; i++)
             {
                 var k = (Keys)keys.GetValue(i);
-                if (KeyPressed(k))
+                if (Keyboard.KeyPressed(k))
                 {
                     var text = Keyboard.ToUnicode(k);
                     if(text != "\b")
@@ -136,12 +141,6 @@ namespace SmallEngine.UI
                     HandleInputEvent(k);
                 }
             }
-        }
-
-        private bool KeyPressed(Keys pKey)
-        {
-            if (_previousState == null) return false;
-            return _currentState.IsPressed(pKey) && !_previousState.IsPressed(pKey);
         }
 
         public override Size MeasureOverride(Size pSize)

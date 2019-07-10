@@ -47,7 +47,7 @@ namespace SmallEngine.Graphics
 
                 var scale = GameObject.Scale * Game.ActiveCamera.Zoom;
 
-                if (Effect != null) Effect.Draw(Bitmap, position, scale);
+                if (Effect != null) Effect.Draw(Bitmap, Opacity, position, scale);
                 else pSystem.DrawBitmap(Bitmap, Opacity, position, scale);
             }
         }
@@ -69,7 +69,7 @@ namespace SmallEngine.Graphics
         {
             base.Dispose();
 
-            Bitmap.Dispose();
+            Bitmap?.Dispose();
             Effect?.Dispose();
         }
     }

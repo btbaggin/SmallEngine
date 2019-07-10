@@ -48,7 +48,7 @@ namespace SmallEngine.UI
 
         public override Size MeasureOverride(Size pSize)
         {
-            return new Size(pSize.Width, Height);
+            return pSize;
         }
 
         public override void Dispose()

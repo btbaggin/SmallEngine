@@ -61,9 +61,6 @@ namespace SmallEngine.Audio
 
         private AudioResource(SerializationInfo pInfo, StreamingContext pContext) : base(pInfo, pContext)
         {
-            if (!ResourceManager.ResourceLoaded(Alias))
-                throw new Serialization.ResourceNotLoadedException(Alias);
-
             var a = ResourceManager.Request<AudioResource>(Alias);
             _buffer = a._buffer;
             Stream = a.Stream;

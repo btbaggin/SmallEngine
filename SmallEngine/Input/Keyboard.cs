@@ -111,7 +111,7 @@ namespace SmallEngine.Input
             return !_inputState.IsPressed(pKey);
         }
 
-        internal static void MarkUIEventHandled(Keys pKey)
+        internal static void MarkKeyHandled(Keys pKey)
         {
             //We want to mark the original state as handled
             //This will cause non-UI elements to see the key as handled

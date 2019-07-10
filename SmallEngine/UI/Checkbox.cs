@@ -9,11 +9,25 @@ namespace SmallEngine.UI
 {
     public class Checkbox : UIElement
     {
+        public EventHandler<EventArgs> ValueChanged { get; set; }
+
         public Brush Background { get; set; }
 
         public Pen Foreground { get; set; }
 
-        public bool IsChecked { get; set; }
+        bool _isChecked;
+        public bool IsChecked
+        {
+            get { return _isChecked; }
+            set
+            {
+                if(value != _isChecked)
+                {
+                    _isChecked = value;
+                    ValueChanged?.Invoke(this, new EventArgs());
+                }
+            }
+        }
 
         public Checkbox() : this(null) { }
 
@@ -43,9 +57,7 @@ namespace SmallEngine.UI
 
         public override Size MeasureOverride(Size pSize)
         {
-            var width = Math.Max(16, Width);
-            var height = Math.Max(16, Height);
-            return new Size(Math.Min(width, pSize.Width), Math.Min(height, pSize.Height));
+            return new Size(16);
         }
 
         public override void Dispose()

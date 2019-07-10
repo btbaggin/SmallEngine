@@ -51,7 +51,7 @@ namespace SmallEngine.Graphics
                 _bitmap = DirectXBitmap,
                 Source = pRectangle,
                 Alias = Alias,
-                _refCount = _refCount + 1
+                ReferenceCount = ReferenceCount + 1
             };
         }
 
@@ -82,9 +82,6 @@ namespace SmallEngine.Graphics
 
         private BitmapResource(SerializationInfo pInfo, StreamingContext pContext) : base(pInfo, pContext)
         {
-            if (!ResourceManager.ResourceLoaded(Alias))
-                throw new Serialization.ResourceNotLoadedException(Alias);
-
             Source = (Rectangle?)pInfo.GetValue("Source", typeof(Rectangle?));
             DirectXBitmap = ResourceManager.Request<BitmapResource>(Alias).DirectXBitmap;
         }
@@ -97,7 +94,7 @@ namespace SmallEngine.Graphics
 
         protected override void DisposeResource()
         {
-            DirectXBitmap.Dispose();
+            DirectXBitmap?.Dispose();
         }
     }
 }

@@ -25,7 +25,7 @@ namespace SmallEngine
             _sceneIndexes.Push(0);
         }
 
-        public void StartScene(SceneLoadModes pMode)
+        public int StartScene(SceneLoadModes pMode)
         {
             switch(pMode)
             {
@@ -45,6 +45,7 @@ namespace SmallEngine
                 default:
                     throw new UnknownEnumException(typeof(SceneLoadModes), pMode);
             }
+            return _startIndex;
         }
 
         public void EndScene()
@@ -81,6 +82,7 @@ namespace SmallEngine
 
             unchecked { _versions[i]++; } //Have the versions wrap back to 0
             if (i < _firstNullIndex) _firstNullIndex = i;
+            if (i == _endIndex) _endIndex--;
         }
 
         public bool GetByPointer(long pPointer, out IGameObject pObject)
@@ -96,9 +98,21 @@ namespace SmallEngine
             return false;
         }
 
-        public IList<IGameObject> GetGameObjects()
+        public void Clear(int pStart, int pEnd)
         {
-            return new ArraySegment<IGameObject>(_gameObjects, _startIndex, _endIndex - _startIndex);
+            if (pEnd == 0) pEnd = _endIndex;
+            _firstNullIndex = pStart;
+            do
+            {
+                _gameObjects[pStart] = null;
+                unchecked { _versions[pStart]++; } //Have the versions wrap back to 0
+            } while (++pStart < pEnd);
+        }
+
+        public IList<IGameObject> GetGameObjects(int pStart, int pEnd)
+        {
+            if (pEnd == 0) pEnd = _endIndex;
+            return new ArraySegment<IGameObject>(_gameObjects, pStart, pEnd - pStart);
         }
     }
 }

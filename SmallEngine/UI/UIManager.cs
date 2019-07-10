@@ -17,16 +17,37 @@ namespace SmallEngine.UI
         public static int DefaultFontSize { get; set; } = 14;
         public static Color DefaultFontColor { get; set; } = Color.Black;
 
-        public void Register(UIElement pElement)
+        public void Add(UIElement pElement, Scene pScene)
         {
+            AddChildElements(pElement, pScene);
             _elements.AddOrdered(pElement);
         }
 
-        internal void AddNamedElement(UIElement pElement)
+        public void Remove(UIElement pElement)
         {
-            System.Diagnostics.Debug.Assert(pElement.Name != null);
+            RemoveChildElements(pElement);
+            _elements.Remove(pElement);
+        }
 
-            _namedElements.Add(pElement.Name, pElement);
+        private void AddChildElements(UIElement pElement, Scene pScene)
+        {
+            pElement.ContainingScene = pScene;
+            pElement.Added = true;
+            if(pElement.Name != null) _namedElements.Add(pElement.Name, pElement);
+            foreach(var c in pElement.Children)
+            {
+                AddChildElements(c, pScene);
+            }
+        }
+
+        private void RemoveChildElements(UIElement pElement)
+        {
+            if (pElement.Name != null) _namedElements.Remove(pElement.Name);
+            pElement.Added = false;
+            foreach(var c in pElement.Children)
+            {
+                RemoveChildElements(c);
+            }
         }
 
         public UIElement GetElement(string pName)
@@ -38,17 +59,6 @@ namespace SmallEngine.UI
 
             return null;
         }
-
-        //public bool IsMouseOver()
-        //{
-        //    foreach(var e in _elements)
-        //    {
-        //        if (e.Bounds.Contains(Input.Mouse.Position)) return true;
-        //    }
-
-        //    return false;
-
-        //}
 
         #region Internal Methods
         internal void Update()

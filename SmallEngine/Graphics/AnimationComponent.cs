@@ -46,6 +46,7 @@ namespace SmallEngine.Graphics
         {
             _animations.Add(pName, pAnim);
             Current = pAnim;
+            _render.Bitmap = Current.Bitmap.CreateSubBitmap(Current.Frame);
         }
 
         public Animation GetAnimation(string pName)

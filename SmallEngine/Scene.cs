@@ -49,15 +49,18 @@ namespace SmallEngine
         //if something gets added it shouldn't be updated until the next frame anyway
         static IndexedStack<Scene> _scenes = new IndexedStack<Scene>();
         SceneLoadModes _mode;
+        int _start, _end;
 
         internal readonly static Dictionary<string, List<Type>> _definitions = new Dictionary<string, List<Type>>();
 
         #region Properties
+        public static int LoadedSceneCount { get { return _scenes.Count; } }
+
         public bool Active { get; set; } = true;
         #endregion  
 
         #region Constructors
-        protected Scene()
+        public Scene()
         {
             _namedObjects = new Dictionary<string, IGameObject>();
             _ui = new UIManager();
@@ -65,6 +68,9 @@ namespace SmallEngine
 
         protected Scene(SerializationInfo pInfo, StreamingContext pContext)
         {
+            _mode = (SceneLoadModes)pInfo.GetInt32("Mode");
+
+            _start = _gameobjects.StartScene(_mode);
             var objects = (IList<IGameObject>)pInfo.GetValue("GameObjects", typeof(IList<IGameObject>));
             foreach(var go in objects)
             {
@@ -74,13 +80,12 @@ namespace SmallEngine
                 }
                 AddGameObject(go);
             }
-            _mode = (SceneLoadModes)pInfo.GetInt32("Mode");
             _ui = new UIManager();
         }
 
         public virtual void GetObjectData(SerializationInfo info, StreamingContext context)
         {
-            info.AddValue("GameObjects", _gameobjects.GetGameObjects(), typeof(IList<IGameObject>));
+            info.AddValue("GameObjects", _gameobjects.GetGameObjects(_start, _end), typeof(IList<IGameObject>));
             info.AddValue("Mode", _mode);
         }
         #endregion
@@ -95,27 +100,38 @@ namespace SmallEngine
             //TODO allow creating scene that isn't registered to all systems
             var scene = (T)Activator.CreateInstance(typeof(T));
             scene._mode = pMode;
+
+            var startIndex = _gameobjects.StartScene(pMode);
+            scene._start = startIndex;
+
+            Scene previous = null;
             if (_scenes.Count > 0)
             {
                 switch (pMode)
                 {
                     case SceneLoadModes.Replace:
-                        _scenes.Pop();
+                        var s = _scenes.Pop();
+                        s.Unload();
                         break;
 
                     case SceneLoadModes.Additive:
+                        previous = _scenes.Peek();
+                        previous._end = startIndex;
                         break;
 
                     case SceneLoadModes.LoadOver:
-                        //TODO should LoadOver go over additive scenes? or should it load over the current scene?
-                        var load = _scenes.Peek();
-                        load.Suspend();
-                        load.Active = false;
+                        for(int i = _scenes.Count - 1; i >= 0; i--)
+                        {
+                            previous = _scenes.PeekAt(i);
+                            previous.Suspend();
+                            previous.Active = false;
+                            previous._end = startIndex;
+                            if (previous._mode != SceneLoadModes.Additive) break;
+                        }
                         break;
                 }
             }
 
-            _gameobjects.StartScene(pMode);
             _scenes.Push(scene);
             scene.Begin();
 
@@ -129,7 +145,7 @@ namespace SmallEngine
         {
             End();
             //Dispose of all GameObjects created within the scene
-            foreach (var go in _gameobjects.GetGameObjects())
+            foreach (var go in _gameobjects.GetGameObjects(_start, _end))
             {
                 if (!string.IsNullOrEmpty(go.Name))
                 {
@@ -137,6 +153,8 @@ namespace SmallEngine
                 }
                 go.Dispose();
             }
+
+            _gameobjects.Clear(_start, _end);
 
             //Dispose UI elements
             _ui.DisposeElements();
@@ -153,9 +171,15 @@ namespace SmallEngine
                         break;
 
                     case SceneLoadModes.LoadOver:
-                        var peek = _scenes.Peek();
-                        peek.Active = true;
-                        peek.Restore();
+                        for(int i = _scenes.Count - 1; i >= 0; i--)
+                        {
+                            var peek = _scenes.PeekAt(i);
+                            peek.Active = true;
+                            peek.Restore();
+                            peek._end = 0;
+                            if (peek._mode != SceneLoadModes.Additive) break;
+                        }
+                           
                         break;
                 }
             }
@@ -235,23 +259,8 @@ namespace SmallEngine
             }
         }
 
-        internal static void RegisterUI(UIElement pElement)
-        {
-            var s = _scenes.Peek();
-            s._ui.Register(pElement);
-        }
-
-        internal static Scene OnUIElementCreated(UIElement pElement)
-        {
-            if (_scenes.Count == 0) throw new InvalidOperationException("UI element created with no scene loaded");
-            var s = _scenes.Peek();
-            if (pElement.Name != null) s._ui.AddNamedElement(pElement);
-            return s;
-        }
-
         internal static void UpdateUI()
         {
-            //Input.Mouse.CursorOverUI = false;
             for (int i = 0; i < _scenes.Count; i++)
             {
                 var s = _scenes.PeekAt(i);
@@ -292,7 +301,7 @@ namespace SmallEngine
         /// Creates a IGameObject with the specified components
         /// </summary>
         /// <param name="pComponents">Components to be attached to the IGameObject</param>
-        public T CreateGameObject<T>(params IComponent[] pComponents) where T : IGameObject
+        public T CreateGameObject<T>(params IComponent[] pComponents) where T : IGameObject, new()
         {
             return CreateGameObject<T>(null, pComponents);
         }
@@ -303,7 +312,7 @@ namespace SmallEngine
         /// <param name="pName">Unique name to give to the game object</param>
         /// <param name="pComponents">Components to be attached to the IGameObject</param>
         /// <returns></returns>
-        public T CreateGameObject<T>(string pName, params IComponent[] pComponents) where T : IGameObject
+        public T CreateGameObject<T>(string pName, params IComponent[] pComponents) where T : IGameObject, new()
         {
             T go = (T)Activator.CreateInstance(typeof(T));
             go.Name = pName;
@@ -321,7 +330,7 @@ namespace SmallEngine
         /// Template must be created by a previous call to <see cref="Define(string, Type[])"/>
         /// </summary>
         /// <param name="pTemplate">Template from which to create the IGameObject</param>
-        public T CreateGameObject<T>(string pTemplate) where T : IGameObject
+        public T CreateGameObject<T>(string pTemplate) where T : IGameObject, new()
         {
             return CreateGameObject<T>(null, pTemplate);
         }
@@ -332,7 +341,7 @@ namespace SmallEngine
         /// </summary>
         /// <param name="pName">Unique name to give to the game object</param>
         /// <param name="pTemplate">Template from which to create the IGameObject</param>
-        public T CreateGameObject<T>(string pName, string pTemplate) where T : IGameObject
+        public T CreateGameObject<T>(string pName, string pTemplate) where T : IGameObject, new()
         {
             if (_definitions.ContainsKey(pTemplate))
             {
@@ -340,6 +349,8 @@ namespace SmallEngine
                 go.Name = pName;
                 foreach (Type t in _definitions[pTemplate])
                 {
+                    System.Diagnostics.Debug.Assert(Component.IsComponent(t), "Type is not a component");
+                    System.Diagnostics.Debug.Assert(t.GetConstructor(Type.EmptyTypes) != null, "Type must contain a parameterless constructor");
                     go.AddComponent(Component.Create(t));
                 }
 
@@ -442,16 +453,26 @@ namespace SmallEngine
         /// <param name="pTag">Tag for which to search</param>
         public IEnumerable<IGameObject> FindGameObjectsWithTag(string pTag)
         {
-            return _gameobjects.GetGameObjects().WithTag(pTag);
+            return _gameobjects.GetGameObjects(_start, _end).WithTag(pTag);
         }
 
         public IList<IGameObject> GetGameObjects()
         {
-            return _gameobjects.GetGameObjects();
+            return _gameobjects.GetGameObjects(_start, _end);
         }
         #endregion
 
         #region UI Methods
+        public void AddUIElement(UIElement pElement)
+        {
+            _ui.Add(pElement, this);
+        }
+
+        public void RemoveUIElement(UIElement pElement)
+        {
+            _ui.Remove(pElement);
+        }
+
         internal void InvalidateMeasure()
         {
             _ui.InvalidateMeasure();
@@ -482,16 +503,6 @@ namespace SmallEngine
 
             return null;
         }
-
-        //public static bool IsMouseOverUIElement() //TODO yuck?
-        //{
-        //    for (int i = 0; i < _scenes.Count; i++)
-        //    {
-        //        if (_scenes.PeekAt(i)._ui.IsMouseOver()) return true;
-        //    }
-
-        //    return false;
-        //}
         #endregion
     }
 }

@@ -11,9 +11,20 @@ namespace SmallEngine.UI
     {
         public EventHandler<EventArgs> Clicked { get; set; }
 
-        public bool IsToggled { get; set; }
+        bool _isToggled;
+        public bool IsToggled
+        {
+            get { return _isToggled; }
+            set
+            {
+                _isToggled = value;
+                _background.Color = value ? ToggledColor : NonToggledColor;
+            }
+        }
 
-        public Brush Foreground { get; set; }
+        public Color ToggledColor { get; set; }
+
+        public Color NonToggledColor { get; set; }
 
         public Pen Border { get; set; }
 
@@ -28,6 +39,7 @@ namespace SmallEngine.UI
             }
         }
 
+        SolidColorBrush _background;
         public ToggleButton(string pText) : this(null, new Label(pText) { HorizontalAlignment = HorizontalAlignments.Center }) { }
 
         public ToggleButton(UIElement pContent) : this(null, pContent) { }
@@ -36,7 +48,10 @@ namespace SmallEngine.UI
         {
             AddChild(pContent);
 
-            Foreground = SolidColorBrush.Create(Color.Gray);
+            NonToggledColor = Color.Gray;
+            ToggledColor = Color.DarkGray;
+
+            _background = SolidColorBrush.Create(NonToggledColor);
             Border = Pen.Create(Color.Yellow, 2);
             _padding = new Thickness(3);
         }
@@ -56,7 +71,8 @@ namespace SmallEngine.UI
 
         public override void Draw(IGraphicsAdapter pSystem)
         {
-            pSystem.DrawRect(Bounds, Foreground);
+            
+            pSystem.DrawRect(Bounds, _background);
             if(IsToggled) pSystem.DrawRectOutline(Bounds, Border);
         }
 
@@ -71,7 +87,7 @@ namespace SmallEngine.UI
 
         public override void Dispose()
         {
-            Foreground.Dispose();
+            _background.Dispose();
             Border.Dispose();
             base.Dispose();
         }

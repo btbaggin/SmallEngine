@@ -88,6 +88,12 @@ namespace SmallEngine
             _update = new UpdateSystem();
             PhysicsHelper.Create();
 
+            ActiveCamera = new Camera(1f, 1f)
+            {
+                Width = Form.Width,
+                Height = Form.Height
+            };
+
             if (MaxFps == 0) MaxFps = 60;
         }
 
@@ -145,9 +151,9 @@ namespace SmallEngine
         }
 
 #region Messages
-        public static int MessageThreads { get; private set; } = System.Environment.ProcessorCount - 1; //reserve dedicated thread for audio
+        public static int MessageThreads { get; set; } = System.Environment.ProcessorCount - 1; //reserve dedicated thread for audio
 
-        public static MessageBus Messages { get; private set; }
+        public static MessageBus Messages { get; set; }
 
         public static void SetMessageThreads(int pThreads)
         {

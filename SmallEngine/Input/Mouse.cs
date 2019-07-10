@@ -78,7 +78,8 @@ namespace SmallEngine.Input
             GetCursorPos(out Point p);
             ScreenToClient(_handle, ref p);
             _mousePos = new Vector2(p.X, p.Y);
-            CheckDrag();
+            CheckDrag(MouseButtons.Left);
+            CheckDrag(MouseButtons.Right);
         }
 
         internal static void MarkButtonHandled(MouseButtons pButton)
@@ -87,42 +88,54 @@ namespace SmallEngine.Input
             Keyboard._previousStateCopy.Handle(pButton);
         }
 
-        private static Vector2 _dragStart;
-        private static Mode _mode = Mode.Normal;
-        private enum Mode
+        static Vector2 _dragStart;
+        static Mode[] _modes = new Mode[6];
+        private enum Mode : byte
         {
+            Normal = 0,
             PossibleDrag,
             Drag,
-            EndingDrag,
-            Normal
+            EndingDrag
         }
 
-        private static void CheckDrag()
+        private static void CheckDrag(MouseButtons pButton)
         {
-            //TODO change to switch
-            if (_mode == Mode.Normal && ButtonPressed(MouseButtons.Left))
+            var i = (int)pButton;
+            switch(_modes[i])
             {
-                _mode = Mode.PossibleDrag;
-                _dragStart = _mousePos;
-                return;
-            }
+                case Mode.Normal:
+                    if (ButtonPressed(pButton))
+                    {
+                        _modes[i] = Mode.PossibleDrag;
+                        _dragStart = _mousePos;
+                    }
+                    break;
 
-            if (_mode == Mode.PossibleDrag && ButtonDown(MouseButtons.Left))
-            {
-                var _dragDistance = _mousePos - _dragStart;
-                if (Math.Abs(_dragDistance.X) > System.Windows.SystemParameters.MinimumHorizontalDragDistance ||
-                    Math.Abs(_dragDistance.Y) > System.Windows.SystemParameters.MinimumVerticalDragDistance)
-                {
-                    _mode = Mode.Drag;
-                }
-            }
-            else if (ButtonUp(MouseButtons.Left) && _mode == Mode.Drag)
-            {
-                _mode = Mode.EndingDrag;
-            }
-            else if (_mode == Mode.EndingDrag || _mode == Mode.PossibleDrag)
-            {
-                _mode = Mode.Normal;
+                case Mode.PossibleDrag:
+                    if (ButtonDown(pButton))
+                    {
+                        var _dragDistance = _mousePos - _dragStart;
+                        if (Math.Abs(_dragDistance.X) > System.Windows.SystemParameters.MinimumHorizontalDragDistance ||
+                            Math.Abs(_dragDistance.Y) > System.Windows.SystemParameters.MinimumVerticalDragDistance)
+                        {
+                            _modes[i] = Mode.Drag;
+                        }
+                    }
+                    else
+                    {
+                        _modes[i] = Mode.Normal;
+                    }
+                    break;
+
+                case Mode.Drag:
+                    if (ButtonUp(pButton)) _modes[i] = Mode.EndingDrag;
+                    break;
+
+                case Mode.EndingDrag:
+                    //EndingDrag allows for 1 frame after the mouse has been released until IsDragging returns false
+                    //This prevents a mouse up event from happening every time the drag ends
+                    _modes[i] = Mode.Normal;
+                    break;
             }
         }
 
@@ -152,10 +165,11 @@ namespace SmallEngine.Input
             return !Keyboard._inputState.IsPressed(pMouse);
         }
 
-        public static bool IsDragging(out Vector2 pAnchor)
+        public static bool IsDragging(MouseButtons pButton, out Vector2 pAnchor)
         {
+            var i = (int)pButton;
             pAnchor = _dragStart;
-            return _mode == Mode.Drag || _mode == Mode.EndingDrag;
+            return _modes[i] == Mode.Drag || _modes[i] == Mode.EndingDrag;
         }
         #endregion
     }

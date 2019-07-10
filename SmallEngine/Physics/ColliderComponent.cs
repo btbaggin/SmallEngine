@@ -37,11 +37,10 @@ namespace SmallEngine.Physics
                 _mesh = value;
                 _mesh.Body = this;
 
-                _mesh.CalculateMass(out float mass, out float inertia);
                 if(_body != null)
                 {
-                    _body.Mass = mass;
-                    _body.Inertia = inertia;
+                    _body.Mass = value.Mass;
+                    _body.Inertia = value.Inertia;
                 }
             }
         }
@@ -76,15 +75,10 @@ namespace SmallEngine.Physics
             base.OnAdded(pGameObject);
             Colliders = new Dictionary<ColliderComponent, bool>();
 
-            if (Mesh != null)
+            if (Mesh != null && _body != null)
             {
-                //TODO split this up
-                _mesh.CalculateMass(out float mass, out float inertia);
-                if (_body != null)
-                {
-                    _body.Mass = mass;
-                    _body.Inertia = inertia;
-                }
+                _body.Mass = Mesh.Mass;
+                _body.Inertia = Mesh.Inertia;
             }
         }
 
@@ -152,7 +146,7 @@ namespace SmallEngine.Physics
 
         internal void OnCollisionExit(ColliderComponent pCollider, Manifold pManifold)
         {
-            //TODO need to check ignored
+            //TODO check ignore?
             if(Colliders.Remove(pCollider))
             {
                 EventHandler<CollisionEventArgs> ce = null;

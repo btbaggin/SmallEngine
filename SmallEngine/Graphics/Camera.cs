@@ -8,70 +8,48 @@ namespace SmallEngine.Graphics
         #region Properties
         public Rectangle Viewport
         {
-            get { return new Rectangle(_position, Width, Height); }
+            get { return new Rectangle(Position, Width, Height); }
         }
 
         public float Width { get; set; }
 
         public float Height { get; set; }
 
-        private Vector2 _position;
-        public Vector2 Position
-        {
-            get { return _position; }
-            set { _position = value; }
-        }
-
-        public float MoveSpeed { get; set; }
+        public Vector2 Position { get; set; }
 
         public float ZoomSpeed { get; set; }
 
-        public float Zoom { get; set; }
-
         public bool AllowZoom { get; set; }
 
-        public bool IsFollowing
-        {
-            get { return _followObject != null; }
-        }
+        public float Zoom { get; set; }
+
+        public float MinZoom { get; set; }
+
+        public float MaxZoom { get; set; }
         #endregion
-
-        readonly float _minZoom, _maxZoom;
-        private float _inverseZoom;
-
-        private IGameObject _followObject;
 
         public Camera(float pMinZoom, float pMaxZoom)
         {
-            System.Diagnostics.Debug.Assert(_maxZoom >= _minZoom);
+            System.Diagnostics.Debug.Assert(pMaxZoom >= pMinZoom);
 
             Position = Vector2.Zero;
 
-            _minZoom = pMinZoom;
-            _maxZoom = pMaxZoom;
+            MinZoom = pMinZoom;
+            MaxZoom = pMaxZoom;
             Width = Game.Form.Width;
             Height = Game.Form.Height;
             AllowZoom = true;
             Zoom = 1;
-            _inverseZoom = 1;
             ZoomSpeed = .05f;
-            MoveSpeed = 1000;
         }
 
         public void Update(float pDeltaTime)
         {
-            if(IsFollowing)
-            {
-                Position = _followObject.Position - new Vector2(Width / 2, Height / 2);
-            }
-
             if(AllowZoom)
             {
                 var mw = Mouse.WheelDelta;
                 Zoom += mw * ZoomSpeed * pDeltaTime;
-                Zoom = MathF.Clamp(Zoom, _minZoom, _maxZoom);
-                _inverseZoom = (_maxZoom - _minZoom) / Zoom;
-                if (_inverseZoom == 0) _inverseZoom = 1;
+                Zoom = MathF.Clamp(Zoom, MinZoom, MaxZoom);
 
                 var oldWidth = Width;
                 var oldHeight = Height;
@@ -81,35 +59,15 @@ namespace SmallEngine.Graphics
             }
         }
 
-        public void MoveLeft()
-        {
-            _position.X -= _inverseZoom * GameTime.DeltaTime * MoveSpeed;
-        }
-
-        public void MoveRight()
-        {
-            _position.X += _inverseZoom * GameTime.DeltaTime * MoveSpeed;
-        }
-
-        public void MoveUp()
-        {
-            _position.Y -= _inverseZoom * GameTime.DeltaTime * MoveSpeed;
-        }
-
-        public void MoveDown()
-        {
-            _position.Y += _inverseZoom * GameTime.DeltaTime * MoveSpeed;
-        }
-
         public Vector2 ToWorldSpace(Vector2 pCameraSpace)
         {
             var p = pCameraSpace / Zoom;
-            return p + _position;
+            return p + Position;
         }
 
         public Vector2 ToCameraSpace(Vector2 pWorldSpace)
         {
-            var p = pWorldSpace - _position;
+            var p = pWorldSpace - Position;
             return p * Zoom;
         }
 
@@ -122,18 +80,8 @@ namespace SmallEngine.Graphics
         public bool IsVisible(IGameObject pGameObject)
         {
             var p = ToCameraSpace(pGameObject.Position);
-            return p.X + (pGameObject.Scale.Width * Zoom) > 0 && p.X <= Width &&
-                   p.Y + (pGameObject.Scale.Height * Zoom) > 0 && p.Y <= Height;
-        }
-
-        public void Follow(IGameObject pObject)
-        {
-            _followObject = pObject;
-        }
-
-        public void StopFollow()
-        {
-            _followObject = null;
+            return p.X + (pGameObject.Scale.Width * Zoom) >= 0 && p.X <= Width &&
+                   p.Y + (pGameObject.Scale.Height * Zoom) >= 0 && p.Y <= Height;
         }
     }
 }

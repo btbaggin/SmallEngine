@@ -11,8 +11,6 @@ namespace SmallEngine.UI
     {
         public Font Font { get; set; }
 
-        public UIElement Element { get; set; }
-
         public string Label { get; set; }
 
         public int LabelWidth { get; set; }
@@ -21,32 +19,31 @@ namespace SmallEngine.UI
 
         public LabeledElement(string pName, string pLabel, UIElement pElement): base(pName)
         {
+            AddChild(pElement);
             Label = pLabel;
             LabelWidth = 100;
-            Element = pElement;
             Font = Font.Create(UIManager.DefaultFontFamily, UIManager.DefaultFontSize, UIManager.DefaultFontColor, Game.Graphics);
         }
 
         public override Size MeasureOverride(Size pSize)
         {
-            Element.Measure(pSize);
-            return new Size(Element.DesiredSize.Width + LabelWidth, Element.DesiredSize.Height);
+            var content = Children[0];
+            content.Measure(pSize);
+            return new Size(content.DesiredSize.Width + LabelWidth, content.DesiredSize.Height);
         }
 
         public override void ArrangeOverride(Rectangle pBounds)
         {
-            Element.Arrange(new Rectangle(pBounds.X + LabelWidth, pBounds.Y, pBounds.Width - LabelWidth, pBounds.Height));
+            var content = Children[0];
+            var rect = new Rectangle(pBounds.X + LabelWidth, pBounds.Y, pBounds.Width - LabelWidth, pBounds.Height);
+            content.Arrange(rect);
         }
 
         public override void Draw(IGraphicsAdapter pSystem)
         {
             pSystem.DrawText(Label, new Rectangle(Bounds.X, Bounds.Y, LabelWidth, ActualHeight), Font);
-            Element.Draw(pSystem);
         }
 
-        public override void Update()
-        {
-            Element.Update();
-        }
+        public override void Update() { }
     }
 }

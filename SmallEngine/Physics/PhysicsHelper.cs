@@ -11,7 +11,7 @@ namespace SmallEngine.Physics
     {
         public static Rectangle WorldBounds { get; set; } = new Rectangle(0, 0, Int16.MaxValue, Int16.MaxValue);
 
-        public static Vector2 Gravity { get; set; }
+        public static Vector2 Gravity { get; set; } = new Vector2(0, 250);
 
         public static ColliderComponent HitTest(Vector2 pPoint)
         {

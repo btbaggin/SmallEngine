@@ -14,6 +14,7 @@ namespace SmallEngine
     public class GameObject : IGameObject
     {
         #region Properties
+        string _name;
         /// <inheritdoc/>
         public string Name { get; set; }
 

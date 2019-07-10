@@ -39,7 +39,7 @@ namespace SmallEngine.UI
 
         ButtonState _state;
         readonly SolidColorBrush _brush;
-        public Button(string pText) : this(null, new Label(pText) { HorizontalAlignment = HorizontalAlignments.Center }) { }
+        public Button(string pText) : this(null, new Label(pText) { HorizontalAlignment = HorizontalAlignments.Center, Margin = new Thickness(0) }) { }
 
         public Button(UIElement pContent) : this(null, pContent) { }
 
@@ -97,7 +97,7 @@ namespace SmallEngine.UI
 
         public override void Update()
         {
-            if(Bounds.Contains(Input.Mouse.Position))
+            if(IsMouseOver())
             {
                 if (Input.Mouse.ButtonPressed(Input.MouseButtons.Left) && _state == ButtonState.MouseOver)
                 {

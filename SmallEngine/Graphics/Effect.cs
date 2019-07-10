@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using SharpDX.Direct2D1;
 using SharpDX.Direct2D1.Effects;
-using SharpDX.DXGI;
+using SharpDX.Mathematics.Interop;
 
 namespace SmallEngine.Graphics
 {
@@ -73,16 +73,16 @@ namespace SmallEngine.Graphics
 
         readonly List<SharpDX.Direct2D1.Effect> _effects;
         readonly DeviceContext _context;
-        bool _requiresScale = true;
+        bool _useTiledScaling; //We need to use a special scaling technique for tiled bitmaps otherwise they will grow/shrink with the camera zoom
 
         //TODO move effects over to normal HLSL
         public Effect()
         {
             _effects = new List<SharpDX.Direct2D1.Effect>();
             _context = ((DirectXAdapter)Game.Graphics).SecondaryContext;
-            _effects.Add(new SharpDX.Direct2D1.Effect(_context, Scale));
         }
 
+        #region Predefined effects
         public Effect AddSaturation(float pValue)
         {
             _effects.Add(new Saturation(_context) { Value = pValue });
@@ -127,25 +127,37 @@ namespace SmallEngine.Graphics
         public Effect AddTile(BitmapResource pResource)
         {
             var e = new SharpDX.Direct2D1.Effect(_context, Tile);
-            if(pResource.Source.HasValue)
-            {
-                e.SetValue(0, pResource.Source.Value);
-            }
-            else
-            {
-                e.SetValue(0, new Rectangle(0, 0, pResource.Width, pResource.Height));
-            }
+
+            var rect = pResource.Source.HasValue ? pResource.Source.Value : new Rectangle(0, 0, pResource.Width, pResource.Height);
+            e.SetValue(0, rect);
             _effects.Add(e);
-            _requiresScale = false;
+            _useTiledScaling = true;
             return this;
         }
+        #endregion
 
-        public Effect AddEffect(Guid pEffect) //TODO values
+        public Effect AddEffect(Guid pEffect)
         {
             var e = new SharpDX.Direct2D1.Effect(_context, pEffect);
             _effects.Add(e);
             return this;
         }
+
+        public void SetValue(int pIndex, Color pColor)
+        {
+            _effects[_effects.Count - 1].SetValue(pIndex, pColor);
+        }
+
+        public void SetValue(int pIndex, Vector2 pVector)
+        {
+            _effects[_effects.Count - 1].SetValue(pIndex, pVector);
+        }
+
+        public void SetValue(int pIndex, float pValue)
+        {
+            _effects[_effects.Count - 1].SetValue(pIndex, pValue);
+        }
+
         public Effect Create()
         {
             for (int i = 1; i < _effects.Count; i++)
@@ -157,15 +169,15 @@ namespace SmallEngine.Graphics
             return this;
         }
 
-        public void Draw(BitmapResource pBitmap, Vector2 pPosition, Size pScale)
+        public void Draw(BitmapResource pBitmap, float pOpacity, Vector2 pPosition, Size pScale)
         {
             DrawInternal(((DirectXAdapter)Game.Graphics).Context, pBitmap, pPosition, pScale);
         }
 
-        public BitmapResource ApplyTo(BitmapResource pBitmap)
+        public BitmapResource ApplyTo(BitmapResource pBitmap, Size pScale)
         {
             var b = new Bitmap1(_context,
-                new SharpDX.Size2(pBitmap.Width, pBitmap.Height),
+                new SharpDX.Size2((int)pScale.Width, (int)pScale.Height),
                 new BitmapProperties1() {
                     PixelFormat = pBitmap.DirectXBitmap.PixelFormat,
                     BitmapOptions = BitmapOptions.Target
@@ -174,7 +186,7 @@ namespace SmallEngine.Graphics
             var t = _context.Target;
             _context.Target = b;
             _context.BeginDraw();
-            DrawInternal(_context, pBitmap, Vector2.Zero, new Size(pBitmap.Width, pBitmap.Height));
+            DrawInternal(_context, pBitmap, Vector2.Zero, pScale);
             _context.EndDraw();
             _context.Target = t;
 
@@ -185,15 +197,28 @@ namespace SmallEngine.Graphics
         {
             _effects[0].SetInput(0, pBitmap.DirectXBitmap, false);
 
-            ////0 is scale effect
-            var widthFactor = pSize.Width / pBitmap.Width;
-            var heightFactor = pSize.Height / pBitmap.Height;
-            if(_requiresScale) _effects[0].SetValue(0, new SharpDX.Mathematics.Interop.RawVector2(widthFactor, heightFactor));
+            float widthFactor;
+            float heightFactor;
+            if(_useTiledScaling)
+            {
+                widthFactor = Game.ActiveCamera.Zoom;
+                heightFactor = Game.ActiveCamera.Zoom;
+            }
+            else
+            {
+                widthFactor = pSize.Width / pBitmap.Width;
+                heightFactor = pSize.Height / pBitmap.Height;
+            }
+
+            var scale = new SharpDX.Direct2D1.Effect(_context, Scale);
+            scale.SetValue(0, new RawVector2(widthFactor, heightFactor));
+            scale.SetInput(0, _effects[_effects.Count - 1].Output, false);
 
             if (pBitmap.Source.HasValue)
             {
-                var source = new SharpDX.Mathematics.Interop.RawRectangleF(pBitmap.Source.Value.Left * widthFactor, pBitmap.Source.Value.Top * heightFactor, pBitmap.Source.Value.Right * widthFactor, pBitmap.Source.Value.Bottom * heightFactor);
-                pContext.DrawImage(_effects[_effects.Count - 1].Output, pPosition, source, InterpolationMode.Linear, CompositeMode.SourceOver);
+                var r = pBitmap.Source.Value;
+                var source = new RawRectangleF(r.Left, r.Top, r.Left + pSize.Width, r.Top + pSize.Height);
+                pContext.DrawImage(scale.Output, pPosition, source, InterpolationMode.Linear, CompositeMode.SourceOver);
             }
             else
             {

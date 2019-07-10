@@ -22,9 +22,9 @@ namespace SmallEngine
         public string Alias { get; internal set; }
 
         public bool Disposed { get; private set; }
-        #endregion
 
-        protected int _refCount;
+        public int ReferenceCount { get; protected set; }
+        #endregion
 
         /// <summary>
         /// Increment the reference count and return the resource.
@@ -32,7 +32,7 @@ namespace SmallEngine
         /// <returns></returns>
         internal Resource Request()
         {
-            _refCount += 1;
+            ReferenceCount++;
             if (Disposed)
             {
                 Create();
@@ -65,6 +65,12 @@ namespace SmallEngine
         {
             Path = pInfo.GetString("Path");
             Alias = pInfo.GetString("Alias");
+
+            if (!ResourceManager.ResourceLoaded(Alias))
+                throw new Serialization.ResourceNotLoadedException(Alias);
+
+
+            ReferenceCount = ResourceManager.GetRefCount(Alias) + 1;
         }
 
         public virtual void GetObjectData(SerializationInfo info, StreamingContext context)
@@ -80,15 +86,15 @@ namespace SmallEngine
 
         internal void ForceDispose()
         {
-            _refCount = 0;
+            ReferenceCount = 0;
             DisposeResource();
             Disposed = true;
         }
 
         public void Dispose()
         {
-            _refCount -= 1;
-            if (_refCount <= 0)
+            ReferenceCount--;
+            if (ReferenceCount <= 0)
             {
                 DisposeResource();
                 Disposed = true;

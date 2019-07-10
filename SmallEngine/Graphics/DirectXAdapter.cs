@@ -163,6 +163,17 @@ namespace SmallEngine.Graphics
             Context.DrawText(pText, pFont.Format, pRect, pFont.Brush, opts);
         }
 
+        public void DrawFixedText(FixedText pText, Vector2 pPoint)
+        {
+            Context.DrawTextLayout(pPoint, pText.Layout, pText.Brush);
+        }
+
+        public void DrawFixedText(FixedText pText, Vector2 pPoint, bool pClip)
+        {
+            var opts = pClip ? DrawTextOptions.Clip : DrawTextOptions.None;
+            Context.DrawTextLayout(pPoint, pText.Layout, pText.Brush, opts);
+        }
+
         public BitmapResource FromByte(byte[] pData, int pWidth, int pHeight)
         {
             Bitmap b = new Bitmap(Context, new Size2(pWidth, pHeight), new BitmapProperties(new PixelFormat(Format.B8G8R8A8_UNorm, SharpDX.Direct2D1.AlphaMode.Premultiplied)));

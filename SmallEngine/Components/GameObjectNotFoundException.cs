@@ -5,7 +5,7 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SmallEngine.Components
+namespace SmallEngine
 {
     /// <summary>
     /// Exception that is thrown when a scene is unable to find a specific game object

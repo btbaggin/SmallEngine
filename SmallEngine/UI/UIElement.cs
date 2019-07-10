@@ -20,7 +20,7 @@ namespace SmallEngine.UI
             set
             {
                 _width = value;
-                ContainingScene.InvalidateMeasure(); //TODO make better
+                ContainingScene?.InvalidateMeasure(); //TODO make better
             }
         }
 
@@ -31,7 +31,7 @@ namespace SmallEngine.UI
             set
             {
                 _height = value;
-                ContainingScene.InvalidateMeasure();
+                ContainingScene?.InvalidateMeasure();
             }
         }
 
@@ -42,7 +42,7 @@ namespace SmallEngine.UI
             set
             {
                 _margin = value;
-                ContainingScene.InvalidateMeasure();
+                ContainingScene?.InvalidateMeasure();
             }
         }
 
@@ -87,7 +87,9 @@ namespace SmallEngine.UI
 
         public string Name { get; private set; }
 
-        public Scene ContainingScene { get; private set; }
+        public Scene ContainingScene { get; internal set; }
+
+        internal protected bool Added { get; internal set; }
         #endregion
 
         bool _disposed;
@@ -99,19 +101,12 @@ namespace SmallEngine.UI
             Visible = Visibility.Visible;
             Enabled = true;
             Name = pName;
-            HorizontalAlignment = HorizontalAlignments.Center;
-            ContainingScene = Scene.OnUIElementCreated(this);
         }
 
         protected void InvalidateMeasure()
         {
             if (Parent != null) { Measure(Parent.DesiredSize); }
             else { Measure(new Size(Game.Form.Width, Game.Form.Height)); }
-        }
-
-        public void FinalizeLayout()
-        {
-            Scene.RegisterUI(this);
         }
 
         public abstract void Draw(IGraphicsAdapter pSystem);
@@ -126,14 +121,32 @@ namespace SmallEngine.UI
             //ZIndex shouldn't affect how the children are displayed within container controls so we keep 2 lists
             _orderedItems.AddOrdered(pElement); 
         }
+
+        protected void InsertChild(int pIndex, UIElement pElement)
+        {
+            pElement.Parent = this;
+            Children.Insert(pIndex, pElement);
+            _orderedItems.AddOrdered(pElement);
+        }
+
         protected void HandleInputEvent(Keys pKey)
         {
-            Keyboard.MarkUIEventHandled(pKey);
+            Keyboard.MarkKeyHandled(pKey);
+        }
+
+        protected void HandleInputEvent(MouseButtons pButton)
+        {
+            Mouse.MarkButtonHandled(pButton);
+        }
+
+        public virtual bool MouseWithin()
+        {
+            return Bounds.Contains(Mouse.Position);
         }
 
         public bool IsMouseOver()
         {
-            if(Bounds.Contains(Mouse.Position))
+            if(Enabled && MouseWithin())
             {
                 foreach(var c in Children)
                 {
@@ -147,9 +160,9 @@ namespace SmallEngine.UI
         }
 
         #region Layout methods
-        public Size DesiredSize { get; set; }
+        public Size DesiredSize { get; private set; }
 
-        public Size ActualSize { get; set; }
+        public Size ActualSize { get; private set; }
 
         public void Measure(Size pSize)
         {
@@ -157,7 +170,9 @@ namespace SmallEngine.UI
 
             //Measure children
             var s = MeasureOverride(pSize);
-            DesiredSize = new Size(s.Width + Margin.Width, s.Height + Margin.Height);
+            var desiredWidth = Width == 0 ? s.Width : Width;
+            var desiredHeight = Height == 0 ? s.Height : Height;
+            DesiredSize = new Size(desiredWidth + Margin.Width, desiredHeight + Margin.Height);
         }
 
         public virtual Size MeasureOverride(Size pSize)
@@ -200,21 +215,21 @@ namespace SmallEngine.UI
             var height = Math.Min(pBounds.Height, DesiredSize.Height);
 
             //Orient based off alignments
-            //TODO these don't work with children
             if (HorizontalAlignment == HorizontalAlignments.Center)
             {
-                x += (pBounds.Width - width) / 2; 
+                x += (pBounds.Width - width) / 2;
             }
             else if (HorizontalAlignment == HorizontalAlignments.Right)
             {
                 x = pBounds.Right - Margin.Width - width;
             }
 
-            if(VerticalAlignment == VerticalAlignments.Center)
+            //Orient vertically
+            if (VerticalAlignment == VerticalAlignments.Center)
             {
                 y += (pBounds.Height - height) / 2;
             }
-            else if(VerticalAlignment == VerticalAlignments.Bottom)
+            else if (VerticalAlignment == VerticalAlignments.Bottom)
             {
                 y = pBounds.Bottom - Margin.Height - height;
             }
@@ -229,12 +244,12 @@ namespace SmallEngine.UI
             Position = Bounds.Location;
 
             //Arrange children
-            ArrangeOverride(Bounds);
+            ArrangeOverride(Bounds);          
         }
 
         public virtual void ArrangeOverride(Rectangle pBounds)
-        {
-            foreach(var c in Children)
+        {           
+            foreach (var c in Children)
             {
                 c.Arrange(pBounds);
             }
@@ -264,7 +279,7 @@ namespace SmallEngine.UI
 
             Update();
 
-            if (Enabled && Bounds.Contains(Mouse.Position))
+            if (Enabled && MouseWithin())
             {
                 Mouse.MarkButtonHandled(MouseButtons.Left);
                 Mouse.MarkButtonHandled(MouseButtons.Right);
