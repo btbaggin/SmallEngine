@@ -45,12 +45,14 @@ namespace SmallEngine.UI
 
         public void DefineColumns(params float[] pWidths)
         {
+            _columns.Clear();
             _columns.AddRange(pWidths);
             _grid = new UIElement[_columns.Count, _grid.GetLength(1)];
         }
 
         public void DefineRows(params float[] pHeights)
         {
+            _rows.Clear();
             _rows.AddRange(pHeights);
             _grid = new UIElement[_grid.GetLength(0), _rows.Count];
         }
@@ -152,6 +154,19 @@ namespace SmallEngine.UI
                 {
                     _rowSizes[y].Sum = _rowSizes[y - 1].Size + _rowSizes[y - 1].Sum;
                 }
+            }
+
+            //Now that we know exact sizes we need to remeasure children so they fit into the proper space
+            //Instead of taking up all of pSize
+            foreach (var c in Children)
+            {
+                var gi = _info[c];
+                var x = _columnSizes[gi.Column].Sum;
+                var y = _rowSizes[gi.Row].Sum;
+                var child_width = _columnSizes[gi.Column + gi.ColumnSpan - 1].Sum - x + _columnSizes[gi.Column + gi.ColumnSpan - 1].Size;
+                var child_height = _rowSizes[gi.Row + gi.RowSpan - 1].Sum - y + _rowSizes[gi.Row + gi.RowSpan - 1].Size;
+
+                c.Measure(new Size(child_width, child_height));
             }
 
             return new Size(width, height);

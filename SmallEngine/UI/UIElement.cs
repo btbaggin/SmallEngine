@@ -20,7 +20,7 @@ namespace SmallEngine.UI
             set
             {
                 _width = value;
-                ContainingScene?.InvalidateMeasure(); //TODO make better
+                ContainingScene?.InvalidateUI();
             }
         }
 
@@ -31,7 +31,7 @@ namespace SmallEngine.UI
             set
             {
                 _height = value;
-                ContainingScene?.InvalidateMeasure();
+                ContainingScene?.InvalidateUI();
             }
         }
 
@@ -42,7 +42,7 @@ namespace SmallEngine.UI
             set
             {
                 _margin = value;
-                ContainingScene?.InvalidateMeasure();
+                ContainingScene?.InvalidateUI();
             }
         }
 
