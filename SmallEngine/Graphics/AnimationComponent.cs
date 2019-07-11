@@ -9,7 +9,7 @@ using SmallEngine.Components;
 namespace SmallEngine.Graphics
 {
     [Serializable]
-    public class AnimationComponent : UpdateComponent
+    public class AnimationComponent : BehaviorComponent
     {
         public delegate void AnimationUpdateDelegate(AnimationComponent pComponent, ref Animation pCurrent);
 
