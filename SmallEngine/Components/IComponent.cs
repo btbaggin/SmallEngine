@@ -7,7 +7,7 @@ using System.Runtime.Serialization;
 
 namespace SmallEngine.Components
 {
-    public interface IComponent : IDisposable, IComparable<IComponent>
+    public interface IComponent : IDisposable
     {
         /// <summary>
         /// Indicates if the component is active or not

@@ -36,6 +36,8 @@ namespace SmallEngine.Components
 
         /// <inheritdoc/>
         public IGameObject GameObject { get; protected set; }
+
+        protected IComparer<IComponent> Comparer { get; set; }
         #endregion
 
         #region Constructors
@@ -62,7 +64,7 @@ namespace SmallEngine.Components
             {
                 //TODO need this for serialization? idk...
                 if (!_components.ContainsKey(RegistrationType)) _components.Add(RegistrationType, new List<IComponent>());
-                _components[RegistrationType].AddOrdered(this);
+                _components[RegistrationType].AddOrdered(this, Comparer);
             }
         }
 
@@ -78,7 +80,7 @@ namespace SmallEngine.Components
         {
             if(pActive)
             {
-                _components[RegistrationType].AddOrdered(this);
+                _components[RegistrationType].AddOrdered(this, Comparer);
             }
             else
             {
@@ -96,14 +98,6 @@ namespace SmallEngine.Components
         public static bool IsComponent(Type pType)
         {
             return typeof(IComponent).IsAssignableFrom(pType);
-        }
-
-        /// <summary>
-        /// Allows setting distinct processing order for components that require it
-        /// </summary>
-        public virtual int CompareTo(IComponent other)
-        {
-            return 0;
         }
 
         /// <summary>

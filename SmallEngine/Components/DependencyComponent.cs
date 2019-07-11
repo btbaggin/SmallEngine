@@ -143,7 +143,7 @@ namespace SmallEngine.Components
             for (int i = 0; i < fields.Count; i++)
             {
                 var field = fields[i];
-                field.Field.SetValue(this, null);
+                field.Field.SetValue(this, field.SerializingValue);
                 field.SerializingValue = null;
                 fields[i] = field;
             }

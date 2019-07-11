@@ -12,7 +12,7 @@ namespace SmallEngine.Components
         /// <summary>
         /// List of components that is registered to this system
         /// </summary>
-        protected List<IComponent> Components { get; set; } = new List<IComponent>();
+        protected IEnumerable<IComponent> Components { get; set; }
 
         protected ComponentSystem()
         {

@@ -12,6 +12,14 @@ namespace SmallEngine.Graphics
     [Serializable]
     public sealed class RenderComponent : DependencyComponent
     {
+        public class RenderComponentComparer : IComparer<RenderComponent>
+        {
+            public int Compare(RenderComponent x, RenderComponent y)
+            {
+                return x.ZIndex.CompareTo(y.ZIndex);
+            }
+        }
+
         [ImportComponent(false)][NonSerialized]
         Physics.RigidBodyComponent _body;
 
@@ -56,13 +64,6 @@ namespace SmallEngine.Graphics
         {
             var onScreen = Game.ActiveCamera.IsVisible(GameObject);
             return onScreen && Opacity > 0f;
-        }
-
-        public override int CompareTo(IComponent other)
-        {
-            if (!(other is RenderComponent rc)) return 0;
-
-            return ZIndex.CompareTo(rc.ZIndex);
         }
 
         public override void Dispose()

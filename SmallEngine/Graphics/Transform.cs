@@ -21,6 +21,7 @@ namespace SmallEngine.Graphics
         public static Transform Create(IGameObject pGameObject)
         {
             var center = new Vector2(pGameObject.Position.X + pGameObject.Scale.Width / 2, pGameObject.Position.Y + pGameObject.Scale.Height / 2);
+            center = Game.ActiveCamera.ToCameraSpace(center);
             SharpDX.Matrix3x2.Rotation(pGameObject.Rotation, new SharpDX.Vector2(center.X, center.Y), out SharpDX.Matrix3x2 m);
             m *= pGameObject.TransformMatrix;
             return new Transform(m);
@@ -29,6 +30,7 @@ namespace SmallEngine.Graphics
         public static Transform CreateBasic(IGameObject pGameObject)
         {
             var center = new Vector2(pGameObject.Position.X + pGameObject.Scale.Width / 2, pGameObject.Position.Y + pGameObject.Scale.Height / 2);
+            center = Game.ActiveCamera.ToCameraSpace(center);
             SharpDX.Matrix3x2.Rotation(pGameObject.Rotation, new SharpDX.Vector2(center.X, center.Y), out SharpDX.Matrix3x2 m);
             return new Transform(m);
         }

@@ -75,7 +75,6 @@ namespace SmallEngine.Graphics
         readonly DeviceContext _context;
         bool _useTiledScaling; //We need to use a special scaling technique for tiled bitmaps otherwise they will grow/shrink with the camera zoom
 
-        //TODO move effects over to normal HLSL
         public Effect()
         {
             _effects = new List<SharpDX.Direct2D1.Effect>();
@@ -93,7 +92,7 @@ namespace SmallEngine.Graphics
         {
             var e =  new ColorMatrix(_context);
             var m = new SharpDX.Mathematics.Interop.RawMatrix5x4();
-            m.M11 = pColor.R * (pColor.A / 255f); //TODO not sure this is working
+            m.M11 = pColor.R * (pColor.A / 255f); //TODO this isn't working
             m.M12 = pColor.G * (pColor.A / 255f);
             m.M13 = pColor.B * (pColor.A / 255f);
             m.M14 = 1;
