@@ -38,6 +38,8 @@ namespace SmallEngine.Physics
             Shape = (Shapes)pInfo.GetInt32("Shape");
             Material = (Material)pInfo.GetValue("Material", typeof(Material));
             Body = (ColliderComponent)pInfo.GetValue("Body", typeof(ColliderComponent));
+            Mass = pInfo.GetSingle("Mass");
+            Inertia = pInfo.GetSingle("Inertia");
         }
 
         public virtual void GetObjectData(SerializationInfo info, StreamingContext context)
@@ -45,6 +47,8 @@ namespace SmallEngine.Physics
             info.AddValue("Shape", Shape);
             info.AddValue("Material", Material, typeof(Material));
             info.AddValue("Body", Body, typeof(ColliderComponent));
+            info.AddValue("Mass", Mass);
+            info.AddValue("Inertia", Inertia);
         }
 
         public abstract AxisAlignedBoundingBox CalculateAABB(Vector2 pPosition);

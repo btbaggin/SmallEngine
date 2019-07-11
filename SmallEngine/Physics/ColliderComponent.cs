@@ -146,8 +146,10 @@ namespace SmallEngine.Physics
 
         internal void OnCollisionExit(ColliderComponent pCollider, Manifold pManifold)
         {
-            //TODO check ignore?
-            if(Colliders.Remove(pCollider))
+            bool ignore = false;
+            if (Colliders.ContainsKey(pCollider)) ignore = Colliders[pCollider];
+
+            if(Colliders.Remove(pCollider) && !ignore)
             {
                 EventHandler<CollisionEventArgs> ce = null;
                 if (IsTrigger)

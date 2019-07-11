@@ -15,6 +15,21 @@ namespace SmallEngine
             pList.Insert(i, pElement);
         }
 
+        internal static void AddOrdered<T>(this List<T> pList, T pElement, IComparer<T> pComparer)
+        {
+            if(pComparer != null)
+            {
+                var i = pList.BinarySearch(pElement, pComparer);
+                if (i < 0) i = ~i;
+                pList.Insert(i, pElement);
+            }
+            else
+            {
+                pList.Add(pElement);
+            }
+            
+        }
+
         #region Random
         public static float NextFloat(this Random r)
         {

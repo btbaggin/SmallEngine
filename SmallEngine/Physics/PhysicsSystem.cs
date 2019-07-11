@@ -27,9 +27,9 @@ namespace SmallEngine.Physics
             _quadTree.Clear();
             var deltaTime = GameTime.PhysicsTime;
 
-            foreach(var component in Components)
+            foreach(var c in Components)
             {
-                var r = (ColliderComponent)component;
+                var r = (ColliderComponent)c;
 
                 //We have to update the AABB here because otherwise our bounding boxes will be one frame behind
                 r.UpdateAABB();
