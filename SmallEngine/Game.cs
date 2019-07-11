@@ -22,7 +22,7 @@ namespace SmallEngine
         float _timeElapsed;
         int _frameCount;
 #endif
-        readonly UpdateSystem _update;
+        readonly BehaviorSystem _update;
         readonly RenderSystem _render;
         float _physicsStep;
 
@@ -85,7 +85,7 @@ namespace SmallEngine
             Form.WindowSizeChanged += Graphics.Resize;
 
             _render = new RenderSystem(Graphics);
-            _update = new UpdateSystem();
+            _update = new BehaviorSystem();
             PhysicsHelper.Create();
 
             ActiveCamera = new Camera(1f, 1f)
@@ -109,14 +109,15 @@ namespace SmallEngine
             ActiveCamera.Update(pDeltaTime);
 
             Scene.UpdateUI();
-            _update.Process();
-            Scene.UpdateAll(pDeltaTime);
+            _update.Update(pDeltaTime);
+            Scene.UpdateAll(pDeltaTime); //TODO Remove eventually?
         }
 
         private void Draw()
         {
             _render.Process();
-            Scene.DrawAll(Graphics);
+            Scene.DrawAll(Graphics); //TODO remove eventually
+            _update.Draw(Graphics);
             Scene.DrawUI(Graphics);
         }
 #endregion
