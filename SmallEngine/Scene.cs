@@ -97,7 +97,6 @@ namespace SmallEngine
         /// <param name="pMode">Mode to load the scene with</param>
         public static T Load<T>(SceneLoadModes pMode) where T : Scene
         {
-            //TODO allow creating scene that isn't registered to all systems
             var scene = (T)Activator.CreateInstance(typeof(T));
             scene._mode = pMode;
 
@@ -281,7 +280,7 @@ namespace SmallEngine
         {
             for(int i = 0; i < _scenes.Count; i++)
             {
-                _scenes.PeekAt(i).InvalidateMeasure();
+                _scenes.PeekAt(i).InvalidateUI();
             }
         }
         #endregion
@@ -473,7 +472,7 @@ namespace SmallEngine
             _ui.Remove(pElement);
         }
 
-        internal void InvalidateMeasure()
+        internal void InvalidateUI()
         {
             _ui.InvalidateMeasure();
         }

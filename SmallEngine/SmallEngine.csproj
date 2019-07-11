@@ -189,8 +189,8 @@
     <Compile Include="UI\UIElement.cs" />
     <Compile Include="UI\UIManager.cs" />
     <Compile Include="UI\Visibility.cs" />
-    <Compile Include="UpdateComponent.cs" />
-    <Compile Include="UpdateSystem.cs" />
+    <Compile Include="BehaviorComponent.cs" />
+    <Compile Include="BehaviorSystem.cs" />
     <Compile Include="Utils\DiamondSquareNoise.cs" />
     <Compile Include="Utils\Extensions.cs" />
     <Compile Include="Mathematics\MathF.cs" />

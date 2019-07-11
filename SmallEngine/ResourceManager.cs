@@ -27,9 +27,10 @@ namespace SmallEngine
 
             //Add to dictionary
             //Set to default resource
+            var path = System.IO.Path.GetFullPath(pPath);
             var r = new T()
             {
-                Path = System.IO.Path.GetFullPath(pPath),
+                Path = path,
                 Alias = pAlias
             };            
             _resources.Add(pAlias, r);

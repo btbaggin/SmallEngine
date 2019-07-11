@@ -14,7 +14,7 @@ namespace SmallEngine
         /// <summary>
         /// Path to the resource for loading.
         /// </summary>
-        internal string Path { get; set; }
+        public string Path { get; internal set; }
 
         /// <summary>
         /// Name to refer to the resource
