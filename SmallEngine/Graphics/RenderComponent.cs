@@ -5,18 +5,17 @@ using System.Text;
 using System.Threading.Tasks;
 using SmallEngine.Input;
 using SmallEngine.Components;
-using System.Runtime.Serialization;
 
 namespace SmallEngine.Graphics
 {
-    [Serializable]
     public sealed class RenderComponent : DependencyComponent
     {
-        public class RenderComponentComparer : IComparer<RenderComponent>
+        public class RenderComponentComparer : IComparer<IComponent>
         {
-            public int Compare(RenderComponent x, RenderComponent y)
+            public int Compare(IComponent x, IComponent y)
             {
-                return x.ZIndex.CompareTo(y.ZIndex);
+                if (!(x is RenderComponent rc1) || !(y is RenderComponent rc2)) return 0;
+                return rc1.ZIndex.CompareTo(rc2.ZIndex);
             }
         }
 
@@ -30,15 +29,24 @@ namespace SmallEngine.Graphics
         public BitmapResource Bitmap { get; set; }
 
         [field: NonSerialized]
-        public Effect Effect { get; set; }
+        public Effect Effect { get; set; } //TODO this needs to be serialized
 
         #region Constructor
-        public RenderComponent() : base() { }
+        public RenderComponent() : base()
+        {
+            Comparer = new RenderComponentComparer();
+        }
 
-        public RenderComponent(BitmapResource pResource, int pZIndex) : base()
+        public RenderComponent(BitmapResource pResource, int pZIndex) : this()
         {
             Bitmap = pResource;
             ZIndex = pZIndex;
+        }
+
+        protected override void OnDeserializeBegin()
+        {
+            base.OnDeserializeBegin();
+            Comparer = new RenderComponentComparer();
         }
         #endregion
 

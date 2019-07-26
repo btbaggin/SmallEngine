@@ -55,9 +55,9 @@ namespace SmallEngine.Graphics
             return _animations[pName];
         }
 
-        [OnDeserializing]
-        private void OnDeserializing(StreamingContext pContext)
+        protected override void OnDeserializeBegin()
         {
+            base.OnDeserializeBegin();
             _animations = new Dictionary<string, Animation>();
         }
     }

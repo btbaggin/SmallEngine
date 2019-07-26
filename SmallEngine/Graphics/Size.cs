@@ -26,6 +26,7 @@ namespace SmallEngine.Graphics
             Height = pHeight;
         }
 
+        #region Operators
         public static implicit operator System.Drawing.Size(Size pSize)
         {
             return new System.Drawing.Size((int)pSize.Width, (int)pSize.Height);
@@ -56,9 +57,25 @@ namespace SmallEngine.Graphics
             return !(pSize1 == pSize2);
         }
 
+        public override int GetHashCode()
+        {
+            unchecked { return (Width.GetHashCode() * 397) ^ Height.GetHashCode(); }
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is Size s)
+            {
+                return Width == s.Width && Height == s.Height;
+            }
+
+            return false;
+        }
+
         public override string ToString()
         {
             return $"Width: {Width} Height: {Height}";
         }
+        #endregion
     }
 }

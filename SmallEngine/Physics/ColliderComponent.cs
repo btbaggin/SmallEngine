@@ -68,6 +68,15 @@ namespace SmallEngine.Physics
         {
             Mesh = pMesh;
         }
+
+        protected override void OnDeserializeFinish()
+        {
+            base.OnDeserializeFinish();
+            if(Mesh != null)
+            {
+                _mesh.Body = this;
+            }
+        }
         #endregion
 
         public override void OnAdded(IGameObject pGameObject)

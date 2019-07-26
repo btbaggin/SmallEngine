@@ -12,7 +12,7 @@ namespace SmallEngine
     public abstract class BehaviorComponent : DependencyComponent, IUpdatable
     {
         //All inherited members should register as update components so only 1 system needs to handle them
-        protected override Type RegistrationType => typeof(BehaviorComponent);
+        public override Type RegistrationType => typeof(BehaviorComponent);
 
         public virtual void Update(float pDeltaTime) { }
 

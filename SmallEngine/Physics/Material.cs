@@ -9,10 +9,10 @@ namespace SmallEngine.Physics
     [Serializable]
     public class Material
     {
-        public float Restitution;
-        public float Density;
-        public float StaticFriction;
-        public float DynamicFriction;
+        public float Restitution { get; set; }
+        public float Density { get; set; }
+        public float StaticFriction { get; set; }
+        public float DynamicFriction { get; set; }
 
         private Material(float pRestitution, float pDensity, float pStaticFriction, float pDynamicFriction)
         {

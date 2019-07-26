@@ -112,50 +112,13 @@ namespace SmallEngine.Components
         }
 
         #region Serialization
-        //These methods will null out any fields with the ImportComponent attribute
-        //Since these fields are references to other components that are being serializing
-        //storing the reference is pointless
-
-        /// <summary>
-        /// Null out any import fields since they will be handled
-        /// separately upon deserialization
-        /// </summary>
-        [OnSerializing]
-        private void OnSerializing(StreamingContext pContext)
-        {
-            var fields = _dependencies[GetType()];
-            for(int i = 0; i < fields.Count; i++)
-            {
-                ImportFieldInfo field = fields[i];
-                field.SerializingValue = fields[i].Field.GetValue(this);
-                field.Field.SetValue(this, null);
-                fields[i] = field;
-            }
-        }
-
-        /// <summary>
-        /// Replace the original field values after serialization is complete
-        /// </summary>
-        [OnSerialized]
-        private void OnSerialized(StreamingContext pContext)
-        {
-            var fields = _dependencies[GetType()];
-            for (int i = 0; i < fields.Count; i++)
-            {
-                var field = fields[i];
-                field.Field.SetValue(this, field.SerializingValue);
-                field.SerializingValue = null;
-                fields[i] = field;
-            }
-        }
-
         /// <summary>
         /// Import dependencies from other components that have been deserialized
         /// </summary>
         /// <param name="pContext"></param>
-        [OnDeserializing]
-        private void OnDeserializing(StreamingContext pContext)
+        protected override void OnDeserializeBegin()
         {
+            base.OnDeserializeBegin();
             _fields = new List<ImportFieldInfo>();
             var t = GetType();
             DetermineDepencencies(t);

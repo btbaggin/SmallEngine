@@ -47,28 +47,6 @@ namespace SmallEngine.Graphics
             SetFrame();
         }
 
-        //private Animation(SerializationInfo pInfo, StreamingContext pContext)
-        //{
-        //    Bitmap = ResourceManager.Request<BitmapResource>(pInfo.GetString("Bitmap"));
-        //    _frameSize = (Size)pInfo.GetValue("Size", typeof(Size));
-        //    _start = pInfo.GetInt32("Start");
-        //    _end = pInfo.GetInt32("End");
-        //    _frameDuration = pInfo.GetSingle("Duration");
-        //    _columns = (int)(Bitmap.Width / _frameSize.Width);
-
-        //    _index = _start;
-        //    SetFrame();
-        //}
-
-        //public void GetObjectData(SerializationInfo info, StreamingContext context)
-        //{
-        //    info.AddValue("Bitmap", Bitmap.Alias);
-        //    info.AddValue("Size", _frameSize, typeof(Size));
-        //    info.AddValue("Start", _start);
-        //    info.AddValue("End", _end);
-        //    info.AddValue("Duration", _frameDuration);
-        //}
-
         public void Update(float pDeltaTime)
         {
             _frameTimer += pDeltaTime;

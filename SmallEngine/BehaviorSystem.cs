@@ -18,9 +18,12 @@ namespace SmallEngine
 
         public void Update(float pDeltaTime)
         {
-            foreach (var c in Components)//TODO improve? Can't use normal for loop because items could get inserted before i causing an infinite loop
+            //It's ok to just go to the initial count
+            //because any components added during the update should be updated until the next frame anyway
+            var count = Components.Count;
+            for(int i = 0; i < count; i++)
             {
-                var u = (BehaviorComponent)c;
+                var u = (BehaviorComponent)Components[i];
                 u.Update(pDeltaTime);
             }
         }

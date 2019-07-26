@@ -56,7 +56,23 @@ namespace SmallEngine
         #region Properties
         public static int LoadedSceneCount { get { return _scenes.Count; } }
 
-        public bool Active { get; set; } = true;
+        bool _active = true;
+        public bool Active
+        {
+            get { return _active; }
+            set
+            {
+                _active = value;
+                foreach(var go in _gameobjects.GetGameObjects(_start, _end))
+                {
+                    foreach(var c in go.GetComponents())
+                    {
+                        if (value) Component.Register(c);
+                        else Component.Deregister(c);
+                    }
+                }
+            }
+        }
         #endregion  
 
         #region Constructors
@@ -363,7 +379,7 @@ namespace SmallEngine
         public IGameObject CreateGameObject(Type pType)
         {
             var go = Activator.CreateInstance(pType) as IGameObject;
-            if (go == null) throw new Exception("Type must be assignable from IGameObject");
+            if (go == null) throw new InvalidCastException("Type must be assignable from IGameObject");
 
             AddGameObject(go);
             return go;

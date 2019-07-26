@@ -17,7 +17,7 @@ namespace SmallEngine.Components
         /// Indicates the type that will be registered with systems.
         /// If you wish to provide a type that can be inherited from set the RegistrationType to the base class
         /// </summary>
-        protected virtual Type RegistrationType => GetType();
+        public virtual Type RegistrationType => GetType();
 
         private bool _active = true;
         /// <inheritdoc/>
@@ -35,9 +35,11 @@ namespace SmallEngine.Components
         }
 
         /// <inheritdoc/>
+        [field: NonSerialized]
         public IGameObject GameObject { get; protected set; }
 
-        protected IComparer<IComponent> Comparer { get; set; }
+        [field: NonSerialized]
+        public IComparer<IComponent> Comparer { get; protected set; }
         #endregion
 
         #region Constructors
@@ -54,18 +56,22 @@ namespace SmallEngine.Components
                 _components.Add(t, new List<IComponent>());
             }
         }
+
+        [SmallEngine.Serialization.OnDeserializeBegin]
+        protected virtual void OnDeserializeBegin()
+        {
+            if (!_components.ContainsKey(RegistrationType)) _components.Add(RegistrationType, new List<IComponent>());
+        }
+
+        [SmallEngine.Serialization.OnDeserializeFinish]
+        protected virtual void OnDeserializeFinish() { }
         #endregion
 
         /// <inheritdoc/>
         public virtual void OnAdded(IGameObject pGameObject)
         {
             GameObject = pGameObject;
-            if (Active)
-            {
-                //TODO need this for serialization? idk...
-                if (!_components.ContainsKey(RegistrationType)) _components.Add(RegistrationType, new List<IComponent>());
-                _components[RegistrationType].AddOrdered(this, Comparer);
-            }
+            if (Active) _components[RegistrationType].AddOrdered(this, Comparer);
         }
 
         /// <inheritdoc/>
@@ -86,6 +92,16 @@ namespace SmallEngine.Components
             {
                 _components[RegistrationType].Remove(this);
             }
+        }
+
+        internal static void Deregister(IComponent pComponent)
+        {
+            _components[pComponent.RegistrationType].Remove(pComponent);
+        }
+
+        internal static void Register(IComponent pComponent)
+        {
+            _components[pComponent.RegistrationType].AddOrdered(pComponent, pComponent.Comparer);
         }
 
         public virtual void Dispose() { }

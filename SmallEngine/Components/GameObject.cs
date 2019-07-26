@@ -14,7 +14,6 @@ namespace SmallEngine
     public class GameObject : IGameObject
     {
         #region Properties
-        string _name;
         /// <inheritdoc/>
         public string Name { get; set; }
 
@@ -41,7 +40,7 @@ namespace SmallEngine
             }
         }
 
-        Mathematics.Matrix2X2 _rotationMatrix = Mathematics.Matrix2X2.Identity;
+        [NonSerialized] Mathematics.Matrix2X2 _rotationMatrix = Mathematics.Matrix2X2.Identity;
         /// <inheritdoc/>
         Mathematics.Matrix2X2 IGameObject.RotationMatrix { get { return _rotationMatrix; } } 
 
@@ -68,7 +67,7 @@ namespace SmallEngine
         public Scene ContainingScene { get; set; }
         #endregion  
 
-        readonly Dictionary<Type, IComponent> _components = new Dictionary<Type, IComponent>();
+        [NonSerialized] Dictionary<Type, IComponent> _components = new Dictionary<Type, IComponent>();
 
         #region Constructor
         public GameObject() : this(null) { }
@@ -76,6 +75,18 @@ namespace SmallEngine
         public GameObject(string pName)
         {
             Name = pName;
+        }
+        
+        [SmallEngine.Serialization.OnDeserializeBegin]
+        protected virtual void BeginDeserialize()
+        {
+            _components = new Dictionary<Type, IComponent>();
+        }
+
+        [SmallEngine.Serialization.OnDeserializeFinish]
+        protected virtual void FinishDeserialize()
+        {
+            _rotationMatrix = new Mathematics.Matrix2X2(Rotation);
         }
         #endregion
 

@@ -39,6 +39,8 @@ namespace SmallEngine
                     break;
 
                 case SceneLoadModes.Replace:
+                    //We need to clear now because the end index gets reset
+                    Clear(_startIndex, _endIndex);
                     _endIndex = _startIndex;
                     break;
 

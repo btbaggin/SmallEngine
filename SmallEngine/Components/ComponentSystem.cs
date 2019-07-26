@@ -12,11 +12,12 @@ namespace SmallEngine.Components
         /// <summary>
         /// List of components that is registered to this system
         /// </summary>
-        protected IEnumerable<IComponent> Components { get; set; }
+        protected List<IComponent> Components { get; set; }
 
         protected ComponentSystem()
         {
             Scene.Register(this);
+            Components = new List<IComponent>();
         }
 
         /// <summary>

@@ -21,6 +21,10 @@ namespace SmallEngine.Components
         /// </summary>
         IGameObject GameObject { get; }
 
+        Type RegistrationType { get; }
+
+        IComparer<IComponent> Comparer { get; }
+
         /// <summary>
         /// Gets called when the component has been added to a game object
         /// This method is called even when components are deserialized 

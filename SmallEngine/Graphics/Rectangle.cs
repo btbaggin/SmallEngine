@@ -50,9 +50,9 @@ namespace SmallEngine.Graphics
             get { return Y + Height; }
         }
 
-        public Vector2 Location;
+        public Vector2 Location { get; set; }
 
-        public Size Size;
+        public Size Size { get; set; }
         #endregion
 
         #region Constructors
