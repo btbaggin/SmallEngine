@@ -77,64 +77,71 @@ namespace SmallEngine.UI
         {
             float width = 0;
             float height = 0;
-            Vector2 p;
+            var p = Position;
             switch(Orientation)
             {
                 case PanelOrientation.Horizontal:
-                    var childWidth = Children.Sum((e) => e.DesiredSize.Width + e.Margin.Width);
                     height = (int)pBounds.Height;
                     width = (int)(DesiredSize.Width < pBounds.Width ? DesiredSize.Width : pBounds.Width);
-
-                    var x = Position.X;
-                    switch (HorizontalContentAlignment)
+                    foreach (var c in Children)
                     {
-                        case HorizontalAlignments.Center:
-                            x += (pBounds.Width - childWidth) / 2;
-                            break;
-
-                        case HorizontalAlignments.Right:
-                            x += (Bounds.Width - childWidth);
-                            break;
+                        c.Arrange(new Rectangle(p, width, height));
+                        p.X += c.ActualWidth + c.Margin.Width;
+                        width -= c.ActualWidth + c.Margin.Width;
                     }
-                    p = new Vector2(x, Position.Y);
                     break;
 
                 case PanelOrientation.Vertical:
-                    var childHeight = Children.Sum((e) => e.DesiredSize.Height + e.Margin.Height);
                     width = (int)pBounds.Width;
                     height = (int)(DesiredSize.Height < pBounds.Height ? DesiredSize.Height : pBounds.Height);
-
-                    var y = Position.Y;
-                    switch(HorizontalContentAlignment)
+                    foreach (var c in Children)
                     {
-                        case HorizontalAlignments.Center:
-                            y += (pBounds.Height - childHeight) / 2;
-                            break;
-
-                        case HorizontalAlignments.Right:
-                            y += (Bounds.Height - childHeight);
-                            break;
+                        c.Arrange(new Rectangle(p, width, height));
+                        p.Y += c.ActualHeight + c.Margin.Height;
+                        height -= c.ActualHeight + c.Margin.Height;
                     }
-                    p = new Vector2(Position.X, y);
                     break;
 
                 default:
                     throw new UnknownEnumException(typeof(PanelOrientation), Orientation);
             }
 
-            foreach(var c in Children)
+            float x = 0;
+            float y = 0;
+            switch(Orientation)
             {
-                c.Arrange(new Rectangle(p, width, height));
-                if(Orientation == PanelOrientation.Horizontal)
-                {
-                    p.X += c.ActualWidth + c.Margin.Width;
-                    width -= c.ActualWidth + c.Margin.Width;
-                }
-                else if(Orientation == PanelOrientation.Vertical)
-                {
-                    p.Y += c.ActualHeight + c.Margin.Height;
-                    height -= c.ActualHeight + c.Margin.Height;
-                }
+                case PanelOrientation.Horizontal:
+                    switch (HorizontalContentAlignment)
+                    {
+                        case HorizontalAlignments.Center:
+                            x = width / 2;
+                            break;
+
+                        case HorizontalAlignments.Right:
+                            x = width;
+                            break;
+                    }
+                    break;
+
+                case PanelOrientation.Vertical:
+                    switch (HorizontalContentAlignment)
+                    {
+                        case HorizontalAlignments.Center:
+                            y = height / 2;
+                            break;
+
+                        case HorizontalAlignments.Right:
+                            y = height;
+                            break;
+                    }
+                    break;
+            }
+
+
+            for (int i = 0; i < Children.Count; i++)
+            {
+                var c = Children[i];
+                c.Position = new Vector2(c.Position.X + x, c.Position.Y + y);
             }
         }
     }

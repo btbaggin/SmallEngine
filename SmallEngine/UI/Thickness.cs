@@ -8,10 +8,10 @@ namespace SmallEngine.UI
 {
     public struct Thickness
     {
-        public int Left { get; set; }
-        public int Top { get; set; }
-        public int Right { get; set; }
-        public int Bottom { get; set; }
+        public byte Left { get; set; }
+        public byte Top { get; set; }
+        public byte Right { get; set; }
+        public byte Bottom { get; set; }
 
         public int Width
         {
@@ -19,12 +19,11 @@ namespace SmallEngine.UI
         }
 
         public int Height
-
         {
             get { return Top + Bottom; }
         }
 
-        public Thickness(int pLeft, int pTop, int pRight, int pBottom)
+        public Thickness(byte pLeft, byte pTop, byte pRight, byte pBottom)
         {
             Left = pLeft;
             Top = pTop;
@@ -32,8 +31,8 @@ namespace SmallEngine.UI
             Bottom = pBottom;
         }
 
-        public Thickness(int pLeftRight, int pTopBottom) : this(pLeftRight, pTopBottom, pLeftRight, pTopBottom) { }
+        public Thickness(byte pLeftRight, byte pTopBottom) : this(pLeftRight, pTopBottom, pLeftRight, pTopBottom) { }
 
-        public Thickness(int pSize) : this(pSize, pSize, pSize, pSize) { }
+        public Thickness(byte pSize) : this(pSize, pSize, pSize, pSize) { }
     }
 }

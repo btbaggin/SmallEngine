@@ -65,14 +65,14 @@ namespace SmallEngine.UI
         {
             var size = new Size(Game.Form.Width, Game.Form.Height);
 
-            Input.Keyboard.SwapUIStates();
+            Input.InputState.SwapUIStates();
             foreach (var e in _elements)
             {
                 if (_measureInvalid) e.Measure(size);
                 e.UpdateInternal();
             }
             _measureInvalid = false;
-            Input.Keyboard.SwapUIStates();
+            Input.InputState.SwapUIStates();
         }
         internal void Draw(IGraphicsAdapter pSystem)
         {

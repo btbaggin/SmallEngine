@@ -186,8 +186,6 @@ namespace SmallEngine.UI
             }
         }
 
-        public override void Draw(IGraphicsAdapter pSystem) { }
-
         public override void Update() { }
 
         public override bool MouseWithin()

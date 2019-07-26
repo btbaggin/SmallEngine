@@ -203,9 +203,9 @@ namespace SmallEngine
                 var deltaTime = GameTime.DeltaTime;
 
                 //Cache pressed keys
-                var input = Keyboard.GetInput();
-                Keyboard.SetState(input);
-                Mouse.SetState(input);
+                var input = InputState.GetInput();
+                InputState.SetState(input);
+                Mouse.GatherInfo();
 
                 Coroutine.Update(deltaTime);
 

@@ -39,7 +39,7 @@ namespace SmallEngine.UI
             }
         }
 
-        SolidColorBrush _background;
+        readonly SolidColorBrush _background;
         public ToggleButton(string pText) : this(null, new Label(pText) { HorizontalAlignment = HorizontalAlignments.Center }) { }
 
         public ToggleButton(UIElement pContent) : this(null, pContent) { }

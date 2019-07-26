@@ -72,7 +72,7 @@ namespace SmallEngine.Input
 
 
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        internal static void SetState(byte[] pInput)
+        internal static void GatherInfo()
         {
             //Get mouse position
             GetCursorPos(out Point p);
@@ -80,12 +80,6 @@ namespace SmallEngine.Input
             _mousePos = new Vector2(p.X, p.Y);
             CheckDrag(MouseButtons.Left);
             CheckDrag(MouseButtons.Right);
-        }
-
-        internal static void MarkButtonHandled(MouseButtons pButton)
-        {
-            Keyboard._inputStateCopy.Handle(pButton);
-            Keyboard._previousStateCopy.Handle(pButton);
         }
 
         static Vector2 _dragStart;
@@ -140,29 +134,24 @@ namespace SmallEngine.Input
         }
 
         #region Public functions
-        public static InputState GetInputState()
-        {
-            return Keyboard._inputState;
-        }
-
         public static bool ButtonPressed(MouseButtons pMouse)
         {
-            return Keyboard._inputState.IsPressed(pMouse) && !Keyboard._previousState.IsPressed(pMouse);
+            return InputState.CurrentState.IsPressed(pMouse) && !InputState.PreviousState.IsPressed(pMouse);
         }
 
         public static bool ButtonReleased(MouseButtons pMouse)
         {
-            return !Keyboard._inputState.IsPressed(pMouse) && Keyboard._previousState.IsPressed(pMouse);
+            return !InputState.CurrentState.IsPressed(pMouse) && InputState.PreviousState.IsPressed(pMouse);
         }
 
         public static bool ButtonDown(MouseButtons pMouse)
         {
-            return Keyboard._inputState.IsPressed(pMouse);
+            return InputState.CurrentState.IsPressed(pMouse);
         }
 
         public static bool ButtonUp(MouseButtons pMouse)
         {
-            return !Keyboard._inputState.IsPressed(pMouse);
+            return !InputState.CurrentState.IsPressed(pMouse);
         }
 
         public static bool IsDragging(MouseButtons pButton, out Vector2 pAnchor)

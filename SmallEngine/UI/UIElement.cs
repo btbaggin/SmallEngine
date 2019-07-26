@@ -11,7 +11,21 @@ namespace SmallEngine.UI
     public abstract class UIElement : IDisposable, IComparable<UIElement>
     {
         #region Properties
-        public Vector2 Position { get; protected set; }
+        Vector2 _position;
+        public Vector2 Position
+        {
+            get { return _position; }
+            protected internal set
+            {
+                var dif = value - _position;
+                foreach(var c in Children)
+                {
+                    c.Position += dif;
+                }
+                _position = value;
+                Bounds = new Rectangle(_position, Bounds.Size);
+            }
+        }
 
         private int _width;
         public int Width
@@ -131,12 +145,12 @@ namespace SmallEngine.UI
 
         protected void HandleInputEvent(Keys pKey)
         {
-            Keyboard.MarkKeyHandled(pKey);
+            InputState.MarkKeyHandled(pKey);
         }
 
         protected void HandleInputEvent(MouseButtons pButton)
         {
-            Mouse.MarkButtonHandled(pButton);
+            InputState.MarkButtonHandled(pButton);
         }
 
         public virtual bool MouseWithin()
@@ -281,8 +295,8 @@ namespace SmallEngine.UI
 
             if (Enabled && MouseWithin())
             {
-                Mouse.MarkButtonHandled(MouseButtons.Left);
-                Mouse.MarkButtonHandled(MouseButtons.Right);
+                InputState.MarkButtonHandled(MouseButtons.Left);
+                InputState.MarkButtonHandled(MouseButtons.Right);
             }
 
         }

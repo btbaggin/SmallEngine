@@ -27,7 +27,6 @@ namespace SmallEngine
             {
                 pList.Add(pElement);
             }
-            
         }
 
         #region Random
