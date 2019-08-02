@@ -1,6 +1,4 @@
-﻿//#define FPS
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,9 +14,13 @@ using SmallEngine.Messages;
 
 namespace SmallEngine
 {
+    /*
+     * TODO
+     * debug performance counter
+     */
     public class Game : IUpdatable, IDisposable
     {
-#if FPS
+#if DEBUG
         float _timeElapsed;
         int _frameCount;
 #endif
@@ -106,19 +108,27 @@ namespace SmallEngine
 
         public virtual void Update(float pDeltaTime)
         {
-            ActiveCamera.Update(pDeltaTime);
+            using (var tb = Debug.TimedBlock.Start())
+            {
+                ActiveCamera.Update(pDeltaTime);
 
-            Scene.UpdateUI();
-            _update.Update(pDeltaTime);
-            Scene.UpdateAll(pDeltaTime); //TODO Remove eventually?
+                Scene.UpdateUI();
+                _update.Update(pDeltaTime);
+                Scene.UpdateAll(pDeltaTime); //TODO Remove eventually?
+            }
         }
 
         private void Draw()
         {
-            _render.Process();
-            Scene.DrawAll(Graphics); //TODO remove eventually
-            _update.Draw(Graphics);
-            Scene.DrawUI(Graphics);
+            using (var tb = Debug.TimedBlock.Start())
+            {
+                _render.Process();
+                Scene.DrawAll(Graphics); //TODO remove eventually
+                _update.Draw(Graphics);
+                Scene.DrawUI(Graphics);
+            }
+                
+            Debug.DebugPrinter.Draw(Graphics);
         }
 #endregion
 
@@ -199,13 +209,32 @@ namespace SmallEngine
 
                 GameTime.Tick();
 
+                //Cache pressed keys
+                byte[] input = null;
+                Vector2 mousePos;
+#if DEBUG
+                if(Debug.FrameRecorder.IsPlaying)
+                {
+                    Debug.FrameRecorder.GetFrameInfo(out mousePos, out input, out float recordDt, out float timeScale);
+                    GameTime.SetDeltaTime(recordDt, timeScale);
+                }
+                else
+                {
+                    input = InputState.GetInput();
+                    mousePos = Mouse.GetMousePosition();
+                }
+
+                Debug.FrameRecorder.SaveFrame(mousePos, input, GameTime.DeltaTime, GameTime.TimeScale);
+#else
+                input = InputState.GetInput();
+                mousePos = Mouse.GetMousePosition();
+#endif
+                Mouse.Position = mousePos;
+                InputState.SetState(input);
+                Mouse.CheckDrag();
+
                 var physicsTime = GameTime.PhysicsTime;
                 var deltaTime = GameTime.DeltaTime;
-
-                //Cache pressed keys
-                var input = InputState.GetInput();
-                InputState.SetState(input);
-                Mouse.GatherInfo();
 
                 Coroutine.Update(deltaTime);
 
@@ -242,7 +271,7 @@ namespace SmallEngine
                     }
                 }
 
-#if FPS
+#if DEBUG
                 {//Calculate FPS
                     _frameCount++;
                     if ((_timeElapsed += GameTime.UnscaledDeltaTime) >= 1f)
