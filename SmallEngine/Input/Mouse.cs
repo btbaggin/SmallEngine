@@ -35,6 +35,7 @@ namespace SmallEngine.Input
         public static Vector2 Position
         {
             get { return _mousePos; }
+            internal set { _mousePos = value; }
         }
 
         private static bool _cursorShown;
@@ -70,14 +71,19 @@ namespace SmallEngine.Input
             _handle = pHandle;
         }
 
-
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        internal static void GatherInfo()
+        internal static Vector2 GetMousePosition()
         {
-            //Get mouse position
             GetCursorPos(out Point p);
             ScreenToClient(_handle, ref p);
-            _mousePos = new Vector2(p.X, p.Y);
+            return new Vector2(p.X, p.Y);
+        }
+
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        internal static void CheckDrag()
+        {
+            //Get mouse position
+
             CheckDrag(MouseButtons.Left);
             CheckDrag(MouseButtons.Right);
         }

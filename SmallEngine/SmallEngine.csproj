@@ -31,7 +31,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
-    <Optimize>true</Optimize>
+    <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>TRACE;DEBUG;WINDOWS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
@@ -101,6 +101,10 @@
   <ItemGroup>
     <Compile Include="Audio\AudioMessage.cs" />
     <Compile Include="Audio\AudioPlayer.cs" />
+    <Compile Include="Debug\DebugLog.cs" />
+    <Compile Include="Debug\DebugPrinter.cs" />
+    <Compile Include="Debug\FrameRecorder.cs" />
+    <Compile Include="Debug\TimedBlock.cs" />
     <Compile Include="Graphics\Camera.cs" />
     <Compile Include="Components\Component.cs" />
     <Compile Include="Components\DependencyComponent.cs" />

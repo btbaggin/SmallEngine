@@ -15,7 +15,7 @@ namespace SmallEngine
         static long _lastTime = 0;
         static long _currentTime = 0;
 
-        #region "Properties"
+        #region Properties
         /// <summary>
         /// Ticks elapsed since the last <see cref="Tick"/> call
         /// </summary>
@@ -105,6 +105,14 @@ namespace SmallEngine
 #endif
         }
 
+        [Conditional("DEBUG")]
+        internal static void SetDeltaTime(float pDeltaTime, float pTimescale)
+        {
+            _unscaleDeltaTime = pDeltaTime;
+            _deltaTime = _unscaleDeltaTime * pTimescale;
+            _timeScale = pTimescale;
+        }
+
         /// <summary>
         /// Rests all time counters
         /// </summary>
@@ -146,7 +154,7 @@ namespace SmallEngine
         }
         #endregion
 
-        #region "Static functions"
+        #region Static functions
         /// <summary>
         /// Converts clock ticks to minutes
         /// </summary>
