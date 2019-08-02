@@ -27,7 +27,7 @@ namespace SmallEngine.UI
             set
             {
                 _text = value;
-                _fixed.Dispose();
+                _fixed?.Dispose();
                 _fixed = null;
                 InvalidateMeasure();
             }

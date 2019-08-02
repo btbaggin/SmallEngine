@@ -278,7 +278,7 @@ namespace SmallEngine.Serialization
             {
                 versionValid = pVersion >= version.MinVersion && pVersion <= version.MaxVersion;
             }
-            return versionValid && isSerialized && !isNotUiElement;
+            return versionValid && isSerialized && isNotUiElement;
         }
     }
 }
