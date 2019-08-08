@@ -35,7 +35,7 @@ namespace SmallEngine.UI
 
         public Textblock(string pName, string pText) : base(pName)
         {
-            Font = Font.Create(UIManager.DefaultFontFamily, UIManager.DefaultFontSize, UIManager.DefaultFontColor, Game.Graphics);
+            Font = Font.Create(UIManager.DefaultFontFamily, UIManager.DefaultFontSize, UIManager.DefaultFontColor);
             Font.Alignment = Alignments.Center;
             Text = pText;
             Enabled = false;

@@ -27,7 +27,7 @@ namespace SmallEngine.UI
             set
             {
                 _text = value;
-                _fixed.Dispose();
+                _fixed?.Dispose();
                 _fixed = null;
                 InvalidateMeasure();
             }
@@ -38,7 +38,7 @@ namespace SmallEngine.UI
 
         public Label(string pName, string pText) : base(pName)
         {
-            _font = Font.Create(UIManager.DefaultFontFamily, UIManager.DefaultFontSize, UIManager.DefaultFontColor, Game.Graphics);
+            _font = Font.Create(UIManager.DefaultFontFamily, UIManager.DefaultFontSize, UIManager.DefaultFontColor);
             Font.Alignment = Alignments.Center;
             _text = pText;
             Enabled = false;

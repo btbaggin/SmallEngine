@@ -41,7 +41,7 @@ namespace SmallEngine.UI
 
         public Textbox(string pName) : base(pName)
         {
-            Font = Font.Create(UIManager.DefaultFontFamily, UIManager.DefaultFontSize, UIManager.DefaultFontColor, Game.Graphics);
+            Font = Font.Create(UIManager.DefaultFontFamily, UIManager.DefaultFontSize, UIManager.DefaultFontColor);
             Font.Alignment = Alignments.Leading;
 
             Background = SolidColorBrush.Create(Color.Gray);

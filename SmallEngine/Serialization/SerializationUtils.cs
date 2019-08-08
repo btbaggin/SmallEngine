@@ -24,7 +24,7 @@ namespace SmallEngine.Serialization
         public static void WriteString(this Stream pStream, string pString)
         {
             pStream.WriteInt(pString.Length);
-            pStream.Write(System.Text.Encoding.ASCII.GetBytes(pString), 0, pString.Length);
+            pStream.Write(Encoding.ASCII.GetBytes(pString), 0, pString.Length);
         }
 
         public static void WriteFloat(this Stream pStream, float pFloat)
@@ -54,7 +54,7 @@ namespace SmallEngine.Serialization
             byte[] buffer = new byte[length];
             pStream.Read(buffer, 0, length);
 
-            return System.Text.Encoding.ASCII.GetString(buffer);
+            return Encoding.ASCII.GetString(buffer);
         }
 
         public static float ReadFloat(this Stream pStream)

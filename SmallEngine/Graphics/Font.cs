@@ -95,9 +95,9 @@ namespace SmallEngine.Graphics
             
         }
 
-        public static Font Create(string pFamily, float pSize, Color pColor, IGraphicsAdapter pAdapter)
+        public static Font Create(string pFamily, float pSize, Color pColor)
         {
-            return new Font(pFamily, pSize, pColor, pAdapter);
+            return new Font(pFamily, pSize, pColor, Game.Graphics);
         }
         #endregion  
 

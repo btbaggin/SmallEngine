@@ -22,7 +22,7 @@ namespace SmallEngine.UI
             AddChild(pElement);
             Label = pLabel;
             LabelWidth = 100;
-            Font = Font.Create(UIManager.DefaultFontFamily, UIManager.DefaultFontSize, UIManager.DefaultFontColor, Game.Graphics);
+            Font = Font.Create(UIManager.DefaultFontFamily, UIManager.DefaultFontSize, UIManager.DefaultFontColor);
         }
 
         public override Size MeasureOverride(Size pSize)

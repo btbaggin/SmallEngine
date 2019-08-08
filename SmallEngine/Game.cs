@@ -108,14 +108,11 @@ namespace SmallEngine
 
         public virtual void Update(float pDeltaTime)
         {
-            using (var tb = Debug.TimedBlock.Start())
-            {
-                ActiveCamera.Update(pDeltaTime);
+            ActiveCamera.Update(pDeltaTime);
 
-                Scene.UpdateUI();
-                _update.Update(pDeltaTime);
-                Scene.UpdateAll(pDeltaTime); //TODO Remove eventually?
-            }
+            Scene.UpdateUI();
+            _update.Update(pDeltaTime);
+            Scene.UpdateAll(pDeltaTime); //TODO Remove eventually?
         }
 
         private void Draw()
@@ -209,45 +206,56 @@ namespace SmallEngine
 
                 GameTime.Tick();
 
-                //Cache pressed keys
-                byte[] input = null;
-                Vector2 mousePos;
+                using (var tb = Debug.TimedBlock.Start("Input"))
+                {
+
+                    //Cache pressed keys
+                    byte[] input = null;
+                    Vector2 mousePos;
 #if DEBUG
-                if(Debug.FrameRecorder.IsPlaying)
-                {
-                    Debug.FrameRecorder.GetFrameInfo(out mousePos, out input, out float recordDt, out float timeScale);
-                    GameTime.SetDeltaTime(recordDt, timeScale);
-                }
-                else
-                {
+                    if(Debug.FrameRecorder.IsPlaying)
+                    {
+                        Debug.FrameRecorder.GetFrameInfo(out mousePos, out input, out float recordDt, out float timeScale);
+                        GameTime.SetDeltaTime(recordDt, timeScale);
+                    }
+                    else
+                    {
+                        input = InputState.GetInput();
+                        mousePos = Mouse.GetMousePosition();
+                    }
+
+                    Debug.FrameRecorder.SaveFrame(mousePos, input, GameTime.DeltaTime, GameTime.TimeScale);
+#else
                     input = InputState.GetInput();
                     mousePos = Mouse.GetMousePosition();
-                }
-
-                Debug.FrameRecorder.SaveFrame(mousePos, input, GameTime.DeltaTime, GameTime.TimeScale);
-#else
-                input = InputState.GetInput();
-                mousePos = Mouse.GetMousePosition();
 #endif
-                Mouse.Position = mousePos;
-                InputState.SetState(input);
-                Mouse.CheckDrag();
+                    Mouse.Position = mousePos;
+                    InputState.SetState(input);
+                    Mouse.CheckDrag();
+                }
 
                 var physicsTime = GameTime.PhysicsTime;
                 var deltaTime = GameTime.DeltaTime;
 
-                Coroutine.Update(deltaTime);
-
-                Update(deltaTime);
-
-                _physicsStep += deltaTime;
-                if (_physicsStep > .02f) _physicsStep = .02f;
-
-                while (_physicsStep > physicsTime)
+                using (var tb = Debug.TimedBlock.Start("Update"))
                 {
-                    //Update physics
-                    PhysicsHelper.Update();
-                    _physicsStep -= physicsTime;
+                    Coroutine.Update(deltaTime);
+
+                    Update(deltaTime);
+                }
+
+                using (var tb = Debug.TimedBlock.Start("Physics"))
+                {
+
+                    _physicsStep += deltaTime;
+                    if (_physicsStep > .02f) _physicsStep = .02f;
+
+                    while (_physicsStep > physicsTime)
+                    {
+                        //Update physics
+                        PhysicsHelper.Update();
+                        _physicsStep -= physicsTime;
+                    }
                 }
 
                 Graphics.BeginDraw();

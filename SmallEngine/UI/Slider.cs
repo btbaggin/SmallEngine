@@ -62,7 +62,7 @@ namespace SmallEngine.UI
             SliderSize = 20;
             BarHeight = 10;
 
-            LabelFont = Font.Create(UIManager.DefaultFontFamily, UIManager.DefaultFontSize, Color.White, Game.Graphics);
+            LabelFont = Font.Create(UIManager.DefaultFontFamily, UIManager.DefaultFontSize, Color.White);
             LabelFont.Alignment = Alignments.Center;
 
             Bar = SolidColorBrush.Create(Color.Gray);
