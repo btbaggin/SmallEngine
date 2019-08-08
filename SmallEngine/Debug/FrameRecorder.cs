@@ -50,7 +50,6 @@ namespace SmallEngine.Debug
         public static void EndRecording()
         {
             System.Diagnostics.Debug.Assert(IsRecording, "Not recording");
-            //TODO write out to file
             IsRecording = false;
         }
 

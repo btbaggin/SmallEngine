@@ -10,28 +10,27 @@ namespace SmallEngine.Debug
 {
     struct TimedBlock : IDisposable //TODO change to ref struct with C# 8.0
     {
-        static DebugLog _log; //TODO something else
         short _headerIndex;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private TimedBlock(uint pHits, string pFile, string pMethod, int pLine)
+        private TimedBlock(uint pHits, string pFile, string pMethod, int pLine, string pAlias)
         {
             _headerIndex = 0;
-            StartLog(pFile, pMethod, pLine);
+            StartLog(pFile, pMethod, pLine, pAlias);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static TimedBlock Start([CallerFilePath] string pFile = "", [CallerMemberName] string pMethod = "", [CallerLineNumber] int pLine = 0)
+        public static TimedBlock Start(string pAlias = "", [CallerFilePath] string pFile = "", [CallerMemberName] string pMethod = "", [CallerLineNumber] int pLine = 0)
         {
-            return new TimedBlock(1, pFile, pMethod, pLine);
+            return new TimedBlock(1, pFile, pMethod, pLine, pAlias);
         }
 
         [Conditional("TRACE")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void StartLog(string pFile, string pMethod,  int pLine)
+        private void StartLog(string pFile, string pMethod,  int pLine, string pAlias)
         {
-            _headerIndex = _log.GetOrAddHeader(pFile, pMethod, pLine);
-            _log.AddEvent(DebugLogTypes.Start, _headerIndex);
+            _headerIndex = DebugLog.GetOrAddHeader(pFile, pMethod, pLine, pAlias);
+            DebugLog.StartEvent(_headerIndex);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -44,7 +43,7 @@ namespace SmallEngine.Debug
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void EndLog()
         {
-            _log.AddEvent(DebugLogTypes.End, _headerIndex);
+            DebugLog.EndEvent(_headerIndex);
         }
     }
 }
