@@ -10,6 +10,7 @@ namespace SmallEngine.Graphics
     [Serializable]
     public sealed class BitmapResource : Resource
     {
+        #region DirectX specific
         SharpDX.Direct2D1.Bitmap _bitmap;
         public SharpDX.Direct2D1.Bitmap DirectXBitmap
         {
@@ -21,6 +22,9 @@ namespace SmallEngine.Graphics
                 Height = (int)_bitmap.Size.Height;
             }
         }
+
+        internal SharpDX.Direct2D1.Image EffectImage { get; set; }
+        #endregion
 
         /// <summary>
         /// Width of the bitmap
