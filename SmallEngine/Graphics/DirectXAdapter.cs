@@ -163,6 +163,12 @@ namespace SmallEngine.Graphics
             Context.DrawText(pText, pFont.Format, pRect, pFont.Brush, opts);
         }
 
+        public void DrawText(string pText, Vector2 pPosition, Font pFont)
+        {
+            Context.DrawText(pText, pFont.Format, new RawRectangleF(pPosition.X, pPosition.Y, 16535, 16535), pFont.Brush);
+        }
+
+
         public void DrawFixedText(FixedText pText, Vector2 pPoint)
         {
             Context.DrawTextLayout(pPoint, pText.Layout, pText.Brush);

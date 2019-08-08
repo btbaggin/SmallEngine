@@ -20,6 +20,7 @@ namespace SmallEngine.Graphics
 
         void DrawText(string pText, Rectangle pRect, Font pFont);
         void DrawText(string pText, Rectangle pRect, Font pFont, bool pClip);
+        void DrawText(string pText, Vector2 pPosition, Font pFont);
         void DrawFixedText(FixedText pText, Vector2 pPoint);
         void DrawFixedText(FixedText pText, Vector2 pPoint, bool pClip);
 
