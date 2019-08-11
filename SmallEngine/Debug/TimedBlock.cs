@@ -8,7 +8,7 @@ using System.Diagnostics;
 
 namespace SmallEngine.Debug
 {
-    struct TimedBlock : IDisposable //TODO change to ref struct with C# 8.0
+    public struct TimedBlock : IDisposable //TODO change to ref struct with C# 8.0
     {
         short _headerIndex;
 
@@ -30,7 +30,7 @@ namespace SmallEngine.Debug
         private void StartLog(string pFile, string pMethod,  int pLine, string pAlias)
         {
             _headerIndex = DebugLog.GetOrAddHeader(pFile, pMethod, pLine, pAlias);
-            DebugLog.StartEvent(_headerIndex);
+            DebugLog.LogEvent(_headerIndex, DebugLogTypes.Start);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -43,7 +43,7 @@ namespace SmallEngine.Debug
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void EndLog()
         {
-            DebugLog.EndEvent(_headerIndex);
+            DebugLog.LogEvent(_headerIndex, DebugLogTypes.End);
         }
     }
 }

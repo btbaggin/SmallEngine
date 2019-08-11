@@ -42,7 +42,8 @@ namespace SmallEngine.Debug
     public enum DebugLogTypes : byte
     {
         Start,
-        End
+        End,
+        Message
     }
 
     static class DebugLog
@@ -50,6 +51,8 @@ namespace SmallEngine.Debug
         public readonly static DebugLogHeader[] Headers = new DebugLogHeader[16384];
 
         static int _headerCount;
+        public static int HeaderCount => _headerCount;
+
         static readonly Dictionary<string, int> _headerMap = new Dictionary<string, int>();
         const int MAX_DEBUG_EVENTS = ushort.MaxValue;
         static readonly DebugLogEvent[][] _events = new DebugLogEvent[2][]
@@ -79,7 +82,7 @@ namespace SmallEngine.Debug
             }
         }
 
-        internal static uint StartEvent(short pHeaderIndex)
+        internal static uint LogEvent(short pHeaderIndex, DebugLogTypes pType)
         {
             var array_Event = Interlocked.Increment(ref _arrayIndex_EventIndex);
             array_Event--;
@@ -87,20 +90,8 @@ namespace SmallEngine.Debug
             uint index = (uint)array_Event;
             System.Diagnostics.Debug.Assert(index < MAX_DEBUG_EVENTS);
 
-            _events[array][index] = new DebugLogEvent(Stopwatch.GetTimestamp(), DebugLogTypes.Start, pHeaderIndex, Thread.CurrentThread.ManagedThreadId);
-
+            _events[array][index] = new DebugLogEvent(Stopwatch.GetTimestamp(), pType, pHeaderIndex, Thread.CurrentThread.ManagedThreadId);
             return index;
-        }
-
-        internal static void EndEvent(short pHeaderIndex)
-        {
-            var array_Event = Interlocked.Increment(ref _arrayIndex_EventIndex);
-            array_Event--;
-            uint array = (uint)(array_Event >> 32);
-            uint index = (uint)array_Event;
-            System.Diagnostics.Debug.Assert(index < MAX_DEBUG_EVENTS);
-
-            _events[array][index] = new DebugLogEvent(Stopwatch.GetTimestamp(), DebugLogTypes.End, pHeaderIndex, Thread.CurrentThread.ManagedThreadId);
         }
 
         public static DebugLogEvent[] GetEvents(out uint pCount)
