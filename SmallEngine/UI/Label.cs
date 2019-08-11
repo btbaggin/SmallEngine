@@ -38,7 +38,7 @@ namespace SmallEngine.UI
 
         public Label(string pName, string pText) : base(pName)
         {
-            _font = Font.Create(UIManager.DefaultFontFamily, UIManager.DefaultFontSize, UIManager.DefaultFontColor);
+            _font = UIManager.DefaultFont;
             Font.Alignment = Alignments.Center;
             _text = pText;
             Enabled = false;
@@ -55,12 +55,6 @@ namespace SmallEngine.UI
         {
             if (_fixed == null) _fixed = _font.FixText(Text, pSize.Width);
             return _fixed.GetSize();
-        }
-
-        public override void Dispose()
-        {
-            _font.Dispose();
-            base.Dispose();
         }
     }
 }

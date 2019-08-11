@@ -41,11 +41,11 @@ namespace SmallEngine.UI
 
         public Textbox(string pName) : base(pName)
         {
-            Font = Font.Create(UIManager.DefaultFontFamily, UIManager.DefaultFontSize, UIManager.DefaultFontColor);
+            Font = UIManager.DefaultFont;
             Font.Alignment = Alignments.Leading;
 
             Background = SolidColorBrush.Create(Color.Gray);
-            Cursor = Pen.Create(UIManager.DefaultFontColor, 1);
+            Cursor = Pen.Create(Font.Brush.Color, 1);
         }
 
         public override void Draw(IGraphicsAdapter pSystem)
@@ -145,15 +145,13 @@ namespace SmallEngine.UI
 
         public override Size MeasureOverride(Size pSize)
         {
-            var s = Font.MeasureString(Text, pSize.Width);
-            return new Size(pSize.Width, s.Height);
+            return new Size(pSize.Width, Font.Size);
         }
 
         public override void Dispose()
         {
             Background.Dispose();
             Cursor.Dispose();
-            Font.Dispose();
             base.Dispose();
         }
     }

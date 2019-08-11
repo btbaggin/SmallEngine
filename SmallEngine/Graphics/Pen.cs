@@ -9,6 +9,7 @@ namespace SmallEngine.Graphics
 {
     public class Pen : IDisposable
     {
+        //TODO cache pens
         internal SharpDX.Direct2D1.SolidColorBrush DirectXBrush { get; private set; }
 
         public Color Color

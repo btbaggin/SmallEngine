@@ -19,13 +19,7 @@ namespace SmallEngine.Graphics
     public class Font : IDisposable
     {
         #region Properties
-        internal SharpDX.Direct2D1.SolidColorBrush Brush { get; private set; }
-
-        public Color Color
-        {
-            get { return Brush.Color; }
-            set { Brush.Color = value; }
-        }
+        public SolidColorBrush Brush { get; set; }
 
         public TextFormat Format { get; private set; }
 
@@ -81,18 +75,17 @@ namespace SmallEngine.Graphics
         #region Constructor
         private Font(string pFamily, float pSize, Color pColor, IGraphicsAdapter pAdapter)
         {
-            if(pAdapter.Method == RenderMethods.DirectX)
+            if (pAdapter.Method == RenderMethods.DirectX)
             {
                 var dx = (DirectXAdapter)pAdapter;
                 _factory = dx.FactoryDWrite;
                 Format = new TextFormat(dx.FactoryDWrite, pFamily, pSize);
-                Brush = new SharpDX.Direct2D1.SolidColorBrush(dx.Context, pColor);
+                Brush = SolidColorBrush.Create(pColor);
             }
             else
             {
                 throw new NotImplementedException();
             }
-            
         }
 
         public static Font Create(string pFamily, float pSize, Color pColor)
@@ -151,7 +144,7 @@ namespace SmallEngine.Graphics
     {
         internal TextLayout Layout { get; private set; }
 
-        internal SharpDX.Direct2D1.SolidColorBrush Brush { get; private set; }
+        internal SolidColorBrush Brush { get; private set; }
 
         public FixedText(Factory pFactory, Font pFont, string pText, float pWidth)
         {

@@ -62,7 +62,7 @@ namespace SmallEngine.UI
             SliderSize = 20;
             BarHeight = 10;
 
-            LabelFont = Font.Create(UIManager.DefaultFontFamily, UIManager.DefaultFontSize, Color.White);
+            LabelFont = UIManager.DefaultFont;// Font.Create(UIManager.DefaultFontFamily, UIManager.DefaultFontSize, Color.White);
             LabelFont.Alignment = Alignments.Center;
 
             Bar = SolidColorBrush.Create(Color.Gray);
@@ -130,7 +130,6 @@ namespace SmallEngine.UI
 
         public override void Dispose()
         {
-            LabelFont.Dispose();
             Bar.Dispose();
             Grip.Dispose();
             base.Dispose();

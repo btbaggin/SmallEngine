@@ -7,10 +7,12 @@ using SharpDX.Direct2D1;
 
 namespace SmallEngine.Graphics
 {
-    public class SolidColorBrush : Brush
+    public sealed class SolidColorBrush : Brush
     {
         readonly SharpDX.Direct2D1.SolidColorBrush _brush;
         internal override SharpDX.Direct2D1.Brush DirectXBrush => _brush;
+
+        readonly static Dictionary<int, SolidColorBrush> _cache = new Dictionary<int, SolidColorBrush>();
 
         public Color Color
         {
@@ -34,7 +36,15 @@ namespace SmallEngine.Graphics
 
         public static SolidColorBrush Create(Color pColor)
         {
-            return new SolidColorBrush(pColor, Game.Graphics);
+            if (!_cache.ContainsKey(pColor._color)) _cache.Add(pColor._color, new SolidColorBrush(pColor, Game.Graphics));
+            return _cache[pColor._color];
+        }
+
+        public override void Dispose() { }
+
+        internal static void DisposeAllBrushes()
+        {
+            foreach (var kv in _cache) kv.Value.DirectXBrush.Dispose();
         }
     }
 }

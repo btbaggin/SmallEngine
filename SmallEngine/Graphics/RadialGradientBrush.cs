@@ -19,7 +19,7 @@ namespace SmallEngine.Graphics
         }
     }
 
-    public class RadialGradientBrush : Brush
+    public sealed class RadialGradientBrush : Brush
     {
         readonly SharpDX.Direct2D1.RadialGradientBrush _brush;
         internal override SharpDX.Direct2D1.Brush DirectXBrush => _brush;
@@ -56,6 +56,11 @@ namespace SmallEngine.Graphics
         public static RadialGradientBrush Create(Vector2 pCenter, Vector2 pDirection, params GradientColor[] pColors)
         {
             return new RadialGradientBrush(pCenter, pDirection, Game.Graphics, pColors);
+        }
+
+        public override void Dispose()
+        {
+            DirectXBrush.Dispose();
         }
     }
 }

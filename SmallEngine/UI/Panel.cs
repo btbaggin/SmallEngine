@@ -31,7 +31,10 @@ namespace SmallEngine.UI
 
         public override Size MeasureOverride(Size pSize)
         {
-            float width = 0;
+            using (var tb = Debug.TimedBlock.Start("Measure_Panel"))
+            {
+
+                float width = 0;
             float height = 0;
             switch(Orientation)
             {
@@ -71,6 +74,7 @@ namespace SmallEngine.UI
             }
 
             return new Size(width, height);
+            }
         }
 
         public override void ArrangeOverride(Rectangle pBounds)

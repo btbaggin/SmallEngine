@@ -9,13 +9,18 @@ namespace SmallEngine.UI
 {
     public class UIManager
     {
+        enum MeasureStatus
+        {
+            Invalid,
+            PendingInvalid,
+            Valid
+        }
+
         readonly List<UIElement> _elements = new List<UIElement>();
         readonly Dictionary<string, UIElement> _namedElements = new Dictionary<string, UIElement>();
-        bool _measureInvalid = true;
+        MeasureStatus _measureStatus = MeasureStatus.Invalid;
 
-        public static string DefaultFontFamily { get; set; } = "Arial";
-        public static int DefaultFontSize { get; set; } = 14;
-        public static Color DefaultFontColor { get; set; } = Color.Black;
+        public static Font DefaultFont { get; set; } = Font.Create("Arial", 14, Color.White);
 
         public void Add(UIElement pElement, Scene pScene)
         {
@@ -32,7 +37,7 @@ namespace SmallEngine.UI
         private void AddChildElements(UIElement pElement, Scene pScene)
         {
             pElement.ContainingScene = pScene;
-            pElement.Added = true;
+            pElement.AddedToLayout = true;
             if(pElement.Name != null) _namedElements.Add(pElement.Name, pElement);
             foreach(var c in pElement.Children)
             {
@@ -43,7 +48,7 @@ namespace SmallEngine.UI
         private void RemoveChildElements(UIElement pElement)
         {
             if (pElement.Name != null) _namedElements.Remove(pElement.Name);
-            pElement.Added = false;
+            pElement.AddedToLayout = false;
             foreach(var c in pElement.Children)
             {
                 RemoveChildElements(c);
@@ -68,12 +73,15 @@ namespace SmallEngine.UI
             Input.InputState.SwapUIStates();
             foreach (var e in _elements)
             {
-                if (_measureInvalid) e.Measure(size);
+                if (_measureStatus == MeasureStatus.Invalid) e.Measure(size);
                 e.UpdateInternal();
             }
-            _measureInvalid = false;
+
+            if (_measureStatus == MeasureStatus.PendingInvalid) _measureStatus = MeasureStatus.Invalid;
+            else _measureStatus = MeasureStatus.Valid;
             Input.InputState.SwapUIStates();
         }
+
         internal void Draw(IGraphicsAdapter pSystem)
         {
             //We update and draw at the same time because GameObjects will often manipulate UI elements
@@ -85,17 +93,16 @@ namespace SmallEngine.UI
             {
                 e.Arrange(bounds);
 
-                if (e.Visible == Visibility.Visible)
+                if (e.Visible == Visibility.Visible) //TODO have separate array for visible elements
                 {
                     e.DrawInternal(pSystem);
                 }
             }
-            _measureInvalid = false;
         }
 
         internal void InvalidateMeasure()
         {
-            _measureInvalid = true;
+            _measureStatus = MeasureStatus.PendingInvalid;
         }
 
         internal void DisposeElements()

@@ -39,9 +39,12 @@ namespace SmallEngine.UI
         UIElement[,] _grid = new UIElement[0, 0];
         readonly Dictionary<UIElement, GridInfo> _info = new Dictionary<UIElement, GridInfo>();
 
-        public Grid() : base(null) { }
+        public Grid() : this(null) { }
 
-        public Grid(string pName) : base(pName) { }
+        public Grid(string pName) : base(pName)
+        {
+            Enabled = false;
+        }
 
         public void DefineColumns(params float[] pWidths)
         {
@@ -187,10 +190,5 @@ namespace SmallEngine.UI
         }
 
         public override void Update() { }
-
-        public override bool MouseWithin()
-        {
-            return false;
-        }
     }
 }

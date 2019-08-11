@@ -18,9 +18,6 @@ namespace SmallEngine.Graphics
             set { DirectXBrush.Opacity = value; }
         }
 
-        public void Dispose()
-        {
-            DirectXBrush.Dispose();
-        }
+        public abstract void Dispose();
     }
 }

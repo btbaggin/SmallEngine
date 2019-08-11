@@ -150,7 +150,7 @@ namespace SmallEngine.Graphics
         public static Color Yellow { get; } = new Color(255, 255, 255, 0);
         public static Color YellowGreen { get; } = new Color(255, 154, 205, 50);
 
-        readonly int _color;
+        internal readonly int _color;
         public byte A => unchecked((byte)(_color >> 24));
         public byte R => unchecked((byte)(_color >> 16));
         public byte G => unchecked((byte)(_color >> 8));

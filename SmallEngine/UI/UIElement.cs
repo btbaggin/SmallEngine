@@ -103,7 +103,7 @@ namespace SmallEngine.UI
 
         public Scene ContainingScene { get; internal set; }
 
-        internal protected bool Added { get; internal set; }
+        internal protected bool AddedToLayout { get; internal set; }
         #endregion
 
         bool _disposed;
@@ -131,6 +131,7 @@ namespace SmallEngine.UI
         {
             pElement.Parent = this;
             Children.Add(pElement);
+
             //Used to draw items by ZIndex
             //ZIndex shouldn't affect how the children are displayed within container controls so we keep 2 lists
             _orderedItems.AddOrdered(pElement); 
@@ -153,14 +154,9 @@ namespace SmallEngine.UI
             InputState.MarkButtonHandled(pButton);
         }
 
-        public virtual bool MouseWithin()
-        {
-            return Bounds.Contains(Mouse.Position);
-        }
-
         public bool IsMouseOver()
         {
-            if(Enabled && MouseWithin())
+            if(Enabled && Bounds.Contains(Mouse.Position))
             {
                 foreach(var c in Children)
                 {
@@ -293,18 +289,17 @@ namespace SmallEngine.UI
 
             Update();
 
-            if (Enabled && MouseWithin())
+            if (Enabled && Bounds.Contains(Mouse.Position))
             {
                 InputState.MarkButtonHandled(MouseButtons.Left);
                 InputState.MarkButtonHandled(MouseButtons.Right);
             }
-
         }
         #endregion  
 
         public virtual void Dispose()
         {
-            _disposed = true;
+            _disposed = true; //TODO remove this boolean and remove this element from the manager
             foreach(var c in Children)
             {
                 c.Dispose();

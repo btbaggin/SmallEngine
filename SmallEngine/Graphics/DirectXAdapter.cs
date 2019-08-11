@@ -154,30 +154,30 @@ namespace SmallEngine.Graphics
 #region Overridden functions
         public void DrawText(string pText, Rectangle pRect, Font pFont)
         {
-            Context.DrawText(pText, pFont.Format, pRect, pFont.Brush);
+            Context.DrawText(pText, pFont.Format, pRect, pFont.Brush.DirectXBrush);
         }
 
         public void DrawText(string pText, Rectangle pRect, Font pFont, bool pClip)
         {
             var opts = pClip ? DrawTextOptions.Clip : DrawTextOptions.None;
-            Context.DrawText(pText, pFont.Format, pRect, pFont.Brush, opts);
+            Context.DrawText(pText, pFont.Format, pRect, pFont.Brush.DirectXBrush, opts);
         }
 
         public void DrawText(string pText, Vector2 pPosition, Font pFont)
         {
-            Context.DrawText(pText, pFont.Format, new RawRectangleF(pPosition.X, pPosition.Y, 16535, 16535), pFont.Brush);
+            Context.DrawText(pText, pFont.Format, new RawRectangleF(pPosition.X, pPosition.Y, 16535, 16535), pFont.Brush.DirectXBrush);
         }
 
 
         public void DrawFixedText(FixedText pText, Vector2 pPoint)
         {
-            Context.DrawTextLayout(pPoint, pText.Layout, pText.Brush);
+            Context.DrawTextLayout(pPoint, pText.Layout, pText.Brush.DirectXBrush);
         }
 
         public void DrawFixedText(FixedText pText, Vector2 pPoint, bool pClip)
         {
             var opts = pClip ? DrawTextOptions.Clip : DrawTextOptions.None;
-            Context.DrawTextLayout(pPoint, pText.Layout, pText.Brush, opts);
+            Context.DrawTextLayout(pPoint, pText.Layout, pText.Brush.DirectXBrush, opts);
         }
 
         public BitmapResource FromByte(byte[] pData, int pWidth, int pHeight)

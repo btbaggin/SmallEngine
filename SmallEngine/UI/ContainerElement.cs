@@ -19,16 +19,22 @@ namespace SmallEngine.UI
 
         public void AddElement(UIElement pElement)
         {
-            AddChildElements(pElement, ContainingScene);
-            base.AddChild(pElement);
-            if(Added) InvalidateMeasure();
+            using (var tb = Debug.TimedBlock.Start())
+            {
+                AddChildElements(pElement, ContainingScene);
+                base.AddChild(pElement);
+                if (AddedToLayout) ContainingScene.InvalidateUI();
+            }
         }
 
         public void InsertElement(int pIndex, UIElement pElement)
         {
-            AddChildElements(pElement, ContainingScene);
-            base.InsertChild(pIndex, pElement);
-            if(Added) InvalidateMeasure();
+            using (var tb = Debug.TimedBlock.Start())
+            {
+                AddChildElements(pElement, ContainingScene);
+                base.InsertChild(pIndex, pElement);
+                if (AddedToLayout) ContainingScene.InvalidateUI();
+            }
         }
 
         private void AddChildElements(UIElement pElement, Scene pScene)

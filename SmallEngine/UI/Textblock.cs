@@ -16,6 +16,7 @@ namespace SmallEngine.UI
             set
             {
                 _font = value;
+                _size = Font.MeasureString(Text, float.MaxValue);
                 InvalidateMeasure();
             }
         }
@@ -27,6 +28,7 @@ namespace SmallEngine.UI
             set
             {
                 _text = value;
+                _size = Font.MeasureString(Text, float.MaxValue);
                 InvalidateMeasure();
             }
         }
@@ -35,7 +37,7 @@ namespace SmallEngine.UI
 
         public Textblock(string pName, string pText) : base(pName)
         {
-            Font = Font.Create(UIManager.DefaultFontFamily, UIManager.DefaultFontSize, UIManager.DefaultFontColor);
+            Font = UIManager.DefaultFont;// Font.Create(UIManager.DefaultFontFamily, UIManager.DefaultFontSize, UIManager.DefaultFontColor);
             Font.Alignment = Alignments.Center;
             Text = pText;
             Enabled = false;
@@ -48,15 +50,10 @@ namespace SmallEngine.UI
 
         public override void Update() { }
 
+        Size _size;
         public override Size MeasureOverride(Size pSize)
         {
-            return Font.MeasureString(Text, pSize.Width);
-        }
-
-        public override void Dispose()
-        {
-            Font.Dispose();
-            base.Dispose();
+            return _size;
         }
     }
 }
