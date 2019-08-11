@@ -102,7 +102,9 @@
     <Compile Include="Audio\AudioMessage.cs" />
     <Compile Include="Audio\AudioPlayer.cs" />
     <Compile Include="Debug\DebugLog.cs" />
+    <Compile Include="Debug\DebugMessage.cs" />
     <Compile Include="Debug\DebugPrinter.cs" />
+    <Compile Include="Debug\DisplayOptions.cs" />
     <Compile Include="Debug\FrameRecorder.cs" />
     <Compile Include="Debug\TimedBlock.cs" />
     <Compile Include="Graphics\Camera.cs" />

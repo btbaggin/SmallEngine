@@ -16,7 +16,8 @@ namespace SmallEngine
 {
     /*
      * TODO
-     * debug performance counter
+     * Apparently my UI code is slow
+     * Particle system
      */
     public class Game : IUpdatable, IDisposable
     {
@@ -155,6 +156,7 @@ namespace SmallEngine
             Graphics.Dispose();
             Form.Dispose();
 
+            SolidColorBrush.DisposeAllBrushes();
             AudioPlayer.DisposePlayer();
         }
 
@@ -213,7 +215,7 @@ namespace SmallEngine
                     byte[] input = null;
                     Vector2 mousePos;
 #if DEBUG
-                    if(Debug.FrameRecorder.IsPlaying)
+                    if (Debug.FrameRecorder.IsPlaying)
                     {
                         Debug.FrameRecorder.GetFrameInfo(out mousePos, out input, out float recordDt, out float timeScale);
                         GameTime.SetDeltaTime(recordDt, timeScale);
@@ -229,6 +231,7 @@ namespace SmallEngine
                     input = InputState.GetInput();
                     mousePos = Mouse.GetMousePosition();
 #endif
+
                     Mouse.Position = mousePos;
                     InputState.SetState(input);
                     Mouse.CheckDrag();

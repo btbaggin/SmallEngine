@@ -42,6 +42,7 @@ namespace SmallEngine.Serialization
 
         public void Serialize(Stream pStream, IList<IGameObject> pObjects)
         {
+            //TODO need to figure out dependencies
             pStream.WriteInt(Version);
             pStream.WriteInt(pObjects.Count);
 
